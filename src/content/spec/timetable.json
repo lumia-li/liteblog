@@ -1,0 +1,36 @@
+﻿{
+	"termName": "大一下2",
+	"totalWeeks": 18,
+	"currentWeek": 1,
+	"termStartDate": "",
+	"periods": [
+		{
+			"id": "p1",
+			"label": "1-2",
+			"time": "08:30 - 10:00"
+		},
+		{
+			"id": "p2",
+			"label": "3-4",
+			"time": "10:20 - 11:50"
+		},
+		{
+			"id": "p3",
+			"label": "5-6",
+			"time": "13:00 - 14:25"
+		},
+		{
+			"id": "p4",
+			"label": "6-8",
+			"time": "14:45 - 16:10"
+		},
+		{
+			"id": "p5",
+			"label": "9-10",
+			"time": "18:30 - 20:00"
+		}
+	],
+	"courses": {},
+	"weeklySheets": {},
+	"weeklyMode": false
+}

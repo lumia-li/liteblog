@@ -1,0 +1,66 @@
+﻿---
+import { profileConfig } from "../config";
+import { url } from "../utils/url-utils";
+
+const startYear = 2026;
+const currentYear = new Date().getFullYear();
+const yearDisplay = currentYear > startYear
+	? `${startYear}-${currentYear}`
+	: `${startYear}`;
+---
+
+<footer class="hub-footer">
+	<div class="hub-footer-meta">
+		<span>© {yearDisplay} {profileConfig.name}</span>
+
+		<span>/</span>
+		<a target="_blank" href={url("rss.xml")} draggable="false">RSS</a>
+		<span>/</span>
+		<a target="_blank" href={url("sitemap-index.xml")} draggable="false">Sitemap</a>
+	</div>
+	<div class="hub-footer-credit">
+		<span>Design Inspired by&nbsp;</span>
+		<a target="_blank" rel="noopener noreferrer" href="https://github.com/afoim" draggable="false">afoim</a>
+	</div>
+</footer>
+
+<style>
+	.hub-footer {
+		padding: 14px 0 24px;
+	}
+
+	.hub-footer-meta {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 10px;
+		color: #696969;
+		font-size: 0.94rem;
+	}
+
+	.hub-footer-meta a {
+		color: #3d3d3d;
+	}
+
+	.hub-footer-credit {
+		margin-top: 8px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		font-size: 0.9rem;
+		color: #737373;
+	}
+
+	.hub-footer-credit a {
+		color: #3d3d3d;
+		text-decoration: none;
+	}
+
+	.hub-footer-credit a:hover {
+		text-decoration: none;
+	}
+
+	.hub-footer a {
+		-webkit-user-drag: none;
+	}
+</style>

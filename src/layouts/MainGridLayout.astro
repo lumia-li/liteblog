@@ -1,0 +1,269 @@
+﻿---
+import Footer from "@components/Footer.astro";
+import HeroHub from "@components/home/HeroHub.astro";
+import type { MarkdownHeading } from "astro";
+import Layout from "./Layout.astro";
+
+interface Props {
+	title?: string;
+	banner?: string;
+	description?: string;
+	lang?: string;
+	setOGTypeArticle?: boolean;
+	headings?: MarkdownHeading[];
+	pageType?: string;
+	showHero?: boolean;
+	homeCentered?: boolean;
+	shellMaxWidth?: string;
+	contentMaxWidth?: string;
+}
+
+const {
+	title,
+	banner,
+	description,
+	lang,
+	setOGTypeArticle,
+	pageType = "hub",
+	showHero = true,
+	homeCentered = false,
+	shellMaxWidth = "980px",
+	contentMaxWidth = "760px",
+} = Astro.props;
+---
+
+<Layout title={title} banner={banner} description={description} lang={lang} setOGTypeArticle={setOGTypeArticle} pageType={pageType}>
+	<slot slot="head" name="head"></slot>
+
+	<div id="banner-wrapper" class="hidden">
+		<div id="banner"></div>
+	</div>
+
+	<div class:list={["hub-shell", { "home-centered": homeCentered }]} style={`--hub-shell-max:${shellMaxWidth};--hub-content-max:${contentMaxWidth};`}>
+		<main id="swup-container" class:list={["hub-content", { "home-centered": homeCentered }]}>
+			{showHero && <HeroHub />}
+			<div id="content-wrapper">
+				<slot></slot>
+			</div>
+			<Footer />
+		</main>
+	</div>
+</Layout>
+
+<style is:global>
+	:root,
+	:root.dark {
+		--page-bg: #ececec;
+		--card-bg: #f5f5f5;
+		--primary: #111111;
+		--btn-content: #222222;
+		--line-divider: rgba(0, 0, 0, 0.12);
+		--btn-regular-bg: #f7f7f7;
+		--btn-regular-bg-hover: #f2f2f2;
+		--btn-regular-bg-active: #ebebeb;
+		--btn-card-bg-hover: #f4f4f4;
+		--btn-card-bg-active: #eeeeee;
+		--btn-plain-bg-hover: #f4f4f4;
+		--btn-plain-bg-active: #efefef;
+		--codeblock-bg: #06101f;
+		--license-block-bg: #e8ebef;
+	}
+
+	html,
+	body {
+		background: #ececec !important;
+		color: #111 !important;
+	}
+	body[data-page-type="article"] {
+		background: #ffffff !important;
+	}
+
+	/* Freeze banner/layout vars on hub homepage to prevent refresh reflow jitter */
+	html,
+	:root {
+		--banner-height-extend: 0px !important;
+		--home-banner-height-custom: 0px !important;
+	}
+
+	body.enable-banner #banner-wrapper,
+	body.enable-banner #banner,
+	body.enable-banner #top-row,
+	body.enable-banner #main-grid,
+	body.enable-banner #sidebar-sticky {
+		transform: none !important;
+		translate: none !important;
+		height: 0 !important;
+		min-height: 0 !important;
+		max-height: 0 !important;
+		top: auto !important;
+		margin: 0 !important;
+		padding: 0 !important;
+	}
+
+	:root::before,
+	:root::after,
+	#banner-wrapper {
+		opacity: 0 !important;
+	}
+
+	body {
+		font-family: "KeinannMaruPOP", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Noto Sans SC", "Source Han Sans SC", sans-serif;
+	}
+
+	#top-row,
+	#toc-wrapper,
+	#back-to-top-btn {
+		display: none !important;
+	}
+
+	.hub-shell {
+		width: min(100%, var(--hub-shell-max, 980px));
+		margin: 0 auto;
+		min-height: 100vh;
+		padding: 24px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		box-sizing: border-box;
+	}
+
+	.hub-content {
+		width: min(100%, var(--hub-content-max, 760px));
+		margin: 0 auto;
+	}
+
+	/* Explicit homepage mode: avoid relying on global body classes */
+	.hub-shell.home-centered {
+		min-height: 100dvh;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+	.hub-content.home-centered {
+		width: min(100%, var(--hub-content-max, 760px));
+		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+	.hub-content.home-centered #content-wrapper {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+	.hub-shell.home-centered .hero-hub {
+		text-align: center;
+		min-height: 72vh;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
+	.hub-shell.home-centered .hero-class-card {
+		text-align: center;
+	}
+
+	.card-base:not(.simple-post-card) {
+		background: #f4f4f4 !important;
+		border: 1px solid #dddddd;
+		border-radius: 16px !important;
+		box-shadow: none !important;
+	}
+	.hub-content-article .card-base:not(.simple-post-card) {
+		background: #ffffff !important;
+		border-color: #e8e8e8;
+	}
+
+	/* Keep text readable in this light-only hub layout, even when html has .dark */
+	.hub-content .dark\:text-white\/90 {
+		color: rgba(17, 17, 17, 0.9) !important;
+	}
+	.hub-content .dark\:text-white\/75 {
+		color: rgba(17, 17, 17, 0.75) !important;
+	}
+	.hub-content .dark\:text-white\/50 {
+		color: rgba(17, 17, 17, 0.5) !important;
+	}
+	.hub-content .dark\:text-white\/30 {
+		color: rgba(17, 17, 17, 0.3) !important;
+	}
+	.hub-content .dark\:text-white\/25 {
+		color: rgba(17, 17, 17, 0.25) !important;
+	}
+	.hub-content .dark\:bg-white\/10 {
+		background-color: rgba(0, 0, 0, 0.05) !important;
+	}
+
+	/* Typography plugin tokens: align prose with light background */
+	.hub-content .custom-md {
+		--tw-prose-body: rgba(17, 17, 17, 0.76);
+		--tw-prose-headings: rgba(17, 17, 17, 0.94);
+		--tw-prose-lead: rgba(17, 17, 17, 0.68);
+		--tw-prose-links: #111111;
+		--tw-prose-bold: #111111;
+		--tw-prose-counters: rgba(17, 17, 17, 0.5);
+		--tw-prose-bullets: rgba(17, 17, 17, 0.35);
+		--tw-prose-hr: rgba(0, 0, 0, 0.14);
+		--tw-prose-quotes: rgba(17, 17, 17, 0.86);
+		--tw-prose-quote-borders: rgba(0, 0, 0, 0.24);
+		--tw-prose-captions: rgba(17, 17, 17, 0.62);
+		--tw-prose-code: #111111;
+		--tw-prose-th-borders: rgba(0, 0, 0, 0.2);
+		--tw-prose-td-borders: rgba(0, 0, 0, 0.12);
+
+		--tw-prose-invert-body: rgba(17, 17, 17, 0.76);
+		--tw-prose-invert-headings: rgba(17, 17, 17, 0.94);
+		--tw-prose-invert-lead: rgba(17, 17, 17, 0.68);
+		--tw-prose-invert-links: #111111;
+		--tw-prose-invert-bold: #111111;
+		--tw-prose-invert-counters: rgba(17, 17, 17, 0.5);
+		--tw-prose-invert-bullets: rgba(17, 17, 17, 0.35);
+		--tw-prose-invert-hr: rgba(0, 0, 0, 0.14);
+		--tw-prose-invert-quotes: rgba(17, 17, 17, 0.86);
+		--tw-prose-invert-quote-borders: rgba(0, 0, 0, 0.24);
+		--tw-prose-invert-captions: rgba(17, 17, 17, 0.62);
+		--tw-prose-invert-code: #111111;
+		--tw-prose-invert-th-borders: rgba(0, 0, 0, 0.2);
+		--tw-prose-invert-td-borders: rgba(0, 0, 0, 0.12);
+	}
+
+	/* Twikoo: keep comment area in light palette inside this layout */
+	.hub-content #comment,
+	.hub-content .twikoo {
+		--tk-text: #111827;
+		--tk-muted: #6b7280;
+		--tk-line: rgba(107, 114, 128, 0.28);
+		--tk-line-soft: rgba(107, 114, 128, 0.18);
+		--tk-card-bg: rgba(255, 255, 255, 0.78);
+		--tk-card-bg-soft: rgba(255, 255, 255, 0.58);
+		--tk-input-bg: rgba(255, 255, 255, 0.8);
+		--tk-input-label-bg: rgba(245, 247, 250, 0.95);
+		--tk-chip-bg: rgba(255, 255, 255, 0.72);
+		--tk-expand-text: rgba(248, 250, 252, 0.96);
+		--tk-shadow: 0 10px 28px rgba(15, 23, 42, 0.1);
+		--tk-shadow-hover: 0 14px 36px rgba(15, 23, 42, 0.16);
+	}
+
+	.btn-card,
+	.btn-regular,
+	.btn-plain {
+		border: 1px solid #d7d7d7;
+		border-radius: 9999px !important;
+	}
+
+	.footer {
+		display: none;
+	}
+	@media (max-width: 768px) {
+		.hub-shell.home-centered .hero-hub {
+			min-height: auto;
+		}
+
+		.hub-shell {
+			padding: 16px 14px;
+		}
+	}
+</style>

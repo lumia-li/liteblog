@@ -1,0 +1,25 @@
+﻿---
+import TimetableEditor from "@components/timetable/TimetableEditor.svelte";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+---
+
+<MainGridLayout
+	title="课程表"
+	description="导入 Excel 并编辑你的课程表"
+	showHero={false}
+	shellMaxWidth="1380px"
+	contentMaxWidth="1280px"
+>
+	<TimetableEditor client:load />
+</MainGridLayout>
+
+<style is:global>
+	html,
+	body {
+		background: #fff !important;
+	}
+
+	:root {
+		--page-bg: #fff !important;
+	}
+</style>

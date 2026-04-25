@@ -1,0 +1,975 @@
+﻿---
+import { navBarConfig, profileConfig, siteConfig } from "@/config";
+import { Icon } from "astro-icon/components";
+import ImageWrapper from "@components/misc/ImageWrapper.astro";
+import { url } from "@utils/url-utils";
+
+const socialLinks = [...profileConfig.links];
+
+const statsExternalLink =
+	navBarConfig.links.find(
+		(item) => typeof item === "object" && item.external === true,
+	) ?? null;
+const statsHref =
+	statsExternalLink && typeof statsExternalLink === "object"
+		? statsExternalLink.url
+		: "#";
+
+const functionLinks = [
+	{ name: "博客", icon: "material-symbols:article-outline-rounded", href: url("/posts/?scrollTo=posts"), active: true, scrollToPosts: true },
+	{ name: "论坛", icon: "material-symbols:forum-outline-rounded", href: "#", active: true, badge: "NEW" },
+	{ name: "课程表", icon: "material-symbols:calendar-month-outline-rounded", href: url("/timetable"), noSwup: true },
+	{ name: "画廊", icon: "material-symbols:photo-library-outline-rounded", href: "#" },
+	{ name: "统计", icon: "material-symbols:monitoring-rounded", href: statsHref, external: true },
+];
+---
+
+<section class="hero-hub">
+	<div class="hero-avatar" aria-label="about" draggable="false">
+		<ImageWrapper src={profileConfig.avatar || ""} alt={profileConfig.name} />
+	</div>
+	<h1 class="hero-name">{profileConfig.name}</h1>
+	<p class="hero-subtitle">{siteConfig.subtitle || "Protect What You Love."}</p>
+	<p class="hero-stats">
+		全站浏览量:
+		<span id="hero-busuanzi-site-pv">--</span>
+		次浏览
+	</p>
+
+		<a href={url("/timetable")} class="hero-class-card hero-class-card-link" aria-label="打开课程表" draggable="false" data-no-swup>
+			<div class="hero-class-toprow">
+				<p id="hero-class-title" class="hero-class-title">今日课程</p>
+				<span id="hero-class-weekline" class="hero-class-weekline">第--周 · --</span>
+			</div>
+		<div class="hero-class-headline-row">
+			<span id="hero-class-status" class="hero-class-status" data-state="idle">暂无课程</span>
+		</div>
+		<p class="hero-class-main">
+			<span id="hero-class-highlight" class="hero-class-highlight">未设置课程</span>
+		</p>
+		<div class="hero-class-meta-row">
+			<p id="hero-class-countdown-row" class="hero-class-countdown">
+				<span id="hero-class-countdown-label">距上课还有:</span>
+				<span id="hero-class-countdown-value">--</span>
+			</p>
+		</div>
+	</a>
+
+	<div class="hero-social-row">
+		{socialLinks.map((item) => (
+			<a href={item.url} target={item.url.startsWith("http") ? "_blank" : null} rel="noopener noreferrer" class="hero-pill" aria-label={item.name} draggable="false">
+				<Icon name={item.icon} class="hero-pill-icon" />
+				<span>{item.name}</span>
+			</a>
+		))}
+	</div>
+
+	<div class="hero-divider"></div>
+
+	<div class="hero-menu-grid">
+		{functionLinks.map((item) => (
+			<a
+				href={item.href}
+				target={item.external ? "_blank" : null}
+				rel={item.external ? "noopener noreferrer" : null}
+				class:list={["hero-chip", { "hero-chip-active": item.active }]}
+				data-scroll-to-posts={item.scrollToPosts ? "true" : null}
+				data-no-swup={item.noSwup ? "" : null}
+				draggable="false"
+			>
+				<Icon name={item.icon} class="hero-chip-icon" />
+				<span>{item.name}</span>
+				{item.badge && <span class="hero-chip-badge">{item.badge}</span>}
+			</a>
+		))}
+	</div>
+</section>
+
+<script is:inline>
+		(() => {
+		const pvTarget = document.getElementById("hero-busuanzi-site-pv");
+		const classTitleTarget = document.getElementById("hero-class-title");
+		const statusTarget = document.getElementById("hero-class-status");
+		const weekLineTarget = document.getElementById("hero-class-weekline");
+		const classHighlightTarget = document.getElementById("hero-class-highlight");
+		const countdownRowTarget = document.getElementById("hero-class-countdown-row");
+		const countdownLabelTarget = document.getElementById("hero-class-countdown-label");
+		const countdownTarget = document.getElementById("hero-class-countdown-value");
+		const tempId = "hero-busuanzi-temp";
+		const scriptId = "hero-busuanzi-script";
+		const src = "https://cdn.busuanzi.cc/busuanzi/3.6.9/busuanzi.min.js";
+		const TIMETABLE_API_URL = "/api/timetable";
+		const TIMETABLE_REFRESH_MS = 30_000;
+		const TIMETABLE_RETRY_MS = 120_000;
+		let cachedTimetable = null;
+		let timetableLastAttemptAt = 0;
+		let timetableFetchPromise = null;
+		const dayByIndex = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+		const dayLabelMap = {
+			sun: "周日",
+			mon: "周一",
+			tue: "周二",
+			wed: "周三",
+			thu: "周四",
+			fri: "周五",
+			sat: "周六",
+		};
+
+		const syncPv = () => {
+			const rawNode = document.getElementById("busuanzi_value_site_pv") || document.getElementById("busuanzi_site_pv");
+			if (!pvTarget || !rawNode) return;
+			const value = rawNode.textContent?.trim();
+			if (value) pvTarget.textContent = value;
+		};
+
+		const ensureTempNode = () => {
+			if (document.getElementById(tempId)) return;
+			const holder = document.createElement("span");
+			holder.id = tempId;
+			holder.style.display = "none";
+			holder.innerHTML = '<span id="busuanzi_site_pv">--</span>';
+			document.body.appendChild(holder);
+		};
+
+		const loadBusuanzi = () => {
+			ensureTempNode();
+			const old = document.getElementById(scriptId);
+			if (old) old.remove();
+			const script = document.createElement("script");
+			script.id = scriptId;
+			script.src = src;
+			script.defer = true;
+			script.onload = () => window.setTimeout(syncPv, 120);
+			document.head.appendChild(script);
+		};
+
+		const format = (v) => String(v).padStart(2, "0");
+		const formatDuration = (seconds) => {
+			const safe = Math.max(0, Math.floor(seconds));
+			const hour = Math.floor(safe / 3600);
+			const minute = Math.floor((safe % 3600) / 60);
+			const second = safe % 60;
+			if (hour >= 24) {
+				const day = Math.floor(hour / 24);
+				const restHour = hour % 24;
+				return `${day}天 ${restHour}时 ${format(minute)}分 ${format(second)}秒`;
+			}
+			if (hour >= 1) {
+				return `${hour}时 ${format(minute)}分 ${format(second)}秒`;
+			}
+			return `${minute}分 ${format(second)}秒`;
+		};
+		const formatMinute = (minute) => {
+			const normalized = ((minute % (24 * 60)) + 24 * 60) % (24 * 60);
+			const h = Math.floor(normalized / 60);
+			const m = normalized % 60;
+			return `${format(h)}:${format(m)}`;
+		};
+		const parseWeekInRange = (weeksText, week) => {
+			const source = typeof weeksText === "string" ? weeksText.trim() : "";
+			if (!source) return true;
+			const normalized = source.replace(/\s+/g, "");
+			const oddOnly = /单/.test(normalized);
+			const evenOnly = /双/.test(normalized);
+			let matched = false;
+			const rangePattern = /(\d{1,2})(?:[-~](\d{1,2}))?/g;
+			let match = rangePattern.exec(normalized);
+			while (match) {
+				const start = Number(match[1]);
+				const end = Number(match[2] || match[1]);
+				if (week >= start && week <= end) {
+					matched = true;
+					break;
+				}
+				match = rangePattern.exec(normalized);
+			}
+			if (!matched && /周/.test(normalized)) return false;
+			if (oddOnly && week % 2 === 0) return false;
+			if (evenOnly && week % 2 === 1) return false;
+			return matched || !/\d/.test(normalized);
+		};
+		const groupedSlotWindowMap = {
+			"1-2": [8 * 60 + 30, 10 * 60],
+			"3-4": [10 * 60 + 20, 11 * 60 + 50],
+			"5-6": [13 * 60, 14 * 60 + 25],
+			"6-8": [14 * 60 + 45, 16 * 60 + 10],
+			"9-10": [18 * 60 + 30, 20 * 60],
+		};
+		const groupedIndexWindowMap = [
+			[8 * 60 + 30, 10 * 60],
+			[10 * 60 + 20, 11 * 60 + 50],
+			[13 * 60, 14 * 60 + 25],
+			[14 * 60 + 45, 16 * 60 + 10],
+			[18 * 60 + 30, 20 * 60],
+		];
+		const normalizePeriodLabelKey = (label) => {
+			const source = (label || "").toString().replace(/\s+/g, "");
+			const range = source.match(/(\d{1,2})[-~—–](\d{1,2})/);
+			if (range?.[1] && range?.[2]) return `${range[1]}-${range[2]}`;
+			const single = source.match(/(?:第)?(\d{1,2})节?/);
+			if (single?.[1]) return single[1];
+			return source;
+		};
+		const slotStartMap = {
+			1: 8 * 60 + 30,
+			2: 9 * 60 + 15,
+			3: 10 * 60 + 20,
+			4: 11 * 60 + 5,
+			5: 13 * 60,
+			6: 13 * 60 + 45,
+			7: 14 * 60 + 45,
+			8: 15 * 60 + 30,
+			9: 18 * 60 + 30,
+			10: 19 * 60 + 15,
+		};
+		const slotEndMap = {
+			1: 9 * 60 + 15,
+			2: 10 * 60,
+			3: 11 * 60 + 5,
+			4: 11 * 60 + 50,
+			5: 13 * 60 + 45,
+			6: 14 * 60 + 25,
+			7: 15 * 60 + 30,
+			8: 16 * 60 + 10,
+			9: 19 * 60 + 15,
+			10: 20 * 60,
+		};
+		const parsePeriodWindow = (period, index, totalPeriods) => {
+			const source = (period?.time || "").toString();
+			const fullRange = source.match(/(\d{1,2})[:：](\d{2})\s*[-~—–到至]+\s*(\d{1,2})[:：](\d{2})/);
+			if (fullRange?.[1] && fullRange?.[2] && fullRange?.[3] && fullRange?.[4]) {
+				const start = Number(fullRange[1]) * 60 + Number(fullRange[2]);
+				const end = Number(fullRange[3]) * 60 + Number(fullRange[4]);
+				return [start, Math.max(end, start + 1)];
+			}
+			const timeMatches = Array.from(source.matchAll(/(\d{1,2})[:：](\d{2})/g));
+			if (timeMatches.length >= 2) {
+				const start = Number(timeMatches[0][1]) * 60 + Number(timeMatches[0][2]);
+				const end = Number(timeMatches[1][1]) * 60 + Number(timeMatches[1][2]);
+				return [start, Math.max(end, start + 1)];
+			}
+			if (timeMatches.length === 1) {
+				const start = Number(timeMatches[0][1]) * 60 + Number(timeMatches[0][2]);
+				return [start, start + 90];
+			}
+			const normalizedLabel = normalizePeriodLabelKey(period?.label || "");
+			if (Object.prototype.hasOwnProperty.call(groupedSlotWindowMap, normalizedLabel)) {
+				return groupedSlotWindowMap[normalizedLabel];
+			}
+			if (period?.id && /^p_group_(\d+)$/.test(String(period.id))) {
+				const groupIndex = Number(String(period.id).replace("p_group_", "")) - 1;
+				if (groupedIndexWindowMap[groupIndex]) return groupedIndexWindowMap[groupIndex];
+			}
+			const slotMatch = normalizedLabel.match(/^(\d{1,2})(?:[-~](\d{1,2}))?$/);
+			if (slotMatch?.[1]) {
+				const startSlot = Number(slotMatch[1]);
+				const endSlot = Number(slotMatch[2] || slotMatch[1]);
+				const start = slotStartMap[startSlot] ?? 8 * 60 + index * 120;
+				const end = slotEndMap[endSlot] ?? start + 90;
+				return [start, Math.max(end, start + 1)];
+			}
+			if (totalPeriods === 5 && groupedIndexWindowMap[index]) {
+				return groupedIndexWindowMap[index];
+			}
+			if (totalPeriods === 10) {
+				const slot = index + 1;
+				const start = slotStartMap[slot] ?? 8 * 60 + index * 120;
+				const end = slotEndMap[slot] ?? start + 90;
+				return [start, Math.max(end, start + 1)];
+			}
+			const fallbackStart = 8 * 60 + index * 120;
+			return [fallbackStart, fallbackStart + 90];
+		};
+		const detectCurrentWeekByDate = (termStartDate, totalWeeks) => {
+			if (!termStartDate) return null;
+			const start = new Date(`${termStartDate}T00:00:00`);
+			if (Number.isNaN(start.getTime())) return null;
+			const now = new Date();
+			const dayDiff = Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+			const week = Math.floor(dayDiff / 7) + 1;
+			return Math.max(1, Math.min(totalWeeks, week));
+		};
+		const normalizeWeeklySheet = (sheet) => {
+			if (!sheet || typeof sheet !== "object") return null;
+			const periods = Array.isArray(sheet?.periods) ? sheet.periods : [];
+			const courses = sheet?.courses && typeof sheet.courses === "object" ? sheet.courses : {};
+			if (!periods.length) return null;
+			return { periods, courses };
+		};
+		const resolveWeeklySnapshot = (parsed, currentWeek) => {
+			if (parsed?.weeklyMode !== true) return null;
+			const weeklySheets = parsed?.weeklySheets;
+			if (!weeklySheets || typeof weeklySheets !== "object") return null;
+			const active = normalizeWeeklySheet(weeklySheets?.[String(currentWeek)]);
+			if (active) return active;
+			const firstKey = Object.keys(weeklySheets).sort((a, b) => Number(a) - Number(b))[0];
+			if (!firstKey) return null;
+			return normalizeWeeklySheet(weeklySheets[firstKey]);
+		};
+		const normalizeCurrentWeek = (parsed, totalWeeks) => {
+			const byStored = Math.max(1, Math.min(totalWeeks, Number(parsed?.currentWeek || 1)));
+			const byDate = detectCurrentWeekByDate(parsed?.termStartDate || "", totalWeeks);
+			return byDate || byStored;
+		};
+		const normalizeTimetableFromState = (parsed) => {
+			if (!parsed || typeof parsed !== "object") return null;
+			const totalWeeks = Math.max(1, Number(parsed?.totalWeeks || 18));
+			const currentWeek = normalizeCurrentWeek(parsed, totalWeeks);
+			const weeklySnapshot = resolveWeeklySnapshot(parsed, currentWeek);
+			if (weeklySnapshot) {
+				return {
+					periods: weeklySnapshot.periods,
+					courses: weeklySnapshot.courses,
+					totalWeeks,
+					currentWeek,
+				};
+			}
+			const periods = Array.isArray(parsed?.periods) ? parsed.periods : [];
+			const courses = parsed?.courses && typeof parsed.courses === "object" ? parsed.courses : {};
+			return { periods, courses, totalWeeks, currentWeek };
+		};
+		const refreshTimetable = (force = false) => {
+			const now = Date.now();
+			const hasData = Boolean(cachedTimetable);
+			const waitMs = hasData ? TIMETABLE_REFRESH_MS : TIMETABLE_RETRY_MS;
+			const expired = now - timetableLastAttemptAt > waitMs;
+			if (!force && !expired) return Promise.resolve(cachedTimetable);
+			if (timetableFetchPromise) return timetableFetchPromise;
+			timetableLastAttemptAt = now;
+			timetableFetchPromise = fetch(TIMETABLE_API_URL, {
+				method: "GET",
+				cache: "no-store",
+			})
+				.then(async (response) => {
+					const payload = await response.json().catch(() => ({}));
+					if (!response.ok) {
+						throw new Error(
+							typeof payload?.message === "string" ? payload.message : "读取课程表失败",
+						);
+					}
+					cachedTimetable = normalizeTimetableFromState(payload?.state);
+					return cachedTimetable;
+				})
+				.catch(() => cachedTimetable)
+				.finally(() => {
+					timetableFetchPromise = null;
+				});
+			return timetableFetchPromise;
+		};
+		const pickCourseFromCell = (rawCell, currentWeek) => {
+			const list = Array.isArray(rawCell) ? rawCell : rawCell ? [rawCell] : [];
+			if (!list.length) return null;
+			return (
+				list.find((item) => item?.course && parseWeekInRange(item?.weeks || "", currentWeek)) ||
+				list.find((item) => item?.course) ||
+				null
+			);
+		};
+		const buildDayEntries = (table, dayKey) => {
+			const entries = [];
+			for (let i = 0; i < table.periods.length; i += 1) {
+				const period = table.periods[i];
+				const course = pickCourseFromCell(table.courses?.[`${period.id}__${dayKey}`], table.currentWeek);
+				if (!course) continue;
+					const [startMinutes, endMinutes] = parsePeriodWindow(period, i, table.periods.length);
+				entries.push({
+					periodLabel: (period?.label || `第${i + 1}节`).toString(),
+					timeText:
+						(period?.time || "").toString().trim() ||
+						`${formatMinute(startMinutes)} - ${formatMinute(endMinutes)}`,
+					course,
+					startMinutes,
+					endMinutes,
+				});
+			}
+			entries.sort((a, b) => a.startMinutes - b.startMinutes);
+			return entries;
+		};
+		const findNextEntry = (table, now, nowMinute) => {
+			const todayIndex = now.getDay();
+			for (let offset = 0; offset < 14; offset += 1) {
+				const dayIndex = (todayIndex + offset) % 7;
+				const dayKey = dayByIndex[dayIndex];
+				const dayEntries = buildDayEntries(table, dayKey);
+				if (!dayEntries.length) continue;
+				const minThreshold = offset === 0 ? nowMinute : -1;
+				const entry = dayEntries.find((item) => item.startMinutes >= minThreshold);
+				if (!entry) continue;
+				const nextAt = new Date(now);
+				nextAt.setDate(now.getDate() + offset);
+				nextAt.setHours(Math.floor(entry.startMinutes / 60), entry.startMinutes % 60, 0, 0);
+				return { offset, dayKey, entry, nextAt };
+			}
+			return null;
+		};
+		const toggleVisible = (el, visible) => {
+			if (!el) return;
+			el.classList.toggle("is-hidden", !visible);
+		};
+		const applyStateBadge = (state, text) => {
+			if (!statusTarget) return;
+			statusTarget.dataset.state = state;
+			statusTarget.textContent = text;
+		};
+		const updateCourseCard = () => {
+			if (!countdownTarget || !classHighlightTarget) return;
+			if (classTitleTarget) classTitleTarget.textContent = "今日课程";
+			const table = cachedTimetable;
+			const now = new Date();
+			const nowMinute = now.getHours() * 60 + now.getMinutes();
+			const todayKey = dayByIndex[now.getDay()];
+			if (weekLineTarget) {
+				weekLineTarget.textContent = table
+					? `第${table.currentWeek}周 · ${dayLabelMap[todayKey] || "--"}`
+					: "第--周 · --";
+			}
+			if (!table || table.periods.length === 0) {
+				applyStateBadge("idle", "未设置");
+				classHighlightTarget.textContent = "点击设置课程表";
+				if (countdownLabelTarget) countdownLabelTarget.textContent = "距上课还有:";
+				countdownTarget.textContent = "--";
+				toggleVisible(countdownRowTarget, false);
+				return;
+			}
+
+			const todayEntries = buildDayEntries(table, todayKey);
+			const currentEntry = todayEntries.find(
+				(item) => nowMinute >= item.startMinutes && nowMinute < item.endMinutes,
+			);
+			const nextTodayEntry = todayEntries.find((item) => item.startMinutes > nowMinute) || null;
+			const doneTodayEntries = todayEntries.filter((item) => item.endMinutes <= nowMinute);
+			let statusState = "idle";
+			let highlightText = "点击设置课程表";
+			let countdownLabel = "距上课还有:";
+			let countdownValue = "--";
+			let showCountdown = true;
+
+			if (currentEntry) {
+				statusState = "active";
+				countdownLabel = "距下课还有:";
+				highlightText = currentEntry.course.location?.trim()
+					? `${currentEntry.course.course} - ${currentEntry.course.location.trim()}`
+					: currentEntry.course.course;
+				const endAt = new Date(now);
+				endAt.setHours(Math.floor(currentEntry.endMinutes / 60), currentEntry.endMinutes % 60, 0, 0);
+				countdownValue = formatDuration((endAt.getTime() - Date.now()) / 1000);
+			} else if (nextTodayEntry) {
+				statusState = doneTodayEntries.length > 0 ? "break" : "pending";
+				countdownLabel = "距上课还有:";
+				highlightText = nextTodayEntry.course.location?.trim()
+					? `${nextTodayEntry.course.course} - ${nextTodayEntry.course.location.trim()}`
+					: nextTodayEntry.course.course;
+				const nextAt = new Date(now);
+				nextAt.setHours(Math.floor(nextTodayEntry.startMinutes / 60), nextTodayEntry.startMinutes % 60, 0, 0);
+				countdownValue = formatDuration((nextAt.getTime() - Date.now()) / 1000);
+			} else {
+				const nextAny = findNextEntry(table, now, nowMinute);
+				if (nextAny) {
+					const crossWeek = now.getDay() + nextAny.offset >= 7;
+					if (crossWeek) {
+						statusState = "nextweek";
+					} else if (nextAny.offset === 1) {
+						statusState = "tomorrow";
+					} else {
+						statusState = "upcoming";
+					}
+					highlightText = nextAny.entry.course.location?.trim()
+						? `${nextAny.entry.course.course} - ${nextAny.entry.course.location.trim()}`
+						: nextAny.entry.course.course;
+					countdownLabel = "距上课还有:";
+					countdownValue = formatDuration((nextAny.nextAt.getTime() - Date.now()) / 1000);
+				} else {
+					statusState = "idle";
+					highlightText = "本周暂无可识别课程";
+					countdownLabel = "距上课还有:";
+					countdownValue = "";
+					showCountdown = false;
+				}
+			}
+
+			const stateTextMap = {
+				active: "上课中",
+				break: "课间休息",
+				pending: "待上课",
+				tomorrow: "翌日课程",
+				nextweek: "下周课程",
+				upcoming: "近期课程",
+				idle: "暂无课程",
+			};
+			applyStateBadge(statusState, stateTextMap[statusState] || "课程状态");
+			if (classTitleTarget) {
+				classTitleTarget.textContent = statusState === "nextweek" ? "本周课毕" : "今日课程";
+			}
+			classHighlightTarget.textContent = highlightText;
+			if (countdownLabelTarget) countdownLabelTarget.textContent = countdownLabel;
+			countdownTarget.textContent = countdownValue;
+			toggleVisible(countdownRowTarget, showCountdown);
+		};
+
+		loadBusuanzi();
+		window.setTimeout(syncPv, 400);
+		const host = window;
+		if (host.__heroPvInterval) {
+			window.clearInterval(host.__heroPvInterval);
+		}
+		host.__heroPvInterval = window.setInterval(syncPv, 3000);
+
+		void refreshTimetable(true).finally(() => {
+			updateCourseCard();
+		});
+		if (host.__heroCourseInterval) {
+			window.clearInterval(host.__heroCourseInterval);
+		}
+		host.__heroCourseInterval = window.setInterval(() => {
+			updateCourseCard();
+			void refreshTimetable();
+		}, 1000);
+		window.addEventListener("focus", () => {
+			void refreshTimetable(true).finally(() => {
+				updateCourseCard();
+			});
+		});
+		window.addEventListener("timetable-updated", () => {
+			void refreshTimetable(true).finally(() => {
+				updateCourseCard();
+			});
+		});
+
+		const dragBlockSelector = ".hero-avatar, .hero-pill, .hero-chip, .simple-post-title, .simple-post-enter";
+		const blogChip = document.querySelector('a.hero-chip[data-scroll-to-posts="true"]');
+
+		const resolvePostsAnchor = () => {
+			const firstPostItem = document.querySelector("#content-wrapper [data-post-item]");
+			if (firstPostItem instanceof HTMLElement) {
+				return firstPostItem;
+			}
+			const firstCard = document.querySelector("#content-wrapper .card-base");
+			if (firstCard instanceof HTMLElement) {
+				return firstCard;
+			}
+			return (
+				document.getElementById("content-wrapper") ||
+				document.getElementById("swup-container")
+			);
+		};
+		const getPostsTop = () => {
+			const postSection = resolvePostsAnchor();
+			if (!(postSection instanceof HTMLElement)) return 0;
+			return Math.max(
+				0,
+				window.scrollY + postSection.getBoundingClientRect().top - 8,
+			);
+		};
+		const smoothScrollToPosts = () => {
+			window.scrollTo({
+				top: getPostsTop(),
+				behavior: "smooth",
+			});
+		};
+		const scheduleAutoScrollToPosts = () => {
+			window.setTimeout(() => {
+				smoothScrollToPosts();
+			}, 360);
+			// Some navigation hooks may reset scroll after first paint; correct once more.
+			window.setTimeout(() => {
+				const targetTop = getPostsTop();
+				if (Math.abs(window.scrollY - targetTop) > 24) {
+					smoothScrollToPosts();
+				}
+			}, 920);
+		};
+
+		if (blogChip instanceof HTMLAnchorElement) {
+			blogChip.addEventListener("click", (event) => {
+				const targetUrl = new URL(blogChip.href, window.location.origin);
+				const normalizePath = (path) => path.replace(/^\/|\/$/g, "");
+				const samePath =
+					normalizePath(targetUrl.pathname) ===
+					normalizePath(window.location.pathname);
+				if (!samePath) return;
+				event.preventDefault();
+				event.stopImmediatePropagation?.();
+				event.stopPropagation();
+				smoothScrollToPosts();
+			}, { capture: true });
+		}
+
+		const currentUrl = new URL(window.location.href);
+		const shouldAutoScroll = currentUrl.searchParams.get("scrollTo") === "posts";
+		if (shouldAutoScroll) {
+			scheduleAutoScrollToPosts();
+			currentUrl.searchParams.delete("scrollTo");
+			const nextSearch = currentUrl.searchParams.toString();
+			const nextUrl = `${currentUrl.pathname}${nextSearch ? `?${nextSearch}` : ""}${currentUrl.hash}`;
+			window.history.replaceState(window.history.state, "", nextUrl);
+		}
+
+		document.addEventListener(
+			"dragstart",
+			(event) => {
+				const target = event.target;
+				if (!(target instanceof Element)) return;
+				if (target.closest(dragBlockSelector)) {
+					event.preventDefault();
+				}
+			},
+			true,
+		);
+	})();
+</script>
+
+<style>
+	.hero-hub {
+		width: min(100%, 760px);
+		margin: 0 auto 24px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+	}
+
+	.hero-avatar {
+		width: 156px;
+		height: 156px;
+		border-radius: 9999px;
+		overflow: hidden;
+		border: 2px solid #e9e9e9;
+		margin-bottom: 14px;
+		background: #fff;
+		-webkit-user-drag: none;
+		user-select: none;
+	}
+
+	.hero-avatar :global(img) {
+		-webkit-user-drag: none;
+		user-drag: none;
+		user-select: none;
+		pointer-events: none;
+	}
+
+	.hero-name {
+		font-size: clamp(2.1rem, 4.3vw, 3.1rem);
+		font-weight: 800;
+		line-height: 1.1;
+		color: #111;
+	}
+
+	.hero-subtitle {
+		margin-top: 4px;
+		font-size: clamp(1.15rem, 2.5vw, 2rem);
+		font-family: Georgia, "Times New Roman", serif;
+		color: #505050;
+	}
+
+	.hero-stats {
+		margin-top: 12px;
+		font-size: 1.08rem;
+		color: #666;
+	}
+
+
+	.hero-class-card {
+		width: min(100%, 480px);
+		margin-top: 24px;
+		padding: 16px 16px 14px;
+		background: #fff;
+		border: 1px solid #d7dde5;
+		border-radius: 14px;
+		box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+		text-align: left;
+		font-family: "KeinannMaruPOP", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+		--hero-class-title-size: clamp(1rem, 0.94rem + 0.3vw, 1.12rem);
+		--hero-class-week-size: clamp(0.78rem, 0.75rem + 0.18vw, 0.86rem);
+		--hero-class-status-size: clamp(0.74rem, 0.71rem + 0.12vw, 0.8rem);
+		--hero-class-highlight-size: clamp(0.96rem, 0.9rem + 0.35vw, 1.08rem);
+		--hero-class-count-size: clamp(0.78rem, 0.75rem + 0.12vw, 0.84rem);
+		--hero-class-count-value-size: clamp(0.84rem, 0.8rem + 0.16vw, 0.92rem);
+	}
+
+	.hero-class-card-link {
+		display: block;
+		color: inherit;
+		text-decoration: none;
+		transition:
+			transform 100ms ease,
+			border-color 160ms ease,
+			box-shadow 160ms ease;
+	}
+
+	.hero-class-card-link:hover {
+		border-color: #c8cfd8;
+		box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+	}
+
+	.hero-class-card-link:active {
+		transform: translateY(1px);
+	}
+
+	.hero-class-toprow {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 10px;
+		flex-wrap: wrap;
+	}
+
+	.hero-class-title {
+		margin: 0;
+		font-size: var(--hero-class-title-size);
+		font-weight: 700;
+		line-height: 1.35;
+		color: #1f2937;
+		letter-spacing: 0;
+	}
+
+	.hero-class-headline-row {
+		margin-top: 10px;
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		gap: 10px;
+		flex-wrap: wrap;
+	}
+
+	.hero-class-status {
+		display: inline-flex;
+		align-items: center;
+		height: 26px;
+		padding: 0 10px;
+		border-radius: 999px;
+		font-size: var(--hero-class-status-size);
+		font-weight: 600;
+		border: 1px solid #d6dce4;
+		background: #f5f7fa;
+		color: #455468;
+	}
+
+	.hero-class-status[data-state="active"] {
+		background: #e8f2ff;
+		color: #1d4f91;
+		border-color: #a6c8f0;
+	}
+
+	.hero-class-status[data-state="break"] {
+		background: #eaf8f1;
+		color: #0f766e;
+		border-color: #9fd7c0;
+	}
+
+	.hero-class-status[data-state="pending"] {
+		background: #fff7e8;
+		color: #b45309;
+		border-color: #f4c27a;
+	}
+
+	.hero-class-status[data-state="tomorrow"] {
+		background: #eef4ff;
+		color: #3730a3;
+		border-color: #b9c4ff;
+	}
+
+	.hero-class-status[data-state="nextweek"] {
+		background: #fff4e6;
+		color: #b45309;
+		border-color: #f4c27a;
+	}
+
+	.hero-class-status[data-state="upcoming"] {
+		background: #ecfdf3;
+		color: #166534;
+		border-color: #9fd7ae;
+	}
+
+	.hero-class-status[data-state="idle"] {
+		background: #f3f4f6;
+		color: #6b7280;
+		border-color: #d1d5db;
+	}
+
+	.hero-class-weekline {
+		font-size: var(--hero-class-week-size);
+		font-weight: 500;
+		line-height: 1.35;
+		color: #6b7280;
+		white-space: nowrap;
+	}
+
+	.hero-class-main {
+		margin-top: 10px;
+		padding: 10px 12px;
+		border-radius: 10px;
+		background: #f8fafc;
+		border: 1px solid #e2e8f0;
+		line-height: 1.55;
+	}
+
+	.hero-class-highlight {
+		color: #1f2937;
+		font-size: var(--hero-class-highlight-size);
+		font-weight: 600;
+		line-height: 1.6;
+		word-break: break-word;
+		text-wrap: pretty;
+	}
+
+	.hero-class-meta-row {
+		margin-top: 10px;
+		display: flex;
+		gap: 6px;
+	}
+
+	.hero-class-countdown {
+		margin: 0;
+		padding: 5px 10px;
+		border-radius: 999px;
+		background: #f7f9fb;
+		border: 1px solid #dde3eb;
+		font-size: var(--hero-class-count-size);
+		font-weight: 600;
+		color: #5b6778;
+	}
+
+	.hero-class-countdown-label {
+		display: none;
+	}
+
+	.hero-class-countdown-value {
+		font-size: var(--hero-class-count-value-size);
+		font-weight: 700;
+		color: #374151;
+	}
+
+	.is-hidden {
+		display: none !important;
+	}
+
+	.hero-social-row {
+		margin-top: 22px;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		justify-content: center;
+	}
+
+	.hero-pill {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		height: 42px;
+		padding: 0 16px;
+		border-radius: 9999px;
+		background: #f8f8f8;
+		border: 1px solid #e4e4e4;
+		font-size: 1rem;
+		color: #111;
+		-webkit-user-drag: none;
+		user-select: none;
+	}
+
+	.hero-pill-icon {
+		font-size: 1.1rem;
+	}
+
+	.hero-divider {
+		width: min(100%, 480px);
+		height: 1px;
+		background: #d2d2d2;
+		margin: 24px 0 18px;
+	}
+
+	.hero-menu-grid {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		justify-content: center;
+	}
+
+	.hero-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		height: 42px;
+		padding: 0 18px;
+		border-radius: 9999px;
+		border: 1px solid #e4e4e4;
+		background: #f8f8f8;
+		color: #111;
+		font-weight: 600;
+		-webkit-user-drag: none;
+		user-select: none;
+	}
+
+	.hero-chip-active {
+		background: #101010;
+		border-color: #101010;
+		color: #fff;
+	}
+
+	.hero-chip-badge {
+		display: inline-flex;
+		align-items: center;
+		height: 22px;
+		padding: 0 8px;
+		border-radius: 9999px;
+		font-size: 0.78rem;
+		background: #fff;
+		color: #111;
+	}
+
+	.hero-chip-icon {
+		font-size: 1rem;
+	}
+
+	@media (max-width: 768px) {
+		.hero-hub {
+			margin-bottom: 16px;
+		}
+		.hero-avatar {
+			width: 112px;
+			height: 112px;
+		}
+		.hero-class-card {
+			width: 100%;
+			padding: 16px 14px 14px;
+			border-radius: 16px;
+			--hero-class-title-size: clamp(0.98rem, 0.92rem + 0.65vw, 1.08rem);
+			--hero-class-week-size: clamp(0.76rem, 0.73rem + 0.45vw, 0.82rem);
+			--hero-class-highlight-size: clamp(0.92rem, 0.86rem + 0.6vw, 1rem);
+		}
+		.hero-class-main {
+			padding: 10px;
+		}
+		.hero-chip,
+		.hero-pill {
+			height: 38px;
+			padding: 0 14px;
+			font-size: 0.92rem;
+		}
+	}
+
+	@media (max-width: 420px) {
+		.hero-class-card {
+			padding: 14px 12px 12px;
+		}
+		.hero-class-status {
+			height: 24px;
+			padding: 0 9px;
+		}
+		.hero-class-main {
+			margin-top: 8px;
+			padding: 9px 10px;
+		}
+		.hero-class-countdown {
+			padding: 4px 9px;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.hero-class-card,
+		.hero-class-card-link {
+			animation: none;
+			transition: none;
+		}
+	}
+</style>
+

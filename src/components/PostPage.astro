@@ -1,0 +1,338 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { Icon } from "astro-icon/components";
+import HomeBatchDeleteToolbar from "@components/editor/HomeBatchDeleteToolbar.svelte";
+import { getPostUrlBySlug } from "@utils/url-utils";
+import PostCard from "./PostCard.astro";
+
+const { page } = Astro.props;
+const clientPagination = Boolean(Astro.props.clientPagination);
+const pageSize = Number(Astro.props.pageSize ?? 8);
+
+let delay = 0;
+const interval = 50;
+const postSummaries = page.data.map((entry: CollectionEntry<"posts">) => ({
+	id: entry.id,
+	title: entry.data.title,
+}));
+---
+<div
+	id={clientPagination ? "client-post-list" : undefined}
+	class="transition flex flex-col rounded-[var(--radius-large)] bg-[var(--card-bg)] py-1 md:py-0 md:bg-transparent md:gap-4 mb-4 relative"
+>
+    <HomeBatchDeleteToolbar client:only="svelte" posts={postSummaries} />
+    {page.data.map((entry: CollectionEntry<"posts">, index: number) => (
+        <div
+            data-post-item={clientPagination ? "true" : undefined}
+            data-item-index={clientPagination ? index : undefined}
+            data-post-slug={clientPagination ? entry.slug : undefined}
+            style={clientPagination && index >= pageSize ? "display: none;" : undefined}
+        >
+            <PostCard
+                entry={entry}
+                title={entry.data.title}
+                tags={entry.data.tags}
+                category={entry.data.category}
+                published={entry.data.published}
+                updated={entry.data.updated}
+                url={getPostUrlBySlug(entry.slug)}
+                image={entry.data.image}
+                description={entry.data.description}
+                draft={entry.data.draft}
+                class:list="onload-animation"
+                style={`animation-delay: calc(var(--content-delay) + ${delay++ * interval}ms);`}
+            ></PostCard>
+        </div>
+    ))}
+</div>
+
+{clientPagination && (
+    <div id="client-post-pager" class="mx-auto onload-animation client-pager" data-page-size={pageSize}>
+        <button type="button" class="pager-link pager-side" data-prev>
+            <Icon name="material-symbols:chevron-left-rounded" class="pager-chevron" />
+            <span>上一页</span>
+        </button>
+        <div class="pager-pages" data-pages></div>
+        <button type="button" class="pager-link pager-side" data-next>
+            <span>下一页</span>
+            <Icon name="material-symbols:chevron-right-rounded" class="pager-chevron" />
+        </button>
+    </div>
+)}
+
+{clientPagination && (
+    <script is:inline>
+        (() => {
+            const list = document.getElementById("client-post-list");
+            const pager = document.getElementById("client-post-pager");
+            if (!list || !pager) return;
+
+            const pageSize = Number(pager.dataset.pageSize || "8");
+            const items = Array.from(list.querySelectorAll("[data-post-item]"));
+            const pagesWrap = pager.querySelector("[data-pages]");
+            const prevBtn = pager.querySelector("[data-prev]");
+            const nextBtn = pager.querySelector("[data-next]");
+            if (!pagesWrap || !prevBtn || !nextBtn || items.length === 0) return;
+
+            const RETURN_STATE_KEY = "posts-list-return-state-v1";
+            const MAX_STATE_AGE_MS = 1000 * 60 * 30;
+            const totalPages = Math.max(1, Math.ceil(items.length / pageSize));
+            let currentPage = 1;
+            let pendingRestoreScrollY = null;
+            const isReturnVisit = (() => {
+                try {
+                    const url = new URL(window.location.href);
+                    return url.searchParams.get("return") === "1";
+                } catch {
+                    return false;
+                }
+            })();
+            const clearReturnQuery = () => {
+                try {
+                    const url = new URL(window.location.href);
+                    if (!url.searchParams.has("return")) return;
+                    url.searchParams.delete("return");
+                    const nextSearch = url.searchParams.toString();
+                    const nextUrl = `${url.pathname}${nextSearch ? `?${nextSearch}` : ""}${url.hash}`;
+                    window.history.replaceState(window.history.state, "", nextUrl);
+                } catch {}
+            };
+
+            const parseReturnState = () => {
+                try {
+                    const raw = sessionStorage.getItem(RETURN_STATE_KEY);
+                    if (!raw) return null;
+                    const parsed = JSON.parse(raw);
+                    if (!parsed || typeof parsed !== "object") return null;
+                    const ts = Number(parsed.ts || 0);
+                    if (!Number.isFinite(ts) || Date.now() - ts > MAX_STATE_AGE_MS) {
+                        sessionStorage.removeItem(RETURN_STATE_KEY);
+                        return null;
+                    }
+                    return parsed;
+                } catch {
+                    return null;
+                }
+            };
+            const restoreScrollImmediately = (targetY) => {
+                const safeTarget = Math.max(0, Math.floor(Number(targetY) || 0));
+                window.scrollTo(0, safeTarget);
+                document.documentElement.scrollTop = safeTarget;
+                document.body.scrollTop = safeTarget;
+            };
+
+            const renderItems = () => {
+                items.forEach((node, idx) => {
+                    const pageNumber = Math.floor(idx / pageSize) + 1;
+                    node.style.display = pageNumber === currentPage ? "" : "none";
+                });
+            };
+
+            const createPageButton = (pageNumber) => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = pageNumber === currentPage ? "pager-current" : "pager-link pager-page";
+                btn.textContent = String(pageNumber);
+                btn.dataset.page = String(pageNumber);
+                return btn;
+            };
+
+            const renderPageButtons = () => {
+                pagesWrap.innerHTML = "";
+                for (let p = 1; p <= totalPages; p += 1) {
+                    pagesWrap.appendChild(createPageButton(p));
+                }
+            };
+
+            const renderState = () => {
+                renderItems();
+                renderPageButtons();
+                prevBtn.classList.toggle("pager-disabled", currentPage <= 1);
+                nextBtn.classList.toggle("pager-disabled", currentPage >= totalPages);
+                pager.dataset.currentPage = String(currentPage);
+            };
+
+            pagesWrap.addEventListener("click", (event) => {
+                const target = event.target;
+                if (!(target instanceof HTMLElement)) return;
+                const btn = target.closest("button[data-page]");
+                if (!(btn instanceof HTMLButtonElement)) return;
+                const nextPage = Number(btn.dataset.page || "1");
+                if (!Number.isFinite(nextPage)) return;
+                currentPage = Math.min(totalPages, Math.max(1, nextPage));
+                renderState();
+            });
+
+            prevBtn.addEventListener("click", () => {
+                if (currentPage <= 1) return;
+                currentPage -= 1;
+                renderState();
+            });
+
+            nextBtn.addEventListener("click", () => {
+                if (currentPage >= totalPages) return;
+                currentPage += 1;
+                renderState();
+            });
+
+            list.addEventListener("click", (event) => {
+                const target = event.target;
+                if (!(target instanceof Element)) return;
+                const link = target.closest("a[href]");
+                if (!(link instanceof HTMLAnchorElement)) return;
+
+                let nextUrl;
+                try {
+                    nextUrl = new URL(link.href, window.location.origin);
+                } catch {
+                    return;
+                }
+                const pathname = nextUrl.pathname.replace(/\/+$/, "") || "/";
+                if (!pathname.startsWith("/posts/") || pathname === "/posts") return;
+
+                const slug = pathname.replace(/^\/posts\//, "");
+                const holder = link.closest("[data-post-item]");
+                const indexRaw = holder?.getAttribute("data-item-index") ?? "";
+                const itemIndex = Number(indexRaw);
+                const inferredPage = Number.isFinite(itemIndex)
+                    ? Math.floor(itemIndex / pageSize) + 1
+                    : currentPage;
+
+                sessionStorage.setItem(
+                    RETURN_STATE_KEY,
+                    JSON.stringify({
+                        slug,
+                        page: Math.max(1, Math.min(totalPages, inferredPage)),
+                        scrollY: Math.max(0, Math.floor(window.scrollY || 0)),
+                        ts: Date.now(),
+                    }),
+                );
+            }, true);
+
+            const onPostsList = /^\/posts\/?$/.test(window.location.pathname);
+            const returnState = onPostsList && isReturnVisit ? parseReturnState() : null;
+            if (returnState) {
+                const statePage = Number(returnState.page);
+                if (Number.isFinite(statePage)) {
+                    currentPage = Math.max(1, Math.min(totalPages, Math.floor(statePage)));
+                }
+                const stateSlug = typeof returnState.slug === "string" ? returnState.slug : "";
+                if (stateSlug) {
+                    const matchIndex = items.findIndex((node) => {
+                        const slug = node.getAttribute("data-post-slug") || "";
+                        return slug === stateSlug;
+                    });
+                    if (matchIndex >= 0) {
+                        currentPage = Math.floor(matchIndex / pageSize) + 1;
+                    }
+                }
+                const stateScrollY = Number(returnState.scrollY);
+                if (Number.isFinite(stateScrollY)) {
+                    pendingRestoreScrollY = Math.max(0, Math.floor(stateScrollY));
+                }
+            }
+
+            renderState();
+
+            if (pendingRestoreScrollY !== null) {
+                const targetY = pendingRestoreScrollY ?? 0;
+                const restore = () => restoreScrollImmediately(targetY);
+                restore();
+                window.requestAnimationFrame(() => {
+                    restore();
+                    window.requestAnimationFrame(restore);
+                });
+                window.setTimeout(restore, 60);
+                window.setTimeout(restore, 180);
+                try {
+                    sessionStorage.removeItem(RETURN_STATE_KEY);
+                } catch {}
+                clearReturnQuery();
+            } else if (isReturnVisit) {
+                clearReturnQuery();
+            }
+        })();
+    </script>
+)}
+
+<style is:global>
+    #client-post-pager.client-pager {
+        display: flex;
+        flex-direction: row;
+        gap: 0.75rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    #client-post-pager .pager-link {
+        color: #1f1f1f;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        user-select: none;
+    }
+
+    #client-post-pager .pager-side {
+        gap: 2px;
+        font-size: 1.0625rem;
+        min-height: 2.5rem;
+        padding: 0 0.25rem;
+    }
+
+    #client-post-pager .pager-pages {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    #client-post-pager .pager-page,
+    #client-post-pager .pager-current {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 9999px;
+        font-size: 1.125rem;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-variant-numeric: tabular-nums;
+    }
+
+    #client-post-pager .pager-page {
+        background: transparent;
+        border: 0;
+        cursor: pointer;
+    }
+
+    #client-post-pager .pager-current {
+        background: #ececec;
+        color: #111;
+        border: 1px solid #dbdbdb;
+        font-weight: 500;
+    }
+
+    #client-post-pager .pager-chevron {
+        font-size: 1.25rem;
+    }
+
+    #client-post-pager .pager-disabled {
+        color: #b3b3b3;
+        pointer-events: none;
+    }
+
+    @media (max-width: 640px) {
+        #client-post-pager .pager-side {
+            font-size: 0.95rem;
+        }
+        #client-post-pager .pager-page,
+        #client-post-pager .pager-current {
+            width: 2.15rem;
+            height: 2.15rem;
+            font-size: 1rem;
+            line-height: 1;
+        }
+    }
+</style>

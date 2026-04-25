@@ -1,36 +1,2463 @@
-﻿{
+{
 	"termName": "大一下2",
-	"totalWeeks": 18,
-	"currentWeek": 1,
-	"termStartDate": "",
+	"totalWeeks": 19,
+	"currentWeek": 8,
+	"termStartDate": "2026-03-02",
 	"periods": [
 		{
-			"id": "p1",
+			"id": "p_group_1",
 			"label": "1-2",
 			"time": "08:30 - 10:00"
 		},
 		{
-			"id": "p2",
+			"id": "p_group_2",
 			"label": "3-4",
 			"time": "10:20 - 11:50"
 		},
 		{
-			"id": "p3",
+			"id": "p_group_3",
 			"label": "5-6",
 			"time": "13:00 - 14:25"
 		},
 		{
-			"id": "p4",
+			"id": "p_group_4",
 			"label": "6-8",
 			"time": "14:45 - 16:10"
 		},
 		{
-			"id": "p5",
+			"id": "p_group_5",
 			"label": "9-10",
 			"time": "18:30 - 20:00"
 		}
 	],
-	"courses": {},
-	"weeklySheets": {},
-	"weeklyMode": false
+	"courses": {
+		"p_group_1__mon": [
+			{
+				"course": "鸿蒙初级应用开发",
+				"weeks": "",
+				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+				"teacher": "刘晓龙",
+				"color": "#8f9eff"
+			}
+		],
+		"p_group_1__tue": [
+			{
+				"course": "Vue应用程序开发",
+				"weeks": "",
+				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+				"teacher": "刘晓龙",
+				"color": "#e9da77"
+			}
+		],
+		"p_group_1__wed": [
+			{
+				"course": "数据库技术",
+				"weeks": "",
+				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+				"teacher": "张荣",
+				"color": "#82cbff"
+			}
+		],
+		"p_group_1__thu": [
+			{
+				"course": "Vue应用程序开发",
+				"weeks": "",
+				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+				"teacher": "刘晓龙",
+				"color": "#82cbff"
+			}
+		],
+		"p_group_2__mon": [
+			{
+				"course": "鸿蒙初级应用开发",
+				"weeks": "",
+				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+				"teacher": "刘晓龙",
+				"color": "#ddb8ea"
+			}
+		],
+		"p_group_2__tue": [
+			{
+				"course": "职业素质与职业发展规划",
+				"weeks": "",
+				"location": "一合楼-4楼-J402阶梯教室(J402)",
+				"teacher": "李宁",
+				"color": "#82cbff"
+			}
+		],
+		"p_group_2__fri": [
+			{
+				"course": "人工智能大模型实践与应用",
+				"weeks": "",
+				"location": "行知楼-2楼-数字剪辑实训室(9217)",
+				"teacher": "蹇赫",
+				"color": "#9ddfcd"
+			}
+		],
+		"p_group_3__mon": [
+			{
+				"course": "web程序设计基础",
+				"weeks": "",
+				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+				"teacher": "赵湘元",
+				"color": "#e9da77"
+			}
+		],
+		"p_group_3__fri": [
+			{
+				"course": "毛概 2",
+				"weeks": "",
+				"location": "一合楼-4楼-J402阶梯教室(J402)",
+				"teacher": "仇百辉",
+				"color": "#82cbff"
+			}
+		],
+		"p_group_4__mon": [
+			{
+				"course": "web程序设计基础",
+				"weeks": "",
+				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+				"teacher": "赵湘元",
+				"color": "#9ddfcd"
+			}
+		],
+		"p_group_4__tue": [
+			{
+				"course": "国家安全教育",
+				"weeks": "",
+				"location": "一合楼-4楼-J404阶梯教室(J404)",
+				"teacher": "郝荣娟",
+				"color": "#e9da77"
+			}
+		]
+	},
+	"weeklySheets": {
+		"1": {
+			"periods": [
+				{
+					"id": "p_group_1",
+					"label": "1-2",
+					"time": "08:30 - 10:00"
+				},
+				{
+					"id": "p_group_2",
+					"label": "3-4",
+					"time": "10:20 - 11:50"
+				},
+				{
+					"id": "p_group_3",
+					"label": "5-6",
+					"time": "13:00 - 14:25"
+				},
+				{
+					"id": "p_group_4",
+					"label": "6-8",
+					"time": "14:45 - 16:10"
+				},
+				{
+					"id": "p_group_5",
+					"label": "9-10",
+					"time": "18:30 - 20:00"
+				}
+			],
+			"courses": {
+				"p_group_1__mon": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_1__thu": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_2__mon": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_2__tue": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_2__wed": [
+					{
+						"course": "数据库技术",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "张荣",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_2__fri": [
+					{
+						"course": "人工智能大模型实践与应用",
+						"weeks": "",
+						"location": "行知楼-2楼-数字剪辑实训室(9217)",
+						"teacher": "蹇赫",
+						"color": "#95dc5d"
+					}
+				],
+				"p_group_3__mon": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_3__tue": [
+					{
+						"course": "劳动教育",
+						"weeks": "",
+						"location": "善工楼-3楼-SG318(318)",
+						"teacher": "李宁",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_3__wed": [
+					{
+						"course": "形势与政策II",
+						"weeks": "",
+						"location": "善工楼-3楼-SG318(318)",
+						"teacher": "仲晨星",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_3__thu": [
+					{
+						"course": "体育与健康II",
+						"weeks": "",
+						"location": "四季运动场-1楼-活动区15(0121)",
+						"teacher": "赵家乐",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_4__mon": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_4__tue": [
+					{
+						"course": "专业英语II",
+						"weeks": "",
+						"location": "一合楼-3楼-网络安全实训室(313-1)",
+						"teacher": "徐金戈",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_4__thu": [
+					{
+						"course": "数据库技术",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "张荣",
+						"color": "#82cbff"
+					}
+				],
+				"p_group_4__fri": [
+					{
+						"course": "毛泽东思想和中国特色社会主义理论体系概论",
+						"weeks": "",
+						"location": "善工楼-3楼-SG316（汽车创客体验中心）(SG316)",
+						"teacher": "仇百辉",
+						"color": "#e9da77"
+					}
+				]
+			}
+		},
+		"2": {
+			"periods": [
+				{
+					"id": "p_group_1",
+					"label": "1-2",
+					"time": "08:30 - 10:00"
+				},
+				{
+					"id": "p_group_2",
+					"label": "3-4",
+					"time": "10:20 - 11:50"
+				},
+				{
+					"id": "p_group_3",
+					"label": "5-6",
+					"time": "13:00 - 14:25"
+				},
+				{
+					"id": "p_group_4",
+					"label": "6-8",
+					"time": "14:45 - 16:10"
+				},
+				{
+					"id": "p_group_5",
+					"label": "9-10",
+					"time": "18:30 - 20:00"
+				}
+			],
+			"courses": {
+				"p_group_1__mon": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_1__wed": [
+					{
+						"course": "形势与政策II",
+						"weeks": "",
+						"location": "善工楼-3楼-SG318(318)",
+						"teacher": "仲晨星",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_2__mon": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_2__tue": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_2__wed": [
+					{
+						"course": "毛泽东思想和中国特色社会主义理论体系概论",
+						"weeks": "",
+						"location": "善工楼-3楼-SG316（汽车创客体验中心）(SG316)",
+						"teacher": "仇百辉",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_3__mon": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#82cbff"
+					}
+				],
+				"p_group_3__tue": [
+					{
+						"course": "人工智能大模型实践与应用",
+						"weeks": "",
+						"location": "行知楼-2楼-数字剪辑实训室(9217)",
+						"teacher": "蹇赫",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_3__thu": [
+					{
+						"course": "体育与健康II",
+						"weeks": "",
+						"location": "四季运动场-1楼-活动区15(0121)",
+						"teacher": "赵家乐",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_3__fri": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_4__mon": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#82cbff"
+					}
+				],
+				"p_group_4__tue": [
+					{
+						"course": "专业英语II",
+						"weeks": "",
+						"location": "一合楼-3楼-网络安全实训室(313-1)",
+						"teacher": "徐金戈",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_4__thu": [
+					{
+						"course": "数据库技术",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "张荣",
+						"color": "#8f9eff"
+					}
+				]
+			}
+		},
+		"3": {
+			"periods": [
+				{
+					"id": "p_group_1",
+					"label": "1-2",
+					"time": "08:30 - 10:00"
+				},
+				{
+					"id": "p_group_2",
+					"label": "3-4",
+					"time": "10:20 - 11:50"
+				},
+				{
+					"id": "p_group_3",
+					"label": "5-6",
+					"time": "13:00 - 14:25"
+				},
+				{
+					"id": "p_group_4",
+					"label": "6-8",
+					"time": "14:45 - 16:10"
+				},
+				{
+					"id": "p_group_5",
+					"label": "9-10",
+					"time": "18:30 - 20:00"
+				}
+			],
+			"courses": {
+				"p_group_1__mon": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_1__wed": [
+					{
+						"course": "形势与政策II",
+						"weeks": "",
+						"location": "善工楼-3楼-SG318(318)",
+						"teacher": "仲晨星",
+						"color": "#82cbff"
+					}
+				],
+				"p_group_2__mon": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_2__tue": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_2__wed": [
+					{
+						"course": "毛泽东思想和中国特色社会主义理论体系概论",
+						"weeks": "",
+						"location": "善工楼-3楼-SG316（汽车创客体验中心）(SG316)",
+						"teacher": "仇百辉",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_3__mon": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_3__thu": [
+					{
+						"course": "体育与健康II",
+						"weeks": "",
+						"location": "四季运动场-1楼-活动区15(0121)",
+						"teacher": "赵家乐",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_3__fri": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_4__mon": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#82cbff"
+					}
+				],
+				"p_group_4__tue": [
+					{
+						"course": "专业英语II",
+						"weeks": "",
+						"location": "一合楼-3楼-网络安全实训室(313-1)",
+						"teacher": "徐金戈",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_4__thu": [
+					{
+						"course": "数据库技术",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "张荣",
+						"color": "#82cbff"
+					}
+				]
+			}
+		},
+		"4": {
+			"periods": [
+				{
+					"id": "p_group_1",
+					"label": "1-2",
+					"time": "08:30 - 10:00"
+				},
+				{
+					"id": "p_group_2",
+					"label": "3-4",
+					"time": "10:20 - 11:50"
+				},
+				{
+					"id": "p_group_3",
+					"label": "5-6",
+					"time": "13:00 - 14:25"
+				},
+				{
+					"id": "p_group_4",
+					"label": "6-8",
+					"time": "14:45 - 16:10"
+				},
+				{
+					"id": "p_group_5",
+					"label": "9-10",
+					"time": "18:30 - 20:00"
+				}
+			],
+			"courses": {
+				"p_group_1__mon": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_1__wed": [
+					{
+						"course": "形势与政策II",
+						"weeks": "",
+						"location": "善工楼-3楼-SG318(318)",
+						"teacher": "仲晨星",
+						"color": "#82cbff"
+					}
+				],
+				"p_group_2__mon": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_2__tue": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_2__fri": [
+					{
+						"course": "人工智能大模型实践与应用",
+						"weeks": "",
+						"location": "行知楼-2楼-数字剪辑实训室(9217)",
+						"teacher": "蹇赫",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_3__mon": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_3__tue": [
+					{
+						"course": "人工智能大模型实践与应用",
+						"weeks": "",
+						"location": "行知楼-2楼-数字剪辑实训室(9217)",
+						"teacher": "蹇赫",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_3__fri": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#95dc5d"
+					}
+				],
+				"p_group_4__mon": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#95dc5d"
+					}
+				],
+				"p_group_4__tue": [
+					{
+						"course": "专业英语II",
+						"weeks": "",
+						"location": "一合楼-3楼-网络安全实训室(313-1)",
+						"teacher": "徐金戈",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_4__thu": [
+					{
+						"course": "数据库技术",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "张荣",
+						"color": "#ddb8ea"
+					}
+				]
+			}
+		},
+		"5": {
+			"periods": [
+				{
+					"id": "p_group_1",
+					"label": "1-2",
+					"time": "08:30 - 10:00"
+				},
+				{
+					"id": "p_group_2",
+					"label": "3-4",
+					"time": "10:20 - 11:50"
+				},
+				{
+					"id": "p_group_3",
+					"label": "5-6",
+					"time": "13:00 - 14:25"
+				},
+				{
+					"id": "p_group_4",
+					"label": "6-8",
+					"time": "14:45 - 16:10"
+				},
+				{
+					"id": "p_group_5",
+					"label": "9-10",
+					"time": "18:30 - 20:00"
+				}
+			],
+			"courses": {
+				"p_group_1__mon": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_1__thu": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_2__mon": [
+					{
+						"course": "职场通用英语II 专科英语",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "马悦",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_2__fri": [
+					{
+						"course": "人工智能大模型实践与应用",
+						"weeks": "",
+						"location": "行知楼-2楼-数字剪辑实训室(9217)",
+						"teacher": "蹇赫",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_3__mon": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#95dc5d"
+					}
+				],
+				"p_group_3__tue": [
+					{
+						"course": "职场通用英语II 专科英语",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "马悦",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_4__mon": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_4__tue": [
+					{
+						"course": "国家安全教育",
+						"weeks": "",
+						"location": "一合楼-4楼-J404阶梯教室(J404)",
+						"teacher": "郝荣娟",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_4__wed": [
+					{
+						"course": "毛概 2",
+						"weeks": "",
+						"location": "一合楼-4楼-J404阶梯教室(J404)",
+						"teacher": "仇百辉",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_4__thu": [
+					{
+						"course": "数据库技术",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "张荣",
+						"color": "#95dc5d"
+					}
+				]
+			}
+		},
+		"6": {
+			"periods": [
+				{
+					"id": "p_group_1",
+					"label": "1-2",
+					"time": "08:30 - 10:00"
+				},
+				{
+					"id": "p_group_2",
+					"label": "3-4",
+					"time": "10:20 - 11:50"
+				},
+				{
+					"id": "p_group_3",
+					"label": "5-6",
+					"time": "13:00 - 14:25"
+				},
+				{
+					"id": "p_group_4",
+					"label": "6-8",
+					"time": "14:45 - 16:10"
+				},
+				{
+					"id": "p_group_5",
+					"label": "9-10",
+					"time": "18:30 - 20:00"
+				}
+			],
+			"courses": {
+				"p_group_1__tue": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_1__thu": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_2__tue": [
+					{
+						"course": "职业素质与职业发展规划",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "李宁",
+						"color": "#95dc5d"
+					}
+				],
+				"p_group_2__wed": [
+					{
+						"course": "专业英语II",
+						"weeks": "",
+						"location": "一合楼-3楼-网络安全实训室(313-1)",
+						"teacher": "徐金戈",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_3__tue": [
+					{
+						"course": "职场通用英语II 专科英语",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "马悦",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_3__fri": [
+					{
+						"course": "毛概 2",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "仇百辉",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_4__tue": [
+					{
+						"course": "国家安全教育",
+						"weeks": "",
+						"location": "一合楼-4楼-J404阶梯教室(J404)",
+						"teacher": "郝荣娟",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_4__thu": [
+					{
+						"course": "数据库技术",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "张荣",
+						"color": "#8f9eff"
+					}
+				]
+			}
+		},
+		"7": {
+			"periods": [
+				{
+					"id": "p_group_1",
+					"label": "1-2",
+					"time": "08:30 - 10:00"
+				},
+				{
+					"id": "p_group_2",
+					"label": "3-4",
+					"time": "10:20 - 11:50"
+				},
+				{
+					"id": "p_group_3",
+					"label": "5-6",
+					"time": "13:00 - 14:25"
+				},
+				{
+					"id": "p_group_4",
+					"label": "6-8",
+					"time": "14:45 - 16:10"
+				},
+				{
+					"id": "p_group_5",
+					"label": "9-10",
+					"time": "18:30 - 20:00"
+				}
+			],
+			"courses": {
+				"p_group_1__mon": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_1__tue": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_1__thu": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_2__mon": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_2__tue": [
+					{
+						"course": "职业素质与职业发展规划",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "李宁",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_2__fri": [
+					{
+						"course": "专业英语II",
+						"weeks": "",
+						"location": "一合楼-3楼-网络安全实训室(313-1)",
+						"teacher": "徐金戈",
+						"color": "#82cbff"
+					}
+				],
+				"p_group_3__mon": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#95dc5d"
+					}
+				],
+				"p_group_3__fri": [
+					{
+						"course": "毛概 2",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "仇百辉",
+						"color": "#82cbff"
+					}
+				],
+				"p_group_4__mon": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_4__tue": [
+					{
+						"course": "国家安全教育",
+						"weeks": "",
+						"location": "一合楼-4楼-J404阶梯教室(J404)",
+						"teacher": "郝荣娟",
+						"color": "#e9da77"
+					}
+				]
+			}
+		},
+		"8": {
+			"periods": [
+				{
+					"id": "p_group_1",
+					"label": "1-2",
+					"time": "08:30 - 10:00"
+				},
+				{
+					"id": "p_group_2",
+					"label": "3-4",
+					"time": "10:20 - 11:50"
+				},
+				{
+					"id": "p_group_3",
+					"label": "5-6",
+					"time": "13:00 - 14:25"
+				},
+				{
+					"id": "p_group_4",
+					"label": "6-8",
+					"time": "14:45 - 16:10"
+				},
+				{
+					"id": "p_group_5",
+					"label": "9-10",
+					"time": "18:30 - 20:00"
+				}
+			],
+			"courses": {
+				"p_group_1__mon": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_1__tue": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_1__wed": [
+					{
+						"course": "数据库技术",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "张荣",
+						"color": "#82cbff"
+					}
+				],
+				"p_group_1__thu": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#82cbff"
+					}
+				],
+				"p_group_2__mon": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_2__tue": [
+					{
+						"course": "职业素质与职业发展规划",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "李宁",
+						"color": "#82cbff"
+					}
+				],
+				"p_group_2__fri": [
+					{
+						"course": "人工智能大模型实践与应用",
+						"weeks": "",
+						"location": "行知楼-2楼-数字剪辑实训室(9217)",
+						"teacher": "蹇赫",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_3__mon": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_3__fri": [
+					{
+						"course": "毛概 2",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "仇百辉",
+						"color": "#82cbff"
+					}
+				],
+				"p_group_4__mon": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_4__tue": [
+					{
+						"course": "国家安全教育",
+						"weeks": "",
+						"location": "一合楼-4楼-J404阶梯教室(J404)",
+						"teacher": "郝荣娟",
+						"color": "#e9da77"
+					}
+				]
+			}
+		},
+		"9": {
+			"periods": [
+				{
+					"id": "p_group_1",
+					"label": "1-2",
+					"time": "08:30 - 10:00"
+				},
+				{
+					"id": "p_group_2",
+					"label": "3-4",
+					"time": "10:20 - 11:50"
+				},
+				{
+					"id": "p_group_3",
+					"label": "5-6",
+					"time": "13:00 - 14:25"
+				},
+				{
+					"id": "p_group_4",
+					"label": "6-8",
+					"time": "14:45 - 16:10"
+				},
+				{
+					"id": "p_group_5",
+					"label": "9-10",
+					"time": "18:30 - 20:00"
+				}
+			],
+			"courses": {
+				"p_group_1__mon": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_1__tue": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_1__wed": [
+					{
+						"course": "毛概 2",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "仇百辉",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_1__thu": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_2__mon": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#95dc5d"
+					}
+				],
+				"p_group_2__tue": [
+					{
+						"course": "毛泽东思想和中国特色社会主义理论体系概论",
+						"weeks": "",
+						"location": "善工楼-3楼-SG316（汽车创客体验中心）(SG316)",
+						"teacher": "仇百辉",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_2__wed": [
+					{
+						"course": "数据库技术",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "张荣",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_3__mon": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_4__mon": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_4__tue": [
+					{
+						"course": "国家安全教育",
+						"weeks": "",
+						"location": "一合楼-4楼-J404阶梯教室(J404)",
+						"teacher": "郝荣娟",
+						"color": "#95dc5d"
+					}
+				],
+				"p_group_4__thu": [
+					{
+						"course": "人工智能大模型实践与应用",
+						"weeks": "",
+						"location": "行知楼-2楼-数字剪辑实训室(9217)",
+						"teacher": "蹇赫",
+						"color": "#82cbff"
+					}
+				]
+			}
+		},
+		"10": {
+			"periods": [
+				{
+					"id": "p_group_1",
+					"label": "1-2",
+					"time": "08:30 - 10:00"
+				},
+				{
+					"id": "p_group_2",
+					"label": "3-4",
+					"time": "10:20 - 11:50"
+				},
+				{
+					"id": "p_group_3",
+					"label": "5-6",
+					"time": "13:00 - 14:25"
+				},
+				{
+					"id": "p_group_4",
+					"label": "6-8",
+					"time": "14:45 - 16:10"
+				},
+				{
+					"id": "p_group_5",
+					"label": "9-10",
+					"time": "18:30 - 20:00"
+				}
+			],
+			"courses": {
+				"p_group_1__thu": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_1__sat": [
+					{
+						"course": "毛概 2",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "仇百辉",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_2__wed": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#95dc5d"
+					}
+				],
+				"p_group_2__fri": [
+					{
+						"course": "人工智能大模型实践与应用",
+						"weeks": "",
+						"location": "行知楼-2楼-数字剪辑实训室(9217)",
+						"teacher": "蹇赫",
+						"color": "#95dc5d"
+					}
+				],
+				"p_group_2__sat": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_3__fri": [
+					{
+						"course": "职业素质与职业发展规划",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "李宁",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_4__thu": [
+					{
+						"course": "数据库技术",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "张荣",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_4__sat": [
+					{
+						"course": "职场通用英语II 专科英语",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "马悦",
+						"color": "#95dc5d"
+					}
+				]
+			}
+		},
+		"11": {
+			"periods": [
+				{
+					"id": "p_group_1",
+					"label": "1-2",
+					"time": "08:30 - 10:00"
+				},
+				{
+					"id": "p_group_2",
+					"label": "3-4",
+					"time": "10:20 - 11:50"
+				},
+				{
+					"id": "p_group_3",
+					"label": "5-6",
+					"time": "13:00 - 14:25"
+				},
+				{
+					"id": "p_group_4",
+					"label": "6-8",
+					"time": "14:45 - 16:10"
+				},
+				{
+					"id": "p_group_5",
+					"label": "9-10",
+					"time": "18:30 - 20:00"
+				}
+			],
+			"courses": {
+				"p_group_1__mon": [
+					{
+						"course": "心理健康教育II",
+						"weeks": "",
+						"location": "一合楼-4楼-J401阶梯教室(J401)",
+						"teacher": "仇百辉",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_1__tue": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#82cbff"
+					}
+				],
+				"p_group_1__wed": [
+					{
+						"course": "毛概 2",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "仇百辉",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_1__thu": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_2__mon": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#82cbff"
+					}
+				],
+				"p_group_2__tue": [
+					{
+						"course": "职业素质与职业发展规划",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "李宁",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_3__mon": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_3__tue": [
+					{
+						"course": "职场通用英语II 专科英语",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "马悦",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_3__thu": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_4__mon": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_4__tue": [
+					{
+						"course": "国家安全教育",
+						"weeks": "",
+						"location": "一合楼-4楼-J404阶梯教室(J404)",
+						"teacher": "郝荣娟",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_4__thu": [
+					{
+						"course": "数据库技术",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "张荣",
+						"color": "#e9da77"
+					}
+				]
+			}
+		},
+		"12": {
+			"periods": [
+				{
+					"id": "p_group_1",
+					"label": "1-2",
+					"time": "08:30 - 10:00"
+				},
+				{
+					"id": "p_group_2",
+					"label": "3-4",
+					"time": "10:20 - 11:50"
+				},
+				{
+					"id": "p_group_3",
+					"label": "5-6",
+					"time": "13:00 - 14:25"
+				},
+				{
+					"id": "p_group_4",
+					"label": "6-8",
+					"time": "14:45 - 16:10"
+				},
+				{
+					"id": "p_group_5",
+					"label": "9-10",
+					"time": "18:30 - 20:00"
+				}
+			],
+			"courses": {
+				"p_group_1__mon": [
+					{
+						"course": "心理健康教育II",
+						"weeks": "",
+						"location": "一合楼-4楼-J401阶梯教室(J401)",
+						"teacher": "仇百辉",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_1__tue": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_1__wed": [
+					{
+						"course": "毛概 2",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "仇百辉",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_1__thu": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_2__mon": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_3__mon": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_3__tue": [
+					{
+						"course": "职场通用英语II 专科英语",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "马悦",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_3__thu": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_4__mon": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#95dc5d"
+					}
+				],
+				"p_group_4__tue": [
+					{
+						"course": "国家安全教育",
+						"weeks": "",
+						"location": "一合楼-4楼-J404阶梯教室(J404)",
+						"teacher": "郝荣娟",
+						"color": "#82cbff"
+					}
+				],
+				"p_group_4__thu": [
+					{
+						"course": "数据库技术",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "张荣",
+						"color": "#9ddfcd"
+					}
+				]
+			}
+		},
+		"13": {
+			"periods": [
+				{
+					"id": "p_group_1",
+					"label": "1-2",
+					"time": "08:30 - 10:00"
+				},
+				{
+					"id": "p_group_2",
+					"label": "3-4",
+					"time": "10:20 - 11:50"
+				},
+				{
+					"id": "p_group_3",
+					"label": "5-6",
+					"time": "13:00 - 14:25"
+				},
+				{
+					"id": "p_group_4",
+					"label": "6-8",
+					"time": "14:45 - 16:10"
+				},
+				{
+					"id": "p_group_5",
+					"label": "9-10",
+					"time": "18:30 - 20:00"
+				}
+			],
+			"courses": {
+				"p_group_1__mon": [
+					{
+						"course": "心理健康教育II",
+						"weeks": "",
+						"location": "一合楼-4楼-J401阶梯教室(J401)",
+						"teacher": "仇百辉",
+						"color": "#95dc5d"
+					}
+				],
+				"p_group_1__tue": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_1__wed": [
+					{
+						"course": "毛概 2",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "仇百辉",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_1__thu": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#95dc5d"
+					}
+				],
+				"p_group_2__mon": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_2__tue": [
+					{
+						"course": "职业素质与职业发展规划",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "李宁",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_2__fri": [
+					{
+						"course": "职场通用英语II 专科英语",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "马悦",
+						"color": "#95dc5d"
+					}
+				],
+				"p_group_3__tue": [
+					{
+						"course": "美育II",
+						"weeks": "",
+						"location": "一合楼-4楼-J401阶梯教室(J401)",
+						"teacher": "谭仙鹤",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_3__fri": [
+					{
+						"course": "职场通用英语II 专科英语",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "马悦",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_4__thu": [
+					{
+						"course": "数据库技术",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "张荣",
+						"color": "#82cbff"
+					}
+				]
+			}
+		},
+		"14": {
+			"periods": [
+				{
+					"id": "p_group_1",
+					"label": "1-2",
+					"time": "08:30 - 10:00"
+				},
+				{
+					"id": "p_group_2",
+					"label": "3-4",
+					"time": "10:20 - 11:50"
+				},
+				{
+					"id": "p_group_3",
+					"label": "5-6",
+					"time": "13:00 - 14:25"
+				},
+				{
+					"id": "p_group_4",
+					"label": "6-8",
+					"time": "14:45 - 16:10"
+				},
+				{
+					"id": "p_group_5",
+					"label": "9-10",
+					"time": "18:30 - 20:00"
+				}
+			],
+			"courses": {
+				"p_group_1__mon": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_1__tue": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_1__wed": [
+					{
+						"course": "毛概 2",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "仇百辉",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_1__thu": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_2__mon": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#82cbff"
+					}
+				],
+				"p_group_2__tue": [
+					{
+						"course": "国家安全教育",
+						"weeks": "",
+						"location": "一合楼-4楼-J404阶梯教室(J404)",
+						"teacher": "郝荣娟",
+						"color": "#95dc5d"
+					}
+				],
+				"p_group_3__tue": [
+					{
+						"course": "美育II",
+						"weeks": "",
+						"location": "一合楼-4楼-J401阶梯教室(J401)",
+						"teacher": "谭仙鹤",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_3__thu": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#82cbff"
+					}
+				],
+				"p_group_4__thu": [
+					{
+						"course": "数据库技术",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "张荣",
+						"color": "#95dc5d"
+					}
+				]
+			}
+		},
+		"15": {
+			"periods": [
+				{
+					"id": "p_group_1",
+					"label": "1-2",
+					"time": "08:30 - 10:00"
+				},
+				{
+					"id": "p_group_2",
+					"label": "3-4",
+					"time": "10:20 - 11:50"
+				},
+				{
+					"id": "p_group_3",
+					"label": "5-6",
+					"time": "13:00 - 14:25"
+				},
+				{
+					"id": "p_group_4",
+					"label": "6-8",
+					"time": "14:45 - 16:10"
+				},
+				{
+					"id": "p_group_5",
+					"label": "9-10",
+					"time": "18:30 - 20:00"
+				}
+			],
+			"courses": {
+				"p_group_1__mon": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_1__tue": [
+					{
+						"course": "web程序设计基础",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "赵湘元",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_1__wed": [
+					{
+						"course": "毛概 2",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "仇百辉",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_1__thu": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_2__mon": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_2__fri": [
+					{
+						"course": "人工智能大模型实践与应用",
+						"weeks": "",
+						"location": "行知楼-2楼-数字剪辑实训室(9217)",
+						"teacher": "蹇赫",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_3__tue": [
+					{
+						"course": "美育II",
+						"weeks": "",
+						"location": "一合楼-4楼-J401阶梯教室(J401)",
+						"teacher": "谭仙鹤",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_3__thu": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_3__fri": [
+					{
+						"course": "职业素质与职业发展规划",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "李宁",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_4__thu": [
+					{
+						"course": "数据库技术",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "张荣",
+						"color": "#82cbff"
+					}
+				]
+			}
+		},
+		"16": {
+			"periods": [
+				{
+					"id": "p_group_1",
+					"label": "1-2",
+					"time": "08:30 - 10:00"
+				},
+				{
+					"id": "p_group_2",
+					"label": "3-4",
+					"time": "10:20 - 11:50"
+				},
+				{
+					"id": "p_group_3",
+					"label": "5-6",
+					"time": "13:00 - 14:25"
+				},
+				{
+					"id": "p_group_4",
+					"label": "6-8",
+					"time": "14:45 - 16:10"
+				},
+				{
+					"id": "p_group_5",
+					"label": "9-10",
+					"time": "18:30 - 20:00"
+				}
+			],
+			"courses": {
+				"p_group_1__mon": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#95dc5d"
+					}
+				],
+				"p_group_1__tue": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_1__wed": [
+					{
+						"course": "毛概 2",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "仇百辉",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_2__mon": [
+					{
+						"course": "人工智能大模型实践与应用",
+						"weeks": "",
+						"location": "行知楼-2楼-数字剪辑实训室(9217)",
+						"teacher": "蹇赫",
+						"color": "#95dc5d"
+					}
+				],
+				"p_group_2__tue": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#95dc5d"
+					}
+				],
+				"p_group_4__tue": [
+					{
+						"course": "美育II",
+						"weeks": "",
+						"location": "一合楼-4楼-J401阶梯教室(J401)",
+						"teacher": "谭仙鹤",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_4__thu": [
+					{
+						"course": "数据库技术",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "张荣",
+						"color": "#95dc5d"
+					}
+				]
+			}
+		},
+		"17": {
+			"periods": [
+				{
+					"id": "p_group_1",
+					"label": "1-2",
+					"time": "08:30 - 10:00"
+				},
+				{
+					"id": "p_group_2",
+					"label": "3-4",
+					"time": "10:20 - 11:50"
+				},
+				{
+					"id": "p_group_3",
+					"label": "5-6",
+					"time": "13:00 - 14:25"
+				},
+				{
+					"id": "p_group_4",
+					"label": "6-8",
+					"time": "14:45 - 16:10"
+				},
+				{
+					"id": "p_group_5",
+					"label": "9-10",
+					"time": "18:30 - 20:00"
+				}
+			],
+			"courses": {
+				"p_group_1__mon": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_1__tue": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_1__thu": [
+					{
+						"course": "鸿蒙初级应用开发实训",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_2__mon": [
+					{
+						"course": "鸿蒙初级应用开发实训",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#ddb8ea"
+					}
+				],
+				"p_group_2__tue": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_2__fri": [
+					{
+						"course": "人工智能大模型实践与应用",
+						"weeks": "",
+						"location": "行知楼-2楼-数字剪辑实训室(9217)",
+						"teacher": "蹇赫",
+						"color": "#82cbff"
+					}
+				],
+				"p_group_3__mon": [
+					{
+						"course": "职业素质与职业发展规划",
+						"weeks": "",
+						"location": "一合楼-4楼-J402阶梯教室(J402)",
+						"teacher": "李宁",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_3__tue": [
+					{
+						"course": "鸿蒙初级应用开发实训",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#68dfcd"
+					}
+				]
+			}
+		},
+		"18": {
+			"periods": [
+				{
+					"id": "p_group_1",
+					"label": "1-2",
+					"time": "08:30 - 10:00"
+				},
+				{
+					"id": "p_group_2",
+					"label": "3-4",
+					"time": "10:20 - 11:50"
+				},
+				{
+					"id": "p_group_3",
+					"label": "5-6",
+					"time": "13:00 - 14:25"
+				},
+				{
+					"id": "p_group_4",
+					"label": "6-8",
+					"time": "14:45 - 16:10"
+				},
+				{
+					"id": "p_group_5",
+					"label": "9-10",
+					"time": "18:30 - 20:00"
+				}
+			],
+			"courses": {
+				"p_group_1__mon": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_1__tue": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#95dc5d"
+					}
+				],
+				"p_group_1__thu": [
+					{
+						"course": "鸿蒙初级应用开发实训",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_1__fri": [
+					{
+						"course": "人工智能大模型实践与应用",
+						"weeks": "",
+						"location": "行知楼-2楼-数字剪辑实训室(9217)",
+						"teacher": "蹇赫",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_2__mon": [
+					{
+						"course": "鸿蒙初级应用开发实训",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_2__tue": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_2__wed": [
+					{
+						"course": "鸿蒙初级应用开发实训",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_2__thu": [
+					{
+						"course": "鸿蒙初级应用开发实训",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_3__tue": [
+					{
+						"course": "鸿蒙初级应用开发实训",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#82cbff"
+					}
+				],
+				"p_group_3__thu": [
+					{
+						"course": "人工智能大模型实践与应用",
+						"weeks": "",
+						"location": "行知楼-2楼-数字剪辑实训室(9217)",
+						"teacher": "蹇赫",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_4__tue": [
+					{
+						"course": "人工智能大模型实践与应用",
+						"weeks": "",
+						"location": "行知楼-2楼-数字剪辑实训室(9217)",
+						"teacher": "蹇赫",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_4__thu": [
+					{
+						"course": "人工智能大模型实践与应用",
+						"weeks": "",
+						"location": "行知楼-2楼-数字剪辑实训室(9217)",
+						"teacher": "蹇赫",
+						"color": "#9ddfcd"
+					}
+				]
+			}
+		},
+		"19": {
+			"periods": [
+				{
+					"id": "p_group_1",
+					"label": "1-2",
+					"time": "08:30 - 10:00"
+				},
+				{
+					"id": "p_group_2",
+					"label": "3-4",
+					"time": "10:20 - 11:50"
+				},
+				{
+					"id": "p_group_3",
+					"label": "5-6",
+					"time": "13:00 - 14:25"
+				},
+				{
+					"id": "p_group_4",
+					"label": "6-8",
+					"time": "14:45 - 16:10"
+				},
+				{
+					"id": "p_group_5",
+					"label": "9-10",
+					"time": "18:30 - 20:00"
+				}
+			],
+			"courses": {
+				"p_group_1__mon": [
+					{
+						"course": "鸿蒙初级应用开发实训",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#95dc5d"
+					}
+				],
+				"p_group_1__tue": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#9ddfcd"
+					}
+				],
+				"p_group_1__thu": [
+					{
+						"course": "鸿蒙初级应用开发实训",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_1__fri": [
+					{
+						"course": "鸿蒙初级应用开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_2__mon": [
+					{
+						"course": "鸿蒙初级应用开发实训",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#e9da77"
+					}
+				],
+				"p_group_2__tue": [
+					{
+						"course": "Vue应用程序开发",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#8f9eff"
+					}
+				],
+				"p_group_3__mon": [
+					{
+						"course": "人工智能大模型实践与应用",
+						"weeks": "",
+						"location": "行知楼-2楼-数字剪辑实训室(9217)",
+						"teacher": "蹇赫",
+						"color": "#68dfcd"
+					}
+				],
+				"p_group_3__tue": [
+					{
+						"course": "鸿蒙初级应用开发实训",
+						"weeks": "",
+						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+						"teacher": "刘晓龙",
+						"color": "#8f9eff"
+					}
+				]
+			}
+		}
+	},
+	"weeklyMode": true
 }

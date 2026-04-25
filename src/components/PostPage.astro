@@ -8,6 +8,7 @@ import PostCard from "./PostCard.astro";
 const { page } = Astro.props;
 const clientPagination = Boolean(Astro.props.clientPagination);
 const pageSize = Number(Astro.props.pageSize ?? 8);
+const toPostItemAnchorId = (slug: string) => `post-item-${encodeURIComponent(slug).replace(/%/g, "_")}`;
 
 let delay = 0;
 const interval = 50;
@@ -18,14 +19,17 @@ const postSummaries = page.data.map((entry: CollectionEntry<"posts">) => ({
 ---
 <div
 	id={clientPagination ? "client-post-list" : undefined}
+	data-post-list="true"
+	data-client-pagination={clientPagination ? "true" : undefined}
 	class="transition flex flex-col rounded-[var(--radius-large)] bg-[var(--card-bg)] py-1 md:py-0 md:bg-transparent md:gap-4 mb-4 relative"
 >
     <HomeBatchDeleteToolbar client:only="svelte" posts={postSummaries} />
     {page.data.map((entry: CollectionEntry<"posts">, index: number) => (
         <div
-            data-post-item={clientPagination ? "true" : undefined}
-            data-item-index={clientPagination ? index : undefined}
-            data-post-slug={clientPagination ? entry.slug : undefined}
+            id={toPostItemAnchorId(entry.slug)}
+            data-post-item="true"
+            data-item-index={index}
+            data-post-slug={entry.slug}
             style={clientPagination && index >= pageSize ? "display: none;" : undefined}
         >
             <PostCard
@@ -74,52 +78,8 @@ const postSummaries = page.data.map((entry: CollectionEntry<"posts">) => ({
             const nextBtn = pager.querySelector("[data-next]");
             if (!pagesWrap || !prevBtn || !nextBtn || items.length === 0) return;
 
-            const RETURN_STATE_KEY = "posts-list-return-state-v1";
-            const MAX_STATE_AGE_MS = 1000 * 60 * 30;
             const totalPages = Math.max(1, Math.ceil(items.length / pageSize));
             let currentPage = 1;
-            let pendingRestoreScrollY = null;
-            const isReturnVisit = (() => {
-                try {
-                    const url = new URL(window.location.href);
-                    return url.searchParams.get("return") === "1";
-                } catch {
-                    return false;
-                }
-            })();
-            const clearReturnQuery = () => {
-                try {
-                    const url = new URL(window.location.href);
-                    if (!url.searchParams.has("return")) return;
-                    url.searchParams.delete("return");
-                    const nextSearch = url.searchParams.toString();
-                    const nextUrl = `${url.pathname}${nextSearch ? `?${nextSearch}` : ""}${url.hash}`;
-                    window.history.replaceState(window.history.state, "", nextUrl);
-                } catch {}
-            };
-
-            const parseReturnState = () => {
-                try {
-                    const raw = sessionStorage.getItem(RETURN_STATE_KEY);
-                    if (!raw) return null;
-                    const parsed = JSON.parse(raw);
-                    if (!parsed || typeof parsed !== "object") return null;
-                    const ts = Number(parsed.ts || 0);
-                    if (!Number.isFinite(ts) || Date.now() - ts > MAX_STATE_AGE_MS) {
-                        sessionStorage.removeItem(RETURN_STATE_KEY);
-                        return null;
-                    }
-                    return parsed;
-                } catch {
-                    return null;
-                }
-            };
-            const restoreScrollImmediately = (targetY) => {
-                const safeTarget = Math.max(0, Math.floor(Number(targetY) || 0));
-                window.scrollTo(0, safeTarget);
-                document.documentElement.scrollTop = safeTarget;
-                document.body.scrollTop = safeTarget;
-            };
 
             const renderItems = () => {
                 items.forEach((node, idx) => {
@@ -152,6 +112,15 @@ const postSummaries = page.data.map((entry: CollectionEntry<"posts">) => ({
                 pager.dataset.currentPage = String(currentPage);
             };
 
+            const revealPage = (pageNumber) => {
+                const nextPage = Number(pageNumber);
+                if (!Number.isFinite(nextPage)) return;
+                currentPage = Math.min(totalPages, Math.max(1, Math.floor(nextPage)));
+                renderState();
+            };
+
+            list.__setPostListPage = revealPage;
+
             pagesWrap.addEventListener("click", (event) => {
                 const target = event.target;
                 if (!(target instanceof HTMLElement)) return;
@@ -175,87 +144,28 @@ const postSummaries = page.data.map((entry: CollectionEntry<"posts">) => ({
                 renderState();
             });
 
-            list.addEventListener("click", (event) => {
-                const target = event.target;
-                if (!(target instanceof Element)) return;
-                const link = target.closest("a[href]");
-                if (!(link instanceof HTMLAnchorElement)) return;
-
-                let nextUrl;
-                try {
-                    nextUrl = new URL(link.href, window.location.origin);
-                } catch {
-                    return;
-                }
-                const pathname = nextUrl.pathname.replace(/\/+$/, "") || "/";
-                if (!pathname.startsWith("/posts/") || pathname === "/posts") return;
-
-                const slug = pathname.replace(/^\/posts\//, "");
-                const holder = link.closest("[data-post-item]");
-                const indexRaw = holder?.getAttribute("data-item-index") ?? "";
-                const itemIndex = Number(indexRaw);
-                const inferredPage = Number.isFinite(itemIndex)
-                    ? Math.floor(itemIndex / pageSize) + 1
-                    : currentPage;
-
-                sessionStorage.setItem(
-                    RETURN_STATE_KEY,
-                    JSON.stringify({
-                        slug,
-                        page: Math.max(1, Math.min(totalPages, inferredPage)),
-                        scrollY: Math.max(0, Math.floor(window.scrollY || 0)),
-                        ts: Date.now(),
-                    }),
-                );
-            }, true);
-
-            const onPostsList = /^\/posts\/?$/.test(window.location.pathname);
-            const returnState = onPostsList && isReturnVisit ? parseReturnState() : null;
-            if (returnState) {
-                const statePage = Number(returnState.page);
-                if (Number.isFinite(statePage)) {
-                    currentPage = Math.max(1, Math.min(totalPages, Math.floor(statePage)));
-                }
-                const stateSlug = typeof returnState.slug === "string" ? returnState.slug : "";
-                if (stateSlug) {
-                    const matchIndex = items.findIndex((node) => {
-                        const slug = node.getAttribute("data-post-slug") || "";
-                        return slug === stateSlug;
-                    });
-                    if (matchIndex >= 0) {
-                        currentPage = Math.floor(matchIndex / pageSize) + 1;
-                    }
-                }
-                const stateScrollY = Number(returnState.scrollY);
-                if (Number.isFinite(stateScrollY)) {
-                    pendingRestoreScrollY = Math.max(0, Math.floor(stateScrollY));
-                }
-            }
-
             renderState();
-
-            if (pendingRestoreScrollY !== null) {
-                const targetY = pendingRestoreScrollY ?? 0;
-                const restore = () => restoreScrollImmediately(targetY);
-                restore();
-                window.requestAnimationFrame(() => {
-                    restore();
-                    window.requestAnimationFrame(restore);
-                });
-                window.setTimeout(restore, 60);
-                window.setTimeout(restore, 180);
-                try {
-                    sessionStorage.removeItem(RETURN_STATE_KEY);
-                } catch {}
-                clearReturnQuery();
-            } else if (isReturnVisit) {
-                clearReturnQuery();
-            }
         })();
     </script>
 )}
 
 <style is:global>
+    #client-post-pager {
+        --pager-text: #1f1f1f;
+        --pager-disabled: #b3b3b3;
+        --pager-current-bg: #ececec;
+        --pager-current-text: #111111;
+        --pager-current-border: #dbdbdb;
+    }
+
+    :root.dark #client-post-pager {
+        --pager-text: #e5ebf7;
+        --pager-disabled: #73819a;
+        --pager-current-bg: #1e2838;
+        --pager-current-text: #f8fbff;
+        --pager-current-border: #33455f;
+    }
+
     #client-post-pager.client-pager {
         display: flex;
         flex-direction: row;
@@ -265,7 +175,7 @@ const postSummaries = page.data.map((entry: CollectionEntry<"posts">) => ({
     }
 
     #client-post-pager .pager-link {
-        color: #1f1f1f;
+        color: var(--pager-text);
         text-decoration: none;
         display: inline-flex;
         align-items: center;
@@ -308,9 +218,9 @@ const postSummaries = page.data.map((entry: CollectionEntry<"posts">) => ({
     }
 
     #client-post-pager .pager-current {
-        background: #ececec;
-        color: #111;
-        border: 1px solid #dbdbdb;
+        background: var(--pager-current-bg);
+        color: var(--pager-current-text);
+        border: 1px solid var(--pager-current-border);
         font-weight: 500;
     }
 
@@ -319,7 +229,7 @@ const postSummaries = page.data.map((entry: CollectionEntry<"posts">) => ({
     }
 
     #client-post-pager .pager-disabled {
-        color: #b3b3b3;
+        color: var(--pager-disabled);
         pointer-events: none;
     }
 

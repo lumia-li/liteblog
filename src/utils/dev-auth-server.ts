@@ -2,6 +2,10 @@ import { createHash } from "node:crypto";
 
 const SHA256_HEX_PATTERN = /^[a-f0-9]{64}$/i;
 
+export function getExpectedDevCode(): string {
+	return String(import.meta.env.DEV_EDITOR_CODE || "").trim();
+}
+
 export function hashDevCodeServer(code: string): string {
 	return createHash("sha256").update(code, "utf8").digest("hex");
 }

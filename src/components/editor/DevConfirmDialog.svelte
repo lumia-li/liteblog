@@ -385,6 +385,7 @@ onMount(() => {
 :global(#banner-wrapper),
 :global(#main-grid),
 :global(#toc-wrapper),
+:global(#comments-shortcut-btn),
 :global(#back-to-top-btn)
   transition filter 240ms cubic-bezier(0.22, 1, 0.36, 1), opacity 240ms cubic-bezier(0.22, 1, 0.36, 1)
 
@@ -392,6 +393,7 @@ onMount(() => {
 :global(body.dev-confirm-dialog-active #banner-wrapper),
 :global(body.dev-confirm-dialog-active #main-grid),
 :global(body.dev-confirm-dialog-active #toc-wrapper),
+:global(body.dev-confirm-dialog-active #comments-shortcut-btn),
 :global(body.dev-confirm-dialog-active #back-to-top-btn)
   filter grayscale(0.28) saturate(0.82) brightness(0.82)
 

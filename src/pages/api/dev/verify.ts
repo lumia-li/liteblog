@@ -1,4 +1,4 @@
-import { matchDevCredential } from "@utils/dev-auth-server";
+import { getExpectedDevCode, matchDevCredential } from "@utils/dev-auth-server";
 import type { APIRoute } from "astro";
 
 export const prerender = false;
@@ -59,7 +59,13 @@ function isValidPayload(payload: VerifyPayload, expectedCode: string): boolean {
 }
 
 export const POST: APIRoute = async ({ request }) => {
-	const expectedCode = import.meta.env.DEV_EDITOR_CODE || "liyue233";
+	const expectedCode = getExpectedDevCode();
+	if (!expectedCode) {
+		return json(500, {
+			ok: false,
+			message: "Missing DEV_EDITOR_CODE environment variable",
+		});
+	}
 	try {
 		const payload = await readVerifyPayload(request);
 		if (!(payload.devCode || payload.devCodeHash)) {
@@ -75,7 +81,13 @@ export const POST: APIRoute = async ({ request }) => {
 };
 
 export const GET: APIRoute = async ({ request }) => {
-	const expectedCode = import.meta.env.DEV_EDITOR_CODE || "liyue233";
+	const expectedCode = getExpectedDevCode();
+	if (!expectedCode) {
+		return json(500, {
+			ok: false,
+			message: "Missing DEV_EDITOR_CODE environment variable",
+		});
+	}
 	const url = new URL(request.url);
 	const payload: VerifyPayload = {
 		devCode: url.searchParams.get("devCode") || "",

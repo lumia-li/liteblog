@@ -4,7 +4,7 @@
 	import * as XLSX from "xlsx";
 
 	type DayKey = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
-	type DisplayDayKey = "mon" | "tue" | "wed" | "thu" | "fri";
+	type DisplayDayKey = DayKey;
 
 	type CourseItem = {
 		course: string;
@@ -33,7 +33,7 @@
 
 	const TIMETABLE_API_URL = "/api/timetable";
 	const DAY_ORDER: DayKey[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
-	const DISPLAY_DAYS: DisplayDayKey[] = ["mon", "tue", "wed", "thu", "fri"];
+	const DISPLAY_DAYS: DisplayDayKey[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 	const DAY_LABELS: Record<DayKey, string> = {
 		mon: "周一",
 		tue: "周二",
@@ -866,16 +866,10 @@
 		return null;
 	}
 
-	function toSoftBg(color: string): string {
+	function toRgbChannels(color: string): string {
 		const rgb = hexToRgb(color);
-		if (!rgb) return "#eef2f5";
-		return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.32)`;
-	}
-
-	function toCardRing(color: string): string {
-		const rgb = hexToRgb(color);
-		if (!rgb) return "rgba(148, 163, 184, 0.35)";
-		return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.62)`;
+		if (!rgb) return "148 163 184";
+		return `${rgb.r} ${rgb.g} ${rgb.b}`;
 	}
 
 	async function importExcel(event: Event) {
@@ -946,7 +940,7 @@
 			}
 
 			if (!parsedSheets.length) {
-				importError = "未识别到课程表结构，请确认文件包含“周一~周五”等表头";
+				importError = "未识别到课程表结构，请确认文件包含“周一~周日”等表头";
 				return;
 			}
 
@@ -1005,9 +999,15 @@
 	<header class="tt-header">
 		<div>
 			<h1>{termName}</h1>
-			<p>共 {totalWeeks} 周 ·</p>
+			<p>共 {totalWeeks} 周</p>
 		</div>
-		<a href="/" class="home-btn" data-no-swup>⌂ 返回首页</a>
+		<a href="/" class="home-btn" data-no-swup>
+			<svg class="home-btn-icon icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+				<path d="M485.289626 241.519089 261.986808 421.942035c0 0.204677 0 0.511693 0 0.71637l0 332.60044c0 5.11693 4.093544 9.210474 9.210474 9.210474l96.198281 0c5.11693 0 9.210474-4.093544 9.210474-9.210474L376.606036 603.797721c0-29.88287 24.356586-54.239456 54.239456-54.239456l111.549071 0c29.88287 0 54.239456 24.356586 54.239456 54.239456l0 151.461123c0 5.11693 4.093544 9.210474 9.210474 9.210474l93.128123 0c5.11693 0 9.210474-4.093544 9.210474-9.210474L708.18309 422.658405c0-0.71637 0-1.330402 0.102339-1.944433L497.058565 241.723766C493.681391 238.858285 488.6668 238.755946 485.289626 241.519089z"></path>
+				<path d="M817.787727 454.38337l-291.665001-247.045373c-19.853688-16.78353-48.917849-17.192884-69.180891-0.818709L165.788527 441.795723c-9.722167 7.777733-11.154907 22.002798-3.377174 31.622626 7.777733 9.722167 22.002798 11.154907 31.622626 3.377174l22.923846-18.523286L216.957825 755.258845c0 29.88287 24.356586 54.239456 54.239456 54.239456l96.198281 0c29.88287 0 54.239456-24.356586 54.239456-54.239456L421.635019 603.797721c0-5.11693 4.093544-9.210474 9.210474-9.210474l111.549071 0c5.11693 0 9.210474 4.093544 9.210474 9.210474l0 151.461123c0 29.88287 24.356586 54.239456 54.239456 54.239456l93.128123 0c29.88287 0 54.239456-24.356586 54.239456-54.239456L753.212073 458.78393l35.409155 29.985209c4.195882 3.581851 9.415151 5.321607 14.532081 5.321607 6.344993 0 12.689986-2.660804 17.192884-7.982411C828.430941 476.693184 827.202878 462.468119 817.787727 454.38337z"></path>
+			</svg>
+			返回首页
+		</a>
 	</header>
 
 	<div class="week-row">
@@ -1023,9 +1023,6 @@
 			{isViewingDetectedWeek ? "当前周" : "定位当前周"}
 		</button>
 	</div>
-	{#if !canEdit}
-		<p class="read-only-tip">当前为共享只读视图。若要修改，请先在开发者编辑器完成口令验证。</p>
-	{/if}
 
 	<section class="table-shell">
 		<table class="timetable">
@@ -1056,7 +1053,7 @@
 									>
 										<div
 											class="course-card"
-											style={`border-left-color:${item.color};background:${toSoftBg(item.color)};box-shadow:inset 0 0 0 1px ${toCardRing(item.color)};`}
+											style={`border-left-color:${item.color};--course-rgb:${toRgbChannels(item.color)};`}
 										>
 											<p class="course-name">{item.course}</p>
 											<p class="course-meta">{item.weeks || ""}</p>
@@ -1188,11 +1185,105 @@
 
 <style>
 	.tt-root {
+		--tt-text: #111111;
+		--tt-muted: #475569;
+		--tt-subtle: #64748b;
+		--tt-label: #374151;
+		--tt-border: #d1d5db;
+		--tt-border-strong: #d4d4d8;
+		--tt-surface: #ffffff;
+		--tt-surface-panel: #ffffff;
+		--tt-surface-quiet: #ececec;
+		--tt-surface-soft: #efefef;
+		--tt-surface-soft-hover: #e7e7e7;
+		--tt-nav-btn-bg: #f8f9fa;
+		--tt-nav-btn-bg-hover: #f1f3f5;
+		--tt-nav-btn-border: #e5e7eb;
+		--tt-hover: rgba(148, 163, 184, 0.06);
+		--tt-btn-solid: #111111;
+		--tt-btn-solid-text: #ffffff;
+		--tt-current-target-bg: #14532d;
+		--tt-current-target-border: #14532d;
+		--tt-course-name: #0b1220;
+		--tt-danger: #b91c1c;
+		--tt-success: #166534;
+		--tt-error: #b42318;
+		--tt-input-bg: #ffffff;
+		--tt-modal-mask: rgba(0, 0, 0, 0.35);
+		--tt-empty-dot-bg: #f8fafc;
+		--tt-outline: #111111;
+		--tt-course-bg-alpha: 0.3;
+		--tt-course-ring-alpha: 0.58;
 		width: min(100%, 1280px);
 		margin: 2px auto 22px;
 		display: grid;
 		gap: 14px;
 		background: transparent;
+		color: var(--tt-text);
+	}
+
+	:global(html.dark) .tt-root {
+		--tt-text: #e7ecf6;
+		--tt-muted: #aeb8cc;
+		--tt-subtle: #93a0b9;
+		--tt-label: #c7d1e3;
+		--tt-border: #2b384d;
+		--tt-border-strong: #33445c;
+		--tt-surface: #0f1725;
+		--tt-surface-panel: #121c2b;
+		--tt-surface-quiet: #1a2435;
+		--tt-surface-soft: #1e2a3d;
+		--tt-surface-soft-hover: #26364f;
+		--tt-nav-btn-bg: #1e2a3d;
+		--tt-nav-btn-bg-hover: #26364f;
+		--tt-nav-btn-border: #33445c;
+		--tt-hover: rgba(148, 163, 184, 0.12);
+		--tt-btn-solid: #dbe7ff;
+		--tt-btn-solid-text: #0b1220;
+		--tt-current-target-bg: #1f7a4a;
+		--tt-current-target-border: #1f7a4a;
+		--tt-course-name: #e8eefc;
+		--tt-danger: #fca5a5;
+		--tt-success: #86efac;
+		--tt-error: #fda4af;
+		--tt-input-bg: #101a2a;
+		--tt-modal-mask: rgba(2, 6, 23, 0.66);
+		--tt-empty-dot-bg: #1a2537;
+		--tt-outline: #dbe7ff;
+		--tt-course-bg-alpha: 0.18;
+		--tt-course-ring-alpha: 0.42;
+	}
+
+	.modal-mask {
+		--tt-text: #111111;
+		--tt-muted: #475569;
+		--tt-subtle: #64748b;
+		--tt-label: #374151;
+		--tt-border: #d1d5db;
+		--tt-border-strong: #d4d4d8;
+		--tt-surface: #ffffff;
+		--tt-surface-panel: #ffffff;
+		--tt-danger: #b91c1c;
+		--tt-input-bg: #ffffff;
+		--tt-modal-mask: rgba(0, 0, 0, 0.35);
+		--tt-empty-dot-bg: #f8fafc;
+		--tt-outline: #111111;
+	}
+
+	:global(html.dark) .modal-mask {
+		--tt-text: #e7ecf6;
+		--tt-muted: #aeb8cc;
+		--tt-subtle: #93a0b9;
+		--tt-label: #c7d1e3;
+		--tt-border: #2b384d;
+		--tt-border-strong: #33445c;
+		--tt-surface: #0f1725;
+		--tt-surface-panel: #121c2b;
+		--tt-danger: #fca5a5;
+		--tt-input-bg: #101a2a;
+		--tt-modal-mask: rgba(2, 6, 23, 0.66);
+		--tt-empty-dot-bg: #1a2537;
+		--tt-outline: #dbe7ff;
 	}
 
 	.tt-header {
@@ -1207,7 +1298,7 @@
 		font-size: clamp(2.45rem, 3.5vw, 3.25rem);
 		font-weight: 800;
 		line-height: 1.08;
-		color: #111;
+		color: var(--tt-text);
 		letter-spacing: 0.01em;
 	}
 
@@ -1215,16 +1306,16 @@
 		margin: 6px 0 0 2px;
 		font-size: 1.04rem;
 		font-weight: 500;
-		color: #475569;
+		color: var(--tt-muted);
 	}
 
 	.home-btn {
 		height: 34px;
 		padding: 0 18px;
 		border-radius: 999px;
-		border: 1px solid #d1d5db;
-		background: #ececec;
-		color: #111;
+		border: 1px solid var(--tt-nav-btn-border);
+		background: var(--tt-nav-btn-bg);
+		color: var(--tt-text);
 		text-decoration: none;
 		font-size: 0.92rem;
 		font-weight: 600;
@@ -1235,7 +1326,14 @@
 	}
 
 	.home-btn:hover {
-		background: #e7e7e7;
+		background: var(--tt-nav-btn-bg-hover);
+	}
+
+	.home-btn-icon {
+		width: 1rem;
+		height: 1rem;
+		fill: currentColor;
+		flex: 0 0 auto;
 	}
 
 	.week-row {
@@ -1248,24 +1346,28 @@
 		margin: 0;
 		font-size: 0.92rem;
 		font-weight: 600;
-		color: #475569;
+		color: var(--tt-muted);
 	}
 
 	.week-nav {
 		width: 38px;
 		height: 38px;
 		border-radius: 999px;
-		border: 1px solid #d1d5db;
-		background: #efefef;
-		color: #111;
+		border: 1px solid var(--tt-nav-btn-border);
+		background: var(--tt-nav-btn-bg);
+		color: var(--tt-text);
 		font-size: 1.4rem;
 		line-height: 1;
+	}
+
+	.week-nav:hover {
+		background: var(--tt-nav-btn-bg-hover);
 	}
 
 	.week-label {
 		font-size: 1.88rem;
 		font-weight: 500;
-		color: #111;
+		color: var(--tt-text);
 		min-width: 106px;
 		text-align: center;
 	}
@@ -1274,16 +1376,17 @@
 		height: 28px;
 		padding: 0 12px;
 		border-radius: 999px;
-		border: 1px solid #111;
-		background: #111;
-		color: #fff;
+		border: 1px solid var(--tt-btn-solid);
+		background: var(--tt-btn-solid);
+		color: var(--tt-btn-solid-text);
 		font-size: 0.88rem;
 		font-weight: 600;
 	}
 
 	.week-current.is-target {
-		border-color: #14532d;
-		background: #14532d;
+		border-color: var(--tt-current-target-border);
+		background: var(--tt-current-target-bg);
+		color: #ffffff;
 	}
 
 	.week-current:disabled {
@@ -1293,9 +1396,9 @@
 
 	.table-shell {
 		overflow: auto;
-		border: 1px solid #d4d4d8;
+		border: 1px solid var(--tt-border-strong);
 		border-radius: 18px;
-		background: #fff;
+		background: var(--tt-surface);
 	}
 
 	.timetable {
@@ -1306,10 +1409,10 @@
 
 	th,
 	td {
-		border-right: 1px solid #d1d5db;
-		border-bottom: 1px solid #d1d5db;
+		border-right: 1px solid var(--tt-border);
+		border-bottom: 1px solid var(--tt-border);
 		vertical-align: top;
-		background: #fff;
+		background: var(--tt-surface);
 	}
 
 	th:last-child,
@@ -1328,8 +1431,8 @@
 		font-size: 1.75rem;
 		font-weight: 700;
 		text-align: left;
-		background: #fff;
-		color: #0f172a;
+		background: var(--tt-surface);
+		color: var(--tt-text);
 	}
 
 	.period-col {
@@ -1345,14 +1448,14 @@
 		font-size: 1.58rem;
 		font-weight: 700;
 		line-height: 1.2;
-		color: #0f172a;
+		color: var(--tt-text);
 	}
 
 	.period-time {
 		margin-top: 3px;
 		font-size: 1rem;
 		font-weight: 500;
-		color: #64748b;
+		color: var(--tt-subtle);
 	}
 
 	.course-slot {
@@ -1366,7 +1469,7 @@
 	}
 
 	.course-slot:hover {
-		background: rgba(148, 163, 184, 0.06);
+		background: var(--tt-hover);
 	}
 
 	.course-slot:active {
@@ -1382,7 +1485,7 @@
 		min-height: 98px;
 		font-size: 1.28rem;
 		font-weight: 500;
-		color: #64748b;
+		color: var(--tt-subtle);
 	}
 
 	.course-card {
@@ -1393,8 +1496,8 @@
 		margin: 0;
 		border-radius: 12px;
 		border-left: 4px solid #94a3b8;
-		background: #eef2f5;
-		box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35);
+		background: rgb(var(--course-rgb, 148 163 184) / var(--tt-course-bg-alpha));
+		box-shadow: inset 0 0 0 1px rgb(var(--course-rgb, 148 163 184) / var(--tt-course-ring-alpha));
 		display: grid;
 		gap: 3px;
 		text-align: left;
@@ -1409,13 +1512,13 @@
 		margin: 0;
 		font-size: 0.86rem;
 		line-height: 1.35;
-		color: #475569;
+		color: var(--tt-muted);
 	}
 
 	.course-name {
 		font-size: 1.05rem !important;
 		font-weight: 700;
-		color: #0b1220 !important;
+		color: var(--tt-course-name) !important;
 		line-height: 1.22;
 		margin: 0 0 3px !important;
 	}
@@ -1427,9 +1530,9 @@
 	}
 
 	.tools-panel {
-		border: 1px solid #d8d8d8;
+		border: 1px solid var(--tt-border-strong);
 		border-radius: 14px;
-		background: #fff;
+		background: var(--tt-surface-panel);
 		overflow: hidden;
 	}
 
@@ -1439,7 +1542,7 @@
 		padding: 12px 14px;
 		font-weight: 800;
 		font-size: 1rem;
-		border-bottom: 1px solid #e0e0e0;
+		border-bottom: 1px solid var(--tt-border);
 	}
 
 	.tools-grid {
@@ -1463,15 +1566,20 @@
 	.color-title {
 		font-size: 0.88rem;
 		font-weight: 700;
-		color: #374151;
+		color: var(--tt-label);
 	}
 
 	input {
 		height: 36px;
-		border: 1px solid #d1d5db;
+		border: 1px solid var(--tt-border);
 		border-radius: 8px;
 		padding: 0 10px;
-		background: #fff;
+		background: var(--tt-input-bg);
+		color: var(--tt-text);
+	}
+
+	input::placeholder {
+		color: var(--tt-subtle);
 	}
 
 	.tools-actions {
@@ -1484,15 +1592,16 @@
 		height: 34px;
 		padding: 0 12px;
 		border-radius: 999px;
-		border: 1px solid #d1d5db;
-		background: #fff;
+		border: 1px solid var(--tt-border);
+		background: var(--tt-surface);
+		color: var(--tt-text);
 		font-size: 0.9rem;
 		font-weight: 700;
 	}
 
 	.plain-btn.danger,
 	.mini-danger {
-		color: #b91c1c;
+		color: var(--tt-danger);
 	}
 
 	.msg {
@@ -1502,11 +1611,11 @@
 	}
 
 	.msg.success {
-		color: #166534;
+		color: var(--tt-success);
 	}
 
 	.msg.error {
-		color: #b42318;
+		color: var(--tt-error);
 	}
 
 	.period-editor-list {
@@ -1524,8 +1633,8 @@
 		height: 36px;
 		padding: 0 10px;
 		border-radius: 8px;
-		border: 1px solid #d1d5db;
-		background: #fff;
+		border: 1px solid var(--tt-border);
+		background: var(--tt-surface);
 		font-size: 0.84rem;
 		font-weight: 700;
 	}
@@ -1537,7 +1646,7 @@
 	.modal-mask {
 		position: fixed;
 		inset: 0;
-		background: rgba(0, 0, 0, 0.35);
+		background: var(--tt-modal-mask);
 		display: grid;
 		place-items: center;
 		padding: 14px;
@@ -1548,8 +1657,8 @@
 		width: min(100%, 460px);
 		padding: 16px;
 		border-radius: 14px;
-		border: 1px solid #d8d8d8;
-		background: #fff;
+		border: 1px solid var(--tt-border-strong);
+		background: var(--tt-surface-panel);
 		display: grid;
 		gap: 10px;
 	}
@@ -1563,7 +1672,7 @@
 	.modal-sub {
 		margin: 0;
 		font-size: 0.9rem;
-		color: #6b7280;
+		color: var(--tt-muted);
 	}
 
 	.color-row {
@@ -1578,9 +1687,9 @@
 		width: 24px;
 		height: 18px;
 		padding: 0;
-		border: 1px solid #94a3b8;
+		border: 1px solid var(--tt-border-strong);
 		border-radius: 2px;
-		background: #fff;
+		background: var(--tt-input-bg);
 		cursor: pointer;
 		overflow: hidden;
 	}
@@ -1589,8 +1698,8 @@
 		width: 22px;
 		height: 22px;
 		border-radius: 999px;
-		border: 1px solid #94a3b8;
-		background: #f8fafc;
+		border: 1px solid var(--tt-border-strong);
+		background: var(--tt-empty-dot-bg);
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
@@ -1598,7 +1707,7 @@
 	}
 
 	.color-dot.active {
-		outline: 2px solid #111;
+		outline: 2px solid var(--tt-outline);
 		outline-offset: 1px;
 	}
 
@@ -1613,7 +1722,7 @@
 	.color-value {
 		margin-left: 4px;
 		font-size: 0.82rem;
-		color: #475569;
+		color: var(--tt-muted);
 		font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 	}
 

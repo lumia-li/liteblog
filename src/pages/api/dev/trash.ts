@@ -1,6 +1,6 @@
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import { matchDevCredential } from "@utils/dev-auth-server";
+import { getExpectedDevCode, matchDevCredential } from "@utils/dev-auth-server";
 import type { APIRoute } from "astro";
 
 export const prerender = false;
@@ -716,7 +716,13 @@ export const POST: APIRoute = async ({ request }) => {
 	const githubRepo = import.meta.env.GITHUB_REPO;
 	const githubBranch = import.meta.env.GITHUB_BRANCH || "main";
 	const vercelDeployHook = import.meta.env.VERCEL_DEPLOY_HOOK_URL;
-	const expectedCode = import.meta.env.DEV_EDITOR_CODE || "liyue233";
+	const expectedCode = getExpectedDevCode();
+	if (!expectedCode) {
+		return json(500, {
+			ok: false,
+			message: "Missing DEV_EDITOR_CODE environment variable",
+		});
+	}
 
 	if (!githubToken || !githubOwner || !githubRepo) {
 		return json(500, {

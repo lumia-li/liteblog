@@ -1,4 +1,4 @@
----
+﻿---
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
@@ -150,9 +150,30 @@ const customFontHref = url("/fonts/KeinannMaruPOP_CN-EN.ttf");
 			root.style.setProperty("--banner-height-extend", `${offset}px`);
 		</script>
 		<script is:inline>
-			// Prevent browser scroll restoration from causing refresh-time layout jumps.
 			try {
-				if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+				if ("scrollRestoration" in history) history.scrollRestoration = "auto";
+			} catch {}
+		</script>
+		<script is:inline>
+			try {
+				const RETURN_STATE_KEY = "posts-list-return-state-v1";
+				const currentUrl = new URL(window.location.href);
+				const queryReturn = currentUrl.searchParams.get("return") === "1";
+				let stateReturn = false;
+				try {
+					const raw = sessionStorage.getItem(RETURN_STATE_KEY);
+					if (raw) {
+						const parsed = JSON.parse(raw);
+						if (parsed && typeof parsed === "object" && typeof parsed.listUrl === "string") {
+							const stateUrl = new URL(parsed.listUrl, window.location.origin);
+							stateReturn =
+								stateUrl.pathname.replace(/\/+$/, "") === currentUrl.pathname.replace(/\/+$/, "");
+						}
+					}
+				} catch {}
+				if (queryReturn || stateReturn) {
+					document.documentElement.classList.add("post-return-pending");
+				}
 			} catch {}
 		</script>
 		<style define:vars={{
@@ -196,6 +217,10 @@ const customFontHref = url("/fonts/KeinannMaruPOP_CN-EN.ttf");
 	font-display: swap;
 }
 
+html.post-return-pending #swup-container {
+	visibility: hidden !important;
+}
+
 @tailwind components;
 @layer components {
 	.enable-banner {
@@ -219,7 +244,7 @@ const customFontHref = url("/fonts/KeinannMaruPOP_CN-EN.ttf");
 		position: relative;
 		isolation: isolate;
 	}
-	/* 移除 main-grid 遮罩层 */
+	/* 绉婚櫎 main-grid 閬僵灞?*/
 	.enable-banner.is-home #main-grid::before {
 		content: none;
 	}
@@ -227,7 +252,7 @@ const customFontHref = url("/fonts/KeinannMaruPOP_CN-EN.ttf");
 		position: relative;
 		z-index: 1;
 	}
-	/* 移除 banner 遮罩层，保持图片完全清晰可见 */
+	/* 绉婚櫎 banner 閬僵灞傦紝淇濇寔鍥剧墖瀹屽叏娓呮櫚鍙 */
 	.enable-banner.is-home #banner-wrapper::after {
 		content: none;
 	}
@@ -370,6 +395,258 @@ function loadHue() {
 let postNavScrollHandlerBound = false;
 let postNavTransitionRunning = false;
 let postNavVisitPending = false;
+let postListReturnHandlerBound = false;
+let backToTopButtonBound = false;
+
+const POST_LIST_RETURN_STATE_KEY = "posts-list-return-state-v1";
+const POST_LIST_RETURN_MAX_AGE_MS = 1000 * 60 * 30;
+const POST_RETURN_PENDING_CLASS = "post-return-pending";
+
+function setPostReturnPending(enabled: boolean) {
+	if (enabled) {
+		document.documentElement.classList.add(POST_RETURN_PENDING_CLASS);
+		return;
+	}
+	document.documentElement.classList.remove(POST_RETURN_PENDING_CLASS);
+}
+
+function readPostListReturnState() {
+	try {
+		const raw = sessionStorage.getItem(POST_LIST_RETURN_STATE_KEY);
+		if (!raw) return null;
+		const parsed = JSON.parse(raw);
+		if (!parsed || typeof parsed !== "object") return null;
+		const ts = Number(parsed.ts || 0);
+		if (!Number.isFinite(ts) || Date.now() - ts > POST_LIST_RETURN_MAX_AGE_MS) {
+			sessionStorage.removeItem(POST_LIST_RETURN_STATE_KEY);
+			return null;
+		}
+		return parsed;
+	} catch {
+		return null;
+	}
+}
+
+function getReturnQuery() {
+	try {
+		const currentUrl = new URL(window.location.href);
+		return {
+			isReturn: currentUrl.searchParams.get("return") === "1",
+			slug: (currentUrl.searchParams.get("slug") || "").trim(),
+		};
+	} catch {
+		return { isReturn: false, slug: "" };
+	}
+}
+
+function clearPostListReturnQuery() {
+	try {
+		const currentUrl = new URL(window.location.href);
+		const hasReturnQuery =
+			currentUrl.searchParams.has("return") || currentUrl.searchParams.has("slug");
+		const hasPostItemHash = /^#post-item-/.test(currentUrl.hash);
+		if (!hasReturnQuery && !hasPostItemHash) return;
+		currentUrl.searchParams.delete("return");
+		currentUrl.searchParams.delete("slug");
+		const nextSearch = currentUrl.searchParams.toString();
+		const nextHash = hasPostItemHash ? "" : currentUrl.hash;
+		const nextUrl = `${currentUrl.pathname}${nextSearch ? `?${nextSearch}` : ""}${nextHash}`;
+		window.history.replaceState(window.history.state, "", nextUrl);
+	} catch {}
+}
+
+function decodePathPart(value: string) {
+	try {
+		return decodeURIComponent(value);
+	} catch {
+		return value;
+	}
+}
+
+function getArticleSlugFromHref(rawHref: string) {
+	try {
+		const nextUrl = new URL(rawHref, window.location.origin);
+		const pathname = nextUrl.pathname.replace(/\/+$/, "") || "/";
+		if (!pathname.startsWith("/posts/") || pathname === "/posts") return "";
+		return decodePathPart(pathname.replace(/^\/posts\//, ""));
+	} catch {
+		return "";
+	}
+}
+
+function getPostItemAnchorId(slug: string) {
+	if (!slug) return "";
+	return `post-item-${encodeURIComponent(slug).replace(/%/g, "_")}`;
+}
+
+function savePostListReturnState(link: HTMLAnchorElement) {
+	const list = link.closest("[data-post-list]");
+	if (!(list instanceof HTMLElement)) return;
+
+	const slug = getArticleSlugFromHref(link.href);
+	if (!slug) return;
+
+	const holder = link.closest("[data-post-item]");
+	const itemIndex = Number(holder?.getAttribute("data-item-index") ?? "");
+	const anchorId = holder instanceof HTMLElement && holder.id
+		? holder.id
+		: getPostItemAnchorId(slug);
+	const pager = document.getElementById("client-post-pager");
+	const pageSize = Number(pager?.dataset?.pageSize || "8");
+	const currentPage = Number(pager?.dataset?.currentPage || "1");
+	const inferredPage = Number.isFinite(itemIndex) && Number.isFinite(pageSize) && pageSize > 0
+		? Math.floor(itemIndex / pageSize) + 1
+		: currentPage;
+
+	try {
+		const currentUrl = new URL(window.location.href);
+		currentUrl.searchParams.delete("return");
+		currentUrl.searchParams.delete("slug");
+		currentUrl.searchParams.delete("scrollTo");
+		sessionStorage.setItem(
+			POST_LIST_RETURN_STATE_KEY,
+			JSON.stringify({
+				slug,
+				anchorId,
+				page: Math.max(1, Math.floor(Number(inferredPage) || 1)),
+				scrollY: Math.max(0, Math.floor(window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0)),
+				listUrl: `${currentUrl.pathname}${currentUrl.search}`,
+				ts: Date.now(),
+			}),
+		);
+	} catch {}
+}
+
+function hasPendingPostListRestore() {
+	const list = document.querySelector("[data-post-list]");
+	if (!(list instanceof HTMLElement)) return false;
+	const returnQuery = getReturnQuery();
+	return returnQuery.isReturn || Boolean(readPostListReturnState());
+}
+
+function revealPostListPage(list: HTMLElement, slug: string, state: any) {
+	const items = Array.from(list.querySelectorAll("[data-post-item]"));
+	if (items.length === 0) return;
+
+	const matchIndex = slug
+		? items.findIndex((node) => node.getAttribute("data-post-slug") === slug)
+		: -1;
+	const pager = document.getElementById("client-post-pager");
+	const pageSize = Number(pager?.dataset?.pageSize || "8");
+	const statePage = Number(state?.page);
+	let pageNumber = Number.isFinite(statePage) ? Math.floor(statePage) : 1;
+	if (matchIndex >= 0 && Number.isFinite(pageSize) && pageSize > 0) {
+		pageNumber = Math.floor(matchIndex / pageSize) + 1;
+	}
+	pageNumber = Math.max(1, pageNumber);
+
+	if (typeof list.__setPostListPage === "function") {
+		list.__setPostListPage(pageNumber);
+		return;
+	}
+
+	if (list.dataset.clientPagination === "true" && Number.isFinite(pageSize) && pageSize > 0) {
+		items.forEach((node, index) => {
+			if (!(node instanceof HTMLElement)) return;
+			const itemPage = Math.floor(index / pageSize) + 1;
+			node.style.display = itemPage === pageNumber ? "" : "none";
+		});
+	}
+}
+
+function restoreScrollPosition(targetY: number) {
+	const safeTarget = Math.max(0, Math.floor(Number(targetY) || 0));
+	window.scrollTo(0, safeTarget);
+	document.documentElement.scrollTop = safeTarget;
+	document.body.scrollTop = safeTarget;
+}
+
+function restorePostListReturnPosition(_reason = "manual") {
+	const list = document.querySelector("[data-post-list]");
+	if (!(list instanceof HTMLElement)) {
+		setPostReturnPending(false);
+		return false;
+	}
+
+	const returnQuery = getReturnQuery();
+	const state = readPostListReturnState();
+	if (!returnQuery.isReturn && !state) {
+		setPostReturnPending(false);
+		return false;
+	}
+
+	const targetSlug = returnQuery.slug || state?.slug || "";
+	revealPostListPage(list, targetSlug, state);
+
+	let targetY: number | null = null;
+	const stateScrollY = Number(state?.scrollY);
+	if (Number.isFinite(stateScrollY)) {
+		targetY = Math.max(0, Math.floor(stateScrollY));
+	}
+
+	if (targetY === null && targetSlug) {
+		const targetItem = list.querySelector(`[data-post-slug="${CSS.escape(targetSlug)}"]`);
+		if (targetItem instanceof HTMLElement) {
+			targetY = Math.max(0, Math.floor(targetItem.getBoundingClientRect().top + window.scrollY - 110));
+		}
+	}
+
+	if (targetY === null) {
+		setPostReturnPending(false);
+		return false;
+	}
+
+	restoreScrollPosition(targetY);
+	window.requestAnimationFrame(() => restoreScrollPosition(targetY));
+	window.setTimeout(() => restoreScrollPosition(targetY), 80);
+	window.setTimeout(() => {
+		restoreScrollPosition(targetY);
+		try {
+			sessionStorage.removeItem(POST_LIST_RETURN_STATE_KEY);
+		} catch {}
+		clearPostListReturnQuery();
+		setPostReturnPending(false);
+	}, 220);
+
+	return true;
+}
+
+function syncArticleBackLinkToSavedList() {
+	const backLink = document.querySelector(".article-back-btn");
+	if (!(backLink instanceof HTMLAnchorElement)) return;
+	const state = readPostListReturnState();
+	if (!state?.listUrl || !state?.slug) return;
+	try {
+		const targetUrl = new URL(state.listUrl, window.location.origin);
+		targetUrl.searchParams.delete("scrollTo");
+		targetUrl.hash = "";
+		targetUrl.searchParams.set("return", "1");
+		targetUrl.searchParams.set("slug", state.slug);
+		backLink.href = `${targetUrl.pathname}${targetUrl.search}`;
+	} catch {}
+}
+
+function initPostListReturnState() {
+	if (!postListReturnHandlerBound) {
+		postListReturnHandlerBound = true;
+		document.addEventListener("click", (event) => {
+			const target = event.target;
+			if (!(target instanceof Element)) return;
+			const link = target.closest("[data-post-list] a[href]");
+			if (!(link instanceof HTMLAnchorElement)) return;
+			savePostListReturnState(link);
+		}, true);
+	}
+
+	syncArticleBackLinkToSavedList();
+	const restored = restorePostListReturnPosition("init");
+	if (!restored) {
+		clearPostListReturnQuery();
+	}
+	window.setTimeout(() => {
+		setPostReturnPending(false);
+	}, 1400);
+}
 
 function animateScrollToTop(duration: number) {
 	return new Promise<void>((resolve) => {
@@ -403,6 +680,26 @@ function animateScrollToTop(duration: number) {
 		};
 
 		requestAnimationFrame(tick);
+	});
+}
+
+function initBackToTopButton() {
+	if (backToTopButtonBound) return;
+	backToTopButtonBound = true;
+
+	document.addEventListener("click", (event) => {
+		const target = event.target;
+		if (!(target instanceof Element)) return;
+
+		const button = target.closest("#back-to-top-btn");
+		if (!(button instanceof HTMLButtonElement)) return;
+
+		event.preventDefault();
+		const currentY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+		const duration = Math.min(620, Math.max(260, currentY * 0.18));
+		animateScrollToTop(duration).catch(() => {
+			window.scrollTo({ top: 0, behavior: "smooth" });
+		});
 	});
 }
 
@@ -585,11 +882,26 @@ function init() {
 	loadTheme();
 	loadHue();
 	initCustomScrollbar();
+	initBackToTopButton();
 	initPostNavScrollTransition();
 	showBanner();
-	if (document.body?.dataset?.pageType === "hub") {
+	const pendingPostListRestore = hasPendingPostListRestore();
+	let shouldPreserveScroll = false;
+	try {
+		const entry = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+		const currentUrl = new URL(window.location.href);
+		const isPostsReturn =
+			/^\/posts\/?$/.test(currentUrl.pathname) &&
+			currentUrl.searchParams.get("return") === "1";
+		shouldPreserveScroll = entry?.type === "back_forward" || isPostsReturn || pendingPostListRestore;
+	} catch {
+		shouldPreserveScroll = pendingPostListRestore;
+	}
+	if (document.body?.dataset?.pageType === "hub" && !shouldPreserveScroll) {
 		window.scrollTo(0, 0);
 	}
+	initPostListReturnState();
+	scrollFunction();
 }
 
 window.addEventListener("banner-enabled-updated", () => {
@@ -653,7 +965,15 @@ const setup = () => {
 			navbar.classList.add('navbar-hidden')
 		}
 	})
-	window.swup.hooks.on('content:replace', initCustomScrollbar)
+	window.swup.hooks.on('content:replace', () => {
+		initCustomScrollbar();
+		restorePostListReturnPosition("content:replace");
+	})
+	window.swup.hooks.before('content:scroll', (visit: {scroll: {reset: boolean; target?: unknown}}) => {
+		if (!hasPendingPostListRestore()) return;
+		visit.scroll.reset = false;
+		visit.scroll.target = undefined;
+	})
 	window.swup.hooks.on('visit:start', (visit: {to: {url: string}}) => {
 		// change banner height immediately when a link is clicked
 		const bodyElement = document.querySelector('body')
@@ -717,6 +1037,7 @@ const setup = () => {
 		}
         initCustomScrollbar();
         showBanner();
+		restorePostListReturnPosition("page:view");
 		scrollFunction();
 		if (isPostNavVisit) {
 			postNavVisitPending = false;
@@ -740,15 +1061,15 @@ let toc = document.getElementById('toc-wrapper');
 let navbar = document.getElementById('navbar-wrapper')
 function scrollFunction() {
 	let bannerHeight = window.innerHeight * (BANNER_HEIGHT / 100)
-	const backToTopShowOffset = 260
+	const backToTopShowOffset = 180
 	const isPostNavTransitionActive =
 		document.documentElement.classList.contains('post-nav-scrolling') ||
 		document.documentElement.classList.contains('post-nav-visit');
-	const isPostPage = window.location.pathname.includes('/posts/')
+	const isPostPage = /^\/posts(?:\/|$)/.test(window.location.pathname)
 	backToTopBtn = document.getElementById('back-to-top-btn');
 
 	if (backToTopBtn) {
-		if (document.body.scrollTop > backToTopShowOffset || document.documentElement.scrollTop > backToTopShowOffset) {
+		if (isPostPage && (document.body.scrollTop > backToTopShowOffset || document.documentElement.scrollTop > backToTopShowOffset)) {
 			backToTopBtn.classList.remove('hide')
 		} else {
 			backToTopBtn.classList.add('hide')
@@ -951,3 +1272,4 @@ function bindPressFeedback() {
 
 bindPressFeedback();
 </script>
+

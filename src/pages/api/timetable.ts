@@ -1,6 +1,6 @@
 ﻿import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import { matchDevCredential } from "@utils/dev-auth-server";
+import { getExpectedDevCode, matchDevCredential } from "@utils/dev-auth-server";
 import type { APIRoute } from "astro";
 
 export const prerender = false;
@@ -17,6 +17,14 @@ type GitHubFile = {
 };
 
 const DEFAULT_TIMETABLE_REPO_PATH = "src/content/spec/timetable.json";
+
+function stripUtf8Bom(input: string): string {
+	return input.replace(/^\uFEFF/, "");
+}
+
+function parseJsonSafely(input: string): unknown {
+	return JSON.parse(stripUtf8Bom(input));
+}
 
 function json(status: number, payload: Record<string, unknown>) {
 	return new Response(JSON.stringify(payload), {
@@ -44,7 +52,7 @@ async function readLocalJson(repoPath: string): Promise<unknown | null> {
 	try {
 		const text = await readFile(toAbsolutePath(repoPath), "utf8");
 		if (!text.trim()) return null;
-		return JSON.parse(text);
+		return parseJsonSafely(text);
 	} catch (error) {
 		if (
 			error &&
@@ -180,14 +188,14 @@ async function parseTimetableRequest(request: Request): Promise<TimetableRequest
 	const raw = await request.text();
 	if (!raw) return {};
 	try {
-		return JSON.parse(raw) as TimetableRequest;
+		return parseJsonSafely(raw) as TimetableRequest;
 	} catch {
 		const params = new URLSearchParams(raw);
 		const stateRaw = params.get("state") || "";
 		let state: unknown = undefined;
 		if (stateRaw) {
 			try {
-				state = JSON.parse(stateRaw);
+				state = parseJsonSafely(stateRaw);
 			} catch {
 				state = undefined;
 			}
@@ -211,7 +219,7 @@ async function readSharedTimetableState(repoPath: string): Promise<unknown | nul
 			headers: getGitHubHeaders(github.token),
 		});
 		if (!githubFile?.content.trim()) return null;
-		return JSON.parse(githubFile.content);
+		return parseJsonSafely(githubFile.content);
 	}
 	return readLocalJson(repoPath);
 }
@@ -231,8 +239,14 @@ export const GET: APIRoute = async () => {
 };
 
 export const POST: APIRoute = async ({ request }) => {
-	const expectedCode = import.meta.env.DEV_EDITOR_CODE || "liyue233";
+	const expectedCode = getExpectedDevCode();
 	const repoPath = resolveTimetableRepoPath();
+	if (!expectedCode) {
+		return json(500, {
+			ok: false,
+			message: "服务器缺少 DEV_EDITOR_CODE 环境变量",
+		});
+	}
 
 	let body: TimetableRequest;
 	try {

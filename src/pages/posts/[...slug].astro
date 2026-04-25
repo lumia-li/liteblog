@@ -26,6 +26,7 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content, headings } = await entry.render();
+const backToPostsHref = `${url("/posts/")}?return=1&slug=${encodeURIComponent(entry.slug)}`;
 
 const { remarkPluginFrontmatter } = await entry.render();
 
@@ -53,7 +54,7 @@ const jsonLd = {
 
 	<article id="post-container" class="article-flow">
 		<div class="article-back-row onload-animation">
-			<a class="article-back-btn" href={url("/posts/?return=1")} data-no-swup>← 返回文章列表</a>
+			<a class="article-back-btn" href={backToPostsHref} data-no-swup>← 返回文章列表</a>
 		</div>
 		<header class="article-header onload-animation">
 			<div class="article-reading-meta transition">
@@ -165,6 +166,46 @@ const jsonLd = {
 </MainGridLayout>
 
 <style>
+	:root {
+		--article-back-text: rgba(17, 17, 17, 0.86);
+		--article-back-text-hover: rgba(17, 17, 17, 0.92);
+		--article-back-hover-bg: rgba(0, 0, 0, 0.06);
+		--article-back-active-bg: rgba(0, 0, 0, 0.1);
+		--article-reading-text: rgba(17, 17, 17, 0.5);
+		--article-reading-icon: rgba(17, 17, 17, 0.58);
+		--article-reading-icon-bg: rgba(0, 0, 0, 0.04);
+		--article-title-text: rgba(17, 17, 17, 0.95);
+		--article-body-text: rgba(17, 17, 17, 0.86);
+		--article-comment-bg: #ffffff;
+		--article-comment-border: #e8e8e8;
+		--article-tk-text: #111827;
+		--article-tk-muted: #9ca3af;
+		--article-tk-line: #d1d5db;
+		--article-tk-line-soft: #e5e7eb;
+		--article-tk-bg: #ffffff;
+		--article-tk-hover: rgba(17, 24, 39, 0.06);
+	}
+
+	:root.dark {
+		--article-back-text: rgba(229, 237, 248, 0.88);
+		--article-back-text-hover: rgba(246, 250, 255, 0.96);
+		--article-back-hover-bg: rgba(148, 163, 184, 0.16);
+		--article-back-active-bg: rgba(148, 163, 184, 0.24);
+		--article-reading-text: rgba(191, 203, 220, 0.74);
+		--article-reading-icon: rgba(216, 226, 242, 0.84);
+		--article-reading-icon-bg: rgba(100, 116, 139, 0.22);
+		--article-title-text: rgba(244, 248, 255, 0.96);
+		--article-body-text: rgba(224, 233, 245, 0.88);
+		--article-comment-bg: #141b26;
+		--article-comment-border: #2d384a;
+		--article-tk-text: #e6edf7;
+		--article-tk-muted: #9ba9bd;
+		--article-tk-line: #3a4a60;
+		--article-tk-line-soft: #2c394d;
+		--article-tk-bg: #101826;
+		--article-tk-hover: rgba(226, 232, 240, 0.08);
+	}
+
 	.article-flow {
 		width: min(100%, 1140px);
 		margin: 0 auto 2rem;
@@ -186,19 +227,19 @@ const jsonLd = {
 		text-decoration: none;
 		font-size: 1rem;
 		font-weight: 600;
-		color: rgba(17, 17, 17, 0.86);
+		color: var(--article-back-text);
 		background: transparent;
 		border: none;
 		transition: background-color 0.2s ease, color 0.2s ease;
 	}
 
 	.article-back-btn:hover {
-		background: rgba(0, 0, 0, 0.06);
-		color: rgba(17, 17, 17, 0.92);
+		background: var(--article-back-hover-bg);
+		color: var(--article-back-text-hover);
 	}
 
 	.article-back-btn:active {
-		background: rgba(0, 0, 0, 0.1);
+		background: var(--article-back-active-bg);
 	}
 
 	.article-header {
@@ -213,7 +254,7 @@ const jsonLd = {
 		align-items: center;
 		gap: 1.1rem;
 		margin-bottom: 0.8rem;
-		color: rgba(17, 17, 17, 0.5);
+		color: var(--article-reading-text);
 	}
 
 	.article-reading-item {
@@ -229,8 +270,8 @@ const jsonLd = {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		color: rgba(17, 17, 17, 0.58);
-		background: rgba(0, 0, 0, 0.04);
+		color: var(--article-reading-icon);
+		background: var(--article-reading-icon-bg);
 	}
 
 	.article-title {
@@ -241,7 +282,7 @@ const jsonLd = {
 		font-size: clamp(2rem, 3vw, 2.95rem);
 		line-height: 1.22;
 		letter-spacing: 0.01em;
-		color: rgba(17, 17, 17, 0.95);
+		color: var(--article-title-text);
 	}
 
 	.article-meta {
@@ -275,7 +316,7 @@ const jsonLd = {
 		max-width: none;
 		font-size: clamp(1.22rem, 1.35vw, 1.38rem) !important;
 		line-height: 1.95;
-		color: rgba(17, 17, 17, 0.86);
+		color: var(--article-body-text);
 	}
 
 	.article-markdown :global(p) {
@@ -296,29 +337,29 @@ const jsonLd = {
 	}
 
 	.article-comments {
-		background: #ffffff !important;
-		border-color: #e8e8e8 !important;
-		--tk-text: #111827;
-		--tk-muted: #9ca3af;
-		--tk-line: #d1d5db;
-		--tk-line-soft: #e5e7eb;
-		--tk-card-bg: #ffffff;
-		--tk-card-bg-soft: #ffffff;
-		--tk-input-bg: #ffffff;
-		--tk-input-label-bg: #ffffff;
-		--tk-chip-bg: #ffffff;
-		--tk-expand-text: #111827;
+		background: var(--article-comment-bg) !important;
+		border-color: var(--article-comment-border) !important;
+		--tk-text: var(--article-tk-text);
+		--tk-muted: var(--article-tk-muted);
+		--tk-line: var(--article-tk-line);
+		--tk-line-soft: var(--article-tk-line-soft);
+		--tk-card-bg: var(--article-tk-bg);
+		--tk-card-bg-soft: var(--article-tk-bg);
+		--tk-input-bg: var(--article-tk-bg);
+		--tk-input-label-bg: var(--article-tk-bg);
+		--tk-chip-bg: var(--article-tk-bg);
+		--tk-expand-text: var(--article-tk-text);
 		--tk-shadow: none;
 		--tk-shadow-hover: none;
 	}
 
 	.article-comments :global(.twikoo) {
-		color: #111827;
+		color: var(--article-tk-text);
 	}
 
 	.article-comments :global(.twikoo .tk-submit) {
 		border-radius: 18px;
-		background: #ffffff;
+		background: var(--article-tk-bg);
 		border: none !important;
 		padding: 0;
 	}
@@ -342,9 +383,9 @@ const jsonLd = {
 	.article-comments :global(.twikoo .tk-submit .tk-input),
 	.article-comments :global(.twikoo .tk-submit .tk-col > .tk-input) {
 		order: 1;
-		width: calc(100% - 32px);
-		margin-left: auto;
-		margin-right: auto;
+		width: 100%;
+		margin-left: 0;
+		margin-right: 0;
 	}
 
 	.article-comments :global(.twikoo .tk-submit .tk-meta-input),
@@ -366,9 +407,9 @@ const jsonLd = {
 	.article-comments :global(.twikoo .el-textarea__inner) {
 		min-height: 176px !important;
 		border-radius: 16px !important;
-		background: #ffffff !important;
-		border: 1px solid #d1d5db !important;
-		color: #111827 !important;
+		background: var(--article-tk-bg) !important;
+		border: 1px solid var(--article-tk-line) !important;
+		color: var(--article-tk-text) !important;
 		box-shadow: none !important;
 		line-height: 1.6 !important;
 		padding-top: 22px !important;
@@ -376,12 +417,12 @@ const jsonLd = {
 	}
 
 	.article-comments :global(.twikoo .el-textarea__inner::placeholder) {
-		color: #9ca3af !important;
+		color: var(--article-tk-muted) !important;
 	}
 
 	.article-comments :global(.twikoo .el-textarea .el-input__count) {
 		background: transparent !important;
-		color: #111827 !important;
+		color: var(--article-tk-text) !important;
 		font-weight: 700;
 	}
 
@@ -397,26 +438,26 @@ const jsonLd = {
 	}
 
 	.article-comments :global(.twikoo .tk-meta-input .el-input-group) {
-		border: 1px solid #d1d5db;
+		border: 1px solid var(--article-tk-line);
 		border-radius: 14px;
 		overflow: hidden;
-		background: #ffffff;
+		background: var(--article-tk-bg);
 	}
 
 	.article-comments :global(.twikoo .tk-meta-input .el-input-group__prepend) {
 		min-width: 84px;
-		background: #ffffff !important;
+		background: var(--article-tk-bg) !important;
 		border: none !important;
-		border-right: 1px solid #d1d5db !important;
-		color: #111827 !important;
+		border-right: 1px solid var(--article-tk-line) !important;
+		color: var(--article-tk-text) !important;
 		font-weight: 700;
 		border-radius: 0 !important;
 	}
 
 	.article-comments :global(.twikoo .tk-meta-input .el-input__inner) {
-		background: #ffffff !important;
+		background: var(--article-tk-bg) !important;
 		border: none !important;
-		color: #111827 !important;
+		color: var(--article-tk-text) !important;
 		border-radius: 0 !important;
 	}
 
@@ -425,22 +466,65 @@ const jsonLd = {
 	}
 
 	.article-comments :global(.twikoo .tk-meta-input .el-input__inner::placeholder) {
-		color: #9ca3af !important;
+		color: var(--article-tk-muted) !important;
 	}
 
 	.article-comments :global(.twikoo .el-input__inner:hover),
 	.article-comments :global(.twikoo .el-textarea__inner:hover),
 	.article-comments :global(.twikoo .el-input__inner:focus),
 	.article-comments :global(.twikoo .el-textarea__inner:focus) {
-		border-color: #9ca3af !important;
+		border-color: var(--article-tk-muted) !important;
 	}
 
 	.article-comments :global(.twikoo .tk-expand:hover) {
-		background-color: rgba(17, 24, 39, 0.06);
+		background-color: var(--article-tk-hover);
 	}
 
 	.article-comments :global(.twikoo .tk-content img) {
 		border-radius: 10px;
+	}
+
+	/* OwO emotion panel: sync with light/dark theme tokens */
+	.article-comments :global(.twikoo .OwO),
+	.article-comments :global(.twikoo .OwO .OwO-body),
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-items),
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-bar) {
+		background: var(--article-tk-bg) !important;
+		color: var(--article-tk-text) !important;
+		border-color: var(--article-tk-line) !important;
+	}
+
+	.article-comments :global(.twikoo .OwO) {
+		border: 1px solid var(--article-tk-line) !important;
+		border-radius: 10px !important;
+		overflow: hidden;
+	}
+
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-items .OwO-item),
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-items span),
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-items li) {
+		color: var(--article-tk-text) !important;
+	}
+
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-items .OwO-item:hover),
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-items span:hover),
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-items li:hover) {
+		background: var(--article-tk-hover) !important;
+	}
+
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-bar .OwO-packages li),
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-bar .OwO-packages span) {
+		color: var(--article-tk-muted) !important;
+		background: transparent !important;
+		border-color: var(--article-tk-line-soft) !important;
+	}
+
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-bar .OwO-packages li:hover),
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-bar .OwO-packages span:hover),
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-bar .OwO-packages .OwO-package-active),
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-bar .OwO-packages .active) {
+		color: var(--article-tk-text) !important;
+		background: var(--article-tk-hover) !important;
 	}
 
 	@media (max-width: 900px) {

@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import { matchDevCredential } from "@utils/dev-auth-server";
+import { getExpectedDevCode, matchDevCredential } from "@utils/dev-auth-server";
 import type { APIRoute } from "astro";
 
 export const prerender = false;
@@ -138,7 +138,13 @@ async function writeRepoBinaryFile(params: {
 }
 
 export const POST: APIRoute = async ({ request }) => {
-	const expectedCode = import.meta.env.DEV_EDITOR_CODE || "liyue233";
+	const expectedCode = getExpectedDevCode();
+	if (!expectedCode) {
+		return json(500, {
+			ok: false,
+			message: "Missing DEV_EDITOR_CODE environment variable",
+		});
+	}
 
 	let form: FormData;
 	try {

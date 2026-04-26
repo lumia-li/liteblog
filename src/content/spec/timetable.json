@@ -1,7 +1,7 @@
 {
 	"termName": "大一下2",
 	"totalWeeks": 19,
-	"currentWeek": 8,
+	"currentWeek": 9,
 	"termStartDate": "2026-03-02",
 	"periods": [
 		{
@@ -37,7 +37,7 @@
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "刘晓龙",
-				"color": "#8f9eff"
+				"color": "#9ddfcd"
 			}
 		],
 		"p_group_1__tue": [
@@ -51,11 +51,11 @@
 		],
 		"p_group_1__wed": [
 			{
-				"course": "数据库技术",
+				"course": "毛概 2",
 				"weeks": "",
-				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
-				"teacher": "张荣",
-				"color": "#82cbff"
+				"location": "一合楼-4楼-J402阶梯教室(J402)",
+				"teacher": "仇百辉",
+				"color": "#9ddfcd"
 			}
 		],
 		"p_group_1__thu": [
@@ -64,7 +64,7 @@
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "刘晓龙",
-				"color": "#82cbff"
+				"color": "#e9da77"
 			}
 		],
 		"p_group_2__mon": [
@@ -73,25 +73,25 @@
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "刘晓龙",
-				"color": "#ddb8ea"
+				"color": "#95dc5d"
 			}
 		],
 		"p_group_2__tue": [
 			{
-				"course": "职业素质与职业发展规划",
+				"course": "毛泽东思想和中国特色社会主义理论体系概论",
 				"weeks": "",
-				"location": "一合楼-4楼-J402阶梯教室(J402)",
-				"teacher": "李宁",
-				"color": "#82cbff"
+				"location": "善工楼-3楼-SG316（汽车创客体验中心）(SG316)",
+				"teacher": "仇百辉",
+				"color": "#68dfcd"
 			}
 		],
-		"p_group_2__fri": [
+		"p_group_2__wed": [
 			{
-				"course": "人工智能大模型实践与应用",
+				"course": "数据库技术",
 				"weeks": "",
-				"location": "行知楼-2楼-数字剪辑实训室(9217)",
-				"teacher": "蹇赫",
-				"color": "#9ddfcd"
+				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+				"teacher": "张荣",
+				"color": "#e9da77"
 			}
 		],
 		"p_group_3__mon": [
@@ -103,22 +103,13 @@
 				"color": "#e9da77"
 			}
 		],
-		"p_group_3__fri": [
-			{
-				"course": "毛概 2",
-				"weeks": "",
-				"location": "一合楼-4楼-J402阶梯教室(J402)",
-				"teacher": "仇百辉",
-				"color": "#82cbff"
-			}
-		],
 		"p_group_4__mon": [
 			{
 				"course": "web程序设计基础",
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "赵湘元",
-				"color": "#9ddfcd"
+				"color": "#ddb8ea"
 			}
 		],
 		"p_group_4__tue": [
@@ -127,7 +118,16 @@
 				"weeks": "",
 				"location": "一合楼-4楼-J404阶梯教室(J404)",
 				"teacher": "郝荣娟",
-				"color": "#e9da77"
+				"color": "#95dc5d"
+			}
+		],
+		"p_group_4__thu": [
+			{
+				"course": "人工智能大模型实践与应用",
+				"weeks": "",
+				"location": "行知楼-2楼-数字剪辑实训室(9217)",
+				"teacher": "蹇赫",
+				"color": "#82cbff"
 			}
 		]
 	},

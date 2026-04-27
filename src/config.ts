@@ -46,7 +46,7 @@ export const navBarConfig: NavBarConfig = {
 		LinkPreset.About,
 		{
 			name: "统计",
-			url: "https://u.liyueovo.top/share/BNQHKRVIrz8MsQiu", // Internal links should not include the base path, as it is automatically added
+			url: "https://u.liyueovo.top/share/JcluoL3fodM2Id2O", // Internal links should not include the base path, as it is automatically added
 			external: true, // Show an external link icon and will open in a new tab
 		},
 	],

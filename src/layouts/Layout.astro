@@ -194,8 +194,8 @@ const customFontHref = url("/fonts/KeinannMaruPOP_CN-EN.ttf");
 	>
 
 		<ConfigCarrier></ConfigCarrier>
-		{!isHubPageType && <Lantern client:load />}
-		{!isHubPageType && <RainEffect client:load />}
+		{!isHubPageType && <Lantern client:only="svelte" />}
+		{!isHubPageType && <RainEffect client:only="svelte" />}
 		<slot />
 
 		<!-- increase the page height during page transition to prevent the scrolling animation from jumping -->
@@ -877,6 +877,10 @@ function showBanner() {
 	syncHomeBannerHeightToAvatar();
 }
 
+let backToTopBtn = document.getElementById('back-to-top-btn');
+let toc = document.getElementById('toc-wrapper');
+let navbar = document.getElementById('navbar-wrapper')
+
 function init() {
 	// disableAnimation()()		// TODO
 	loadTheme();
@@ -1056,9 +1060,6 @@ if (window?.swup?.hooks) {
 	document.addEventListener('swup:enable', setup)
 }
 
-let backToTopBtn = document.getElementById('back-to-top-btn');
-let toc = document.getElementById('toc-wrapper');
-let navbar = document.getElementById('navbar-wrapper')
 function scrollFunction() {
 	let bannerHeight = window.innerHeight * (BANNER_HEIGHT / 100)
 	const backToTopShowOffset = 180

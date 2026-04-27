@@ -75,6 +75,7 @@
 	let isSaving = false;
 	let detectedCurrentWeek: number | null = null;
 	let isViewingDetectedWeek = false;
+	let hasSyncedDetectedWeek = false;
 
 	let modalOpen = false;
 	let editingKey = "";
@@ -387,6 +388,7 @@
 		void (async () => {
 			await loadState();
 			if (currentWeek > totalWeeks) currentWeek = totalWeeks;
+			await syncDetectedWeekOnLoad();
 			hasLoadedState = true;
 		})();
 		return () => {
@@ -420,7 +422,19 @@
 		syncViewFromWeekly();
 	}
 
-	function setCurrentWeekTag() {
+	async function syncDetectedWeekOnLoad() {
+		if (hasSyncedDetectedWeek) return;
+		hasSyncedDetectedWeek = true;
+		const detected = detectCurrentWeekByDate();
+		if (detected === null || currentWeek === detected) return;
+		currentWeek = detected;
+		syncViewFromWeekly();
+		if (hasDevCredential()) {
+			await saveNow({ silent: true, suppressCredentialError: true });
+		}
+	}
+
+	async function setCurrentWeekTag() {
 		const detected = detectCurrentWeekByDate();
 		if (detected === null) {
 			importError = "请先设置开学日期，再使用“当前周”自动判定";
@@ -431,6 +445,9 @@
 		importError = "";
 		importMessage = `已按日期自动定位到第 ${currentWeek} 周`;
 		syncViewFromWeekly();
+		await saveNow({
+			successMessage: `已按日期自动定位到第 ${currentWeek} 周，并保存`,
+		});
 	}
 
 	function addPeriod() {
@@ -451,7 +468,7 @@
 
 	function openEditor(periodId: string, day: DayKey) {
 		if (!canEdit) {
-			importError = "当前为只读模式，请先在开发者编辑器完成口令验证后再编辑";
+			importError = "不要改喵！会看不懂的喵！";
 			importMessage = "";
 			return;
 		}
@@ -801,14 +818,22 @@
 		return Math.max(1, Math.min(totalWeeks, week));
 	}
 
-	async function saveNow() {
+	type SaveOptions = {
+		silent?: boolean;
+		successMessage?: string;
+		suppressCredentialError?: boolean;
+	};
+
+	async function saveNow(options: SaveOptions = {}) {
 		if (typeof window === "undefined") return;
 		if (isSaving) return;
 		const devCodeHash = readStoredDevCredential();
 		if (!devCodeHash) {
 			canEdit = false;
-			importError = "未检测到开发者凭据，请先在编辑器里验证口令后再保存";
-			importMessage = "";
+			if (!options.suppressCredentialError) {
+				importError = "这里不能保存喵，看看课程就好啦！";
+				importMessage = "";
+			}
 			return;
 		}
 		isSaving = true;
@@ -835,12 +860,16 @@
 						: "保存失败",
 				);
 			}
-			importMessage = "已保存到共享课程表";
+			if (!options.silent) {
+				importMessage = options.successMessage || "已保存到共享课程表";
+			}
 			importError = "";
 			window.dispatchEvent(new CustomEvent("timetable-updated"));
 		} catch (error) {
-			importError = error instanceof Error ? error.message : "保存失败";
-			importMessage = "";
+			if (!options.silent) {
+				importError = error instanceof Error ? error.message : "保存失败";
+				importMessage = "";
+			}
 		} finally {
 			isSaving = false;
 			canEdit = hasDevCredential();
@@ -1016,7 +1045,7 @@
 		<button type="button" class="week-nav" on:click={nextWeek} aria-label="下一周">›</button>
 		<button
 			type="button"
-			class:list={["week-current", { "is-target": isViewingDetectedWeek }]}
+			class={`week-current${isViewingDetectedWeek ? " is-target" : ""}`}
 			on:click={setCurrentWeekTag}
 			disabled={isViewingDetectedWeek}
 		>
@@ -1044,11 +1073,11 @@
 						{#each DISPLAY_DAYS as day}
 							{@const key = courseKey(period.id, day)}
 							{@const item = getDisplayCourse(period.id, day)}
-							<td class:list={["course-cell", { inactive: !!item && !isActiveCourse(item) }]}>
+							<td class={`course-cell${!!item && !isActiveCourse(item) ? " inactive" : ""}`}>
 								{#if item}
 									<button
 										type="button"
-										class:list={["course-slot", { inactive: !isActiveCourse(item) }]}
+										class={`course-slot${!isActiveCourse(item) ? " inactive" : ""}`}
 										on:click={() => openEditor(period.id, day)}
 									>
 										<div
@@ -1093,7 +1122,7 @@
 					</label>
 				</div>
 				<div class="tools-actions">
-					<button type="button" class="plain-btn" on:click={saveNow} disabled={isSaving}>
+					<button type="button" class="plain-btn" on:click={() => saveNow()} disabled={isSaving}>
 						{isSaving ? "保存中..." : "保存课程表"}
 					</button>
 					<button type="button" class="plain-btn" on:click={onFilePick}>导入 xls/xlsx</button>
@@ -1399,6 +1428,14 @@
 		border: 1px solid var(--tt-border-strong);
 		border-radius: 18px;
 		background: var(--tt-surface);
+		scrollbar-width: none;
+		-ms-overflow-style: none;
+	}
+
+	.table-shell::-webkit-scrollbar {
+		display: none;
+		width: 0;
+		height: 0;
 	}
 
 	.timetable {

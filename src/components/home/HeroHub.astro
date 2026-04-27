@@ -501,6 +501,8 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 			);
 			const nextTodayEntry = todayEntries.find((item) => item.startMinutes > nowMinute) || null;
 			const doneTodayEntries = todayEntries.filter((item) => item.endMinutes <= nowMinute);
+			const isTodayFinished =
+				todayEntries.length > 0 && todayEntries.every((item) => item.endMinutes <= nowMinute);
 			let statusState = "idle";
 			let highlightText = "点击设置课程表";
 			let countdownLabel = "距上课还有:";
@@ -561,7 +563,11 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 			};
 			applyStateBadge(statusState, stateTextMap[statusState] || "课程状态");
 			if (classTitleTarget) {
-				classTitleTarget.textContent = statusState === "nextweek" ? "本周课毕" : "今日课程";
+				classTitleTarget.textContent = isTodayFinished
+					? "今日课毕"
+					: statusState === "nextweek"
+						? "本周课毕"
+						: "今日课程";
 			}
 			classHighlightTarget.textContent = highlightText;
 			if (countdownLabelTarget) countdownLabelTarget.textContent = countdownLabel;

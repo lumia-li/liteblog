@@ -184,7 +184,12 @@ const {
 		--btn-plain-bg-hover: #f4f4f4;
 		--btn-plain-bg-active: #efefef;
 		--btn-border: #d7d7d7;
-		--codeblock-bg: #06101f;
+		--codeblock-bg: #f6f8fa;
+		--codeblock-topbar-bg: #eef2f7;
+		--codeblock-border: #d8dee8;
+		--codeblock-shadow: 0 8px 22px rgba(15, 23, 42, 0.12);
+		--codeblock-badge-bg: #e2e8f0;
+		--codeblock-badge-text: #334155;
 		--license-block-bg: #e8ebef;
 		--radius-large: 1rem;
 		--meta-divider: rgba(17, 17, 17, 0.28);
@@ -209,6 +214,11 @@ const {
 		--btn-plain-bg-active: #263245;
 		--btn-border: #2a3444;
 		--codeblock-bg: #090d14;
+		--codeblock-topbar-bg: #101827;
+		--codeblock-border: #263244;
+		--codeblock-shadow: 0 10px 28px rgba(0, 0, 0, 0.42);
+		--codeblock-badge-bg: #253246;
+		--codeblock-badge-text: #bfdbfe;
 		--license-block-bg: #151c26;
 		--meta-divider: rgba(236, 242, 255, 0.35);
 	}
@@ -455,6 +465,139 @@ const {
 		--tw-prose-code: var(--tw-prose-invert-code);
 		--tw-prose-th-borders: var(--tw-prose-invert-th-borders);
 		--tw-prose-td-borders: var(--tw-prose-invert-td-borders);
+	}
+
+	.hub-content .custom-md :is(h1, h2, h3, h4, h5, h6) .anchor {
+		margin-left: 0.28em;
+		text-decoration: none !important;
+		opacity: 0;
+		transition: opacity 0.16s ease;
+	}
+
+	.hub-content .custom-md :is(h1, h2, h3, h4, h5, h6):hover .anchor,
+	.hub-content .custom-md :is(h1, h2, h3, h4, h5, h6) .anchor:focus-visible {
+		opacity: 0.55;
+	}
+
+	.hub-content .custom-md .anchor-icon {
+		font-size: 0.72em;
+		line-height: 1;
+		text-decoration: none !important;
+		vertical-align: 0.08em;
+	}
+
+	.hub-content .custom-md .expressive-code {
+		margin: 1.35em 0 1.7em;
+	}
+
+	.hub-content .custom-md .expressive-code .frame {
+		border-radius: 14px;
+		box-shadow: var(--codeblock-shadow);
+	}
+
+	.hub-content .custom-md .expressive-code pre {
+		position: relative;
+		border-color: var(--codeblock-border) !important;
+		border-radius: 14px;
+		background: var(--codeblock-bg) !important;
+		overflow-x: auto;
+		overflow-y: hidden;
+		scrollbar-width: none;
+		-ms-overflow-style: none;
+	}
+
+	.hub-content .custom-md .expressive-code .gutter .ln {
+		color: color-mix(in srgb, var(--text-color) 34%, transparent) !important;
+	}
+
+	.hub-content .custom-md .expressive-code .ec-line .gutter ~ .code {
+		--ecLineBrdCol: color-mix(in srgb, var(--text-color) 12%, transparent);
+	}
+
+	.hub-content .custom-md .expressive-code [data-language]::before {
+		top: 0.7rem;
+		right: 3.15rem;
+		margin-right: 0;
+		border-radius: 999px;
+		background: var(--codeblock-badge-bg);
+		color: var(--codeblock-badge-text);
+		opacity: 1;
+	}
+
+	.hub-content .custom-md .expressive-code .copy-btn {
+		all: unset;
+		position: absolute;
+		top: 0.62rem;
+		right: 0.62rem;
+		z-index: 4;
+		box-sizing: border-box;
+		display: inline-flex;
+		width: 2rem;
+		height: 2rem;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid color-mix(in srgb, var(--codeblock-badge-text) 18%, transparent);
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--codeblock-badge-bg) 88%, var(--codeblock-bg));
+		color: var(--codeblock-badge-text);
+		box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+		cursor: pointer;
+		opacity: 0.86;
+		transition:
+			opacity 0.16s ease,
+			background-color 0.16s ease,
+			border-color 0.16s ease,
+			transform 0.16s ease;
+	}
+
+	.hub-content .custom-md .expressive-code .copy-btn:hover,
+	.hub-content .custom-md .expressive-code .copy-btn:focus-visible,
+	.hub-content .custom-md .expressive-code .copy-btn.success {
+		border-color: color-mix(in srgb, var(--codeblock-badge-text) 32%, transparent);
+		background: color-mix(in srgb, var(--codeblock-badge-bg) 72%, var(--codeblock-badge-text));
+		opacity: 1;
+		transform: translateY(-1px);
+	}
+
+	.hub-content .custom-md .expressive-code .copy-btn:focus-visible {
+		outline: 2px solid color-mix(in srgb, var(--codeblock-badge-text) 42%, transparent);
+		outline-offset: 2px;
+	}
+
+	.hub-content .custom-md .expressive-code .copy-btn > .copy-btn-icon {
+		display: grid;
+		width: 1rem;
+		height: 1rem;
+		place-items: center;
+		pointer-events: none;
+	}
+
+	.hub-content .custom-md .expressive-code .copy-btn svg {
+		grid-area: 1 / 1;
+		display: block;
+		width: 1rem;
+		height: 1rem;
+		fill: currentColor;
+		pointer-events: none;
+	}
+
+	.hub-content .custom-md .expressive-code .copy-btn .success-icon,
+	.hub-content .custom-md .expressive-code .copy-btn.success .copy-icon {
+		display: none;
+	}
+
+	.hub-content .custom-md .expressive-code .copy-btn.success .success-icon {
+		display: block;
+	}
+
+	.hub-content .custom-md .expressive-code pre::-webkit-scrollbar {
+		display: none;
+		width: 0;
+		height: 0;
+	}
+
+	.hub-content .custom-md .expressive-code .os-scrollbar {
+		display: none !important;
 	}
 
 	/* Twikoo: keep comment area in light palette inside this layout */

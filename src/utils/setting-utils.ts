@@ -89,9 +89,16 @@ function applyThemeWithTransitions(theme: LIGHT_DARK_MODE): void {
 	};
 
 	if (!prefersReducedMotion && typeof doc.startViewTransition === "function") {
-		doc.startViewTransition(() => {
+		try {
+			const transition = doc.startViewTransition(() => {
+				applyThemeToDocument(theme);
+			});
+			transition.finished?.catch(() => {
+				// View transitions can be aborted by rapid toggles or navigation.
+			});
+		} catch {
 			applyThemeToDocument(theme);
-		});
+		}
 		return;
 	}
 

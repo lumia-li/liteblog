@@ -49,15 +49,6 @@
 				"color": "#e9da77"
 			}
 		],
-		"p_group_1__wed": [
-			{
-				"course": "毛概 2",
-				"weeks": "",
-				"location": "一合楼-4楼-J402阶梯教室(J402)",
-				"teacher": "仇百辉",
-				"color": "#9ddfcd"
-			}
-		],
 		"p_group_1__thu": [
 			{
 				"course": "Vue应用程序开发",
@@ -74,15 +65,6 @@
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "刘晓龙",
 				"color": "#95dc5d"
-			}
-		],
-		"p_group_2__tue": [
-			{
-				"course": "毛泽东思想和中国特色社会主义理论体系概论",
-				"weeks": "",
-				"location": "善工楼-3楼-SG316（汽车创客体验中心）(SG316)",
-				"teacher": "仇百辉",
-				"color": "#68dfcd"
 			}
 		],
 		"p_group_2__wed": [
@@ -128,6 +110,15 @@
 				"location": "行知楼-2楼-数字剪辑实训室(9217)",
 				"teacher": "蹇赫",
 				"color": "#82cbff"
+			}
+		],
+		"p_group_4__wed": [
+			{
+				"course": "国家安全教育",
+				"weeks": "",
+				"location": "一合楼-4楼-J404阶梯教室(J404)",
+				"teacher": "郝荣娟",
+				"color": "#9ddfcd"
 			}
 		]
 	},
@@ -1210,15 +1201,6 @@
 						"color": "#e9da77"
 					}
 				],
-				"p_group_1__wed": [
-					{
-						"course": "毛概 2",
-						"weeks": "",
-						"location": "一合楼-4楼-J402阶梯教室(J402)",
-						"teacher": "仇百辉",
-						"color": "#9ddfcd"
-					}
-				],
 				"p_group_1__thu": [
 					{
 						"course": "Vue应用程序开发",
@@ -1235,15 +1217,6 @@
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
 						"color": "#95dc5d"
-					}
-				],
-				"p_group_2__tue": [
-					{
-						"course": "毛泽东思想和中国特色社会主义理论体系概论",
-						"weeks": "",
-						"location": "善工楼-3楼-SG316（汽车创客体验中心）(SG316)",
-						"teacher": "仇百辉",
-						"color": "#68dfcd"
 					}
 				],
 				"p_group_2__wed": [
@@ -1289,6 +1262,15 @@
 						"location": "行知楼-2楼-数字剪辑实训室(9217)",
 						"teacher": "蹇赫",
 						"color": "#82cbff"
+					}
+				],
+				"p_group_4__wed": [
+					{
+						"course": "国家安全教育",
+						"weeks": "",
+						"location": "一合楼-4楼-J404阶梯教室(J404)",
+						"teacher": "郝荣娟",
+						"color": "#9ddfcd"
 					}
 				]
 			}

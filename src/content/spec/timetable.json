@@ -120,6 +120,15 @@
 				"teacher": "郝荣娟",
 				"color": "#9ddfcd"
 			}
+		],
+		"p_group_5__thu": [
+			{
+				"course": "回家awa",
+				"weeks": "",
+				"location": "",
+				"teacher": "",
+				"color": "#68dfcd"
+			}
 		]
 	},
 	"weeklySheets": {
@@ -1271,6 +1280,15 @@
 						"location": "一合楼-4楼-J404阶梯教室(J404)",
 						"teacher": "郝荣娟",
 						"color": "#9ddfcd"
+					}
+				],
+				"p_group_5__thu": [
+					{
+						"course": "回家awa",
+						"weeks": "",
+						"location": "",
+						"teacher": "",
+						"color": "#68dfcd"
 					}
 				]
 			}

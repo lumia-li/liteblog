@@ -29,6 +29,29 @@ const { Content, headings } = await entry.render();
 const backToPostsHref = `${url("/posts/")}?return=1&slug=${encodeURIComponent(entry.slug)}`;
 
 const { remarkPluginFrontmatter } = await entry.render();
+const publishedDate = entry.data.published;
+const lastUpdatedDate = entry.data.updated ?? entry.data.published;
+const publishedText = formatDateToYYYYMMDD(publishedDate);
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
+const ageDays = Math.max(
+	0,
+	Math.floor((Date.now() - lastUpdatedDate.getTime()) / MS_PER_DAY),
+);
+
+type FreshnessTone = "fresh" | "notice" | "warn";
+let freshnessTone: FreshnessTone;
+let freshnessMessage: string;
+
+if (ageDays <= 3) {
+	freshnessTone = "fresh";
+	freshnessMessage = `发布于 ${publishedText}，这篇文章刚出炉，内容还热乎。`;
+} else if (ageDays <= 45) {
+	freshnessTone = "notice";
+	freshnessMessage = `发布于 ${publishedText}，最近更新于 ${ageDays} 天前，整体内容仍然可参考。`;
+} else {
+	freshnessTone = "warn";
+	freshnessMessage = `发布于 ${publishedText}，最近更新于 ${ageDays} 天前，部分信息可能已经发生变化。`;
+}
 
 const jsonLd = {
 	"@context": "https://schema.org",
@@ -55,6 +78,16 @@ const jsonLd = {
 	<article id="post-container" class="article-flow">
 		<div class="article-back-row onload-animation">
 			<a class="article-back-btn" href={backToPostsHref} data-no-swup>← 返回文章列表</a>
+		</div>
+		<div
+			class:list={["article-freshness-bar onload-animation", `is-${freshnessTone}`]}
+			role="status"
+			aria-live="polite"
+		>
+			<div class="article-freshness-icon">
+				<Icon name="material-symbols:info-rounded"></Icon>
+			</div>
+			<p class="article-freshness-text">{freshnessMessage}</p>
 		</div>
 		<header class="article-header onload-animation">
 			<div class="article-reading-meta transition">
@@ -184,6 +217,18 @@ const jsonLd = {
 		--article-tk-line-soft: #e5e7eb;
 		--article-tk-bg: #ffffff;
 		--article-tk-hover: rgba(17, 24, 39, 0.06);
+		--article-fresh-bg: #e8f8ee;
+		--article-fresh-border: #b7e5c8;
+		--article-fresh-text: #185b34;
+		--article-fresh-icon: #1f7a43;
+		--article-notice-bg: #fff6e7;
+		--article-notice-border: #f6dcad;
+		--article-notice-text: #7a5116;
+		--article-notice-icon: #a96913;
+		--article-warn-bg: #fff0f2;
+		--article-warn-border: #f7c2cb;
+		--article-warn-text: #8f2337;
+		--article-warn-icon: #c13957;
 	}
 
 	:root.dark {
@@ -204,6 +249,18 @@ const jsonLd = {
 		--article-tk-line-soft: #2c394d;
 		--article-tk-bg: #101826;
 		--article-tk-hover: rgba(226, 232, 240, 0.08);
+		--article-fresh-bg: rgba(22, 101, 52, 0.2);
+		--article-fresh-border: rgba(74, 222, 128, 0.38);
+		--article-fresh-text: #c8f5d8;
+		--article-fresh-icon: #7be7a7;
+		--article-notice-bg: rgba(120, 53, 15, 0.24);
+		--article-notice-border: rgba(251, 191, 36, 0.4);
+		--article-notice-text: #ffe6b0;
+		--article-notice-icon: #ffd277;
+		--article-warn-bg: rgba(127, 29, 29, 0.24);
+		--article-warn-border: rgba(251, 113, 133, 0.44);
+		--article-warn-text: #ffd4dc;
+		--article-warn-icon: #ff97a9;
 	}
 
 	.article-flow {
@@ -216,6 +273,62 @@ const jsonLd = {
 		display: flex;
 		justify-content: flex-start;
 		margin-bottom: 1.4rem;
+	}
+
+	.article-freshness-bar {
+		display: flex;
+		align-items: center;
+		gap: 0.65rem;
+		margin-bottom: 1rem;
+		padding: 0.75rem 0.9rem;
+		border-radius: 0.8rem;
+		border: 1px solid;
+		line-height: 1.55;
+	}
+
+	.article-freshness-bar.is-fresh {
+		background: var(--article-fresh-bg);
+		border-color: var(--article-fresh-border);
+		color: var(--article-fresh-text);
+	}
+
+	.article-freshness-bar.is-notice {
+		background: var(--article-notice-bg);
+		border-color: var(--article-notice-border);
+		color: var(--article-notice-text);
+	}
+
+	.article-freshness-bar.is-warn {
+		background: var(--article-warn-bg);
+		border-color: var(--article-warn-border);
+		color: var(--article-warn-text);
+	}
+
+	.article-freshness-icon {
+		flex: 0 0 auto;
+		width: 1.1rem;
+		height: 1.1rem;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.article-freshness-bar.is-fresh .article-freshness-icon {
+		color: var(--article-fresh-icon);
+	}
+
+	.article-freshness-bar.is-notice .article-freshness-icon {
+		color: var(--article-notice-icon);
+	}
+
+	.article-freshness-bar.is-warn .article-freshness-icon {
+		color: var(--article-warn-icon);
+	}
+
+	.article-freshness-text {
+		margin: 0;
+		font-size: 0.97rem;
+		font-weight: 600;
 	}
 
 	.article-back-btn {

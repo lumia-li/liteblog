@@ -1,7 +1,7 @@
 {
 	"termName": "大一下2",
 	"totalWeeks": 19,
-	"currentWeek": 9,
+	"currentWeek": 10,
 	"termStartDate": "2026-03-02",
 	"periods": [
 		{
@@ -31,103 +31,76 @@
 		}
 	],
 	"courses": {
-		"p_group_1__mon": [
-			{
-				"course": "鸿蒙初级应用开发",
-				"weeks": "",
-				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
-				"teacher": "刘晓龙",
-				"color": "#9ddfcd"
-			}
-		],
-		"p_group_1__tue": [
-			{
-				"course": "Vue应用程序开发",
-				"weeks": "",
-				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
-				"teacher": "刘晓龙",
-				"color": "#e9da77"
-			}
-		],
 		"p_group_1__thu": [
 			{
-				"course": "Vue应用程序开发",
+				"course": "鸿蒙初级应用开发",
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "刘晓龙",
 				"color": "#e9da77"
 			}
 		],
-		"p_group_2__mon": [
+		"p_group_1__sat": [
 			{
-				"course": "鸿蒙初级应用开发",
+				"course": "毛概 2",
 				"weeks": "",
-				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
-				"teacher": "刘晓龙",
-				"color": "#95dc5d"
+				"location": "一合楼-4楼-J402阶梯教室(J402)",
+				"teacher": "仇百辉",
+				"color": "#8f9eff"
 			}
 		],
 		"p_group_2__wed": [
 			{
-				"course": "数据库技术",
-				"weeks": "",
-				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
-				"teacher": "张荣",
-				"color": "#e9da77"
-			}
-		],
-		"p_group_3__mon": [
-			{
 				"course": "web程序设计基础",
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "赵湘元",
-				"color": "#e9da77"
-			}
-		],
-		"p_group_4__mon": [
-			{
-				"course": "web程序设计基础",
-				"weeks": "",
-				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
-				"teacher": "赵湘元",
-				"color": "#ddb8ea"
-			}
-		],
-		"p_group_4__tue": [
-			{
-				"course": "国家安全教育",
-				"weeks": "",
-				"location": "一合楼-4楼-J404阶梯教室(J404)",
-				"teacher": "郝荣娟",
 				"color": "#95dc5d"
 			}
 		],
-		"p_group_4__thu": [
+		"p_group_2__fri": [
 			{
 				"course": "人工智能大模型实践与应用",
 				"weeks": "",
 				"location": "行知楼-2楼-数字剪辑实训室(9217)",
 				"teacher": "蹇赫",
-				"color": "#82cbff"
+				"color": "#95dc5d"
 			}
 		],
-		"p_group_4__wed": [
+		"p_group_2__sat": [
 			{
-				"course": "国家安全教育",
+				"course": "鸿蒙初级应用开发",
 				"weeks": "",
-				"location": "一合楼-4楼-J404阶梯教室(J404)",
-				"teacher": "郝荣娟",
-				"color": "#9ddfcd"
+				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+				"teacher": "刘晓龙",
+				"color": "#8f9eff"
 			}
 		],
-		"p_group_5__thu": [
+		"p_group_3__fri": [
 			{
-				"course": "回家awa",
+				"course": "职业素质与职业发展规划",
 				"weeks": "",
-				"location": "",
-				"teacher": "",
-				"color": "#68dfcd"
+				"location": "一合楼-4楼-J402阶梯教室(J402)",
+				"teacher": "李宁",
+				"color": "#e9da77"
+			}
+		],
+		"p_group_4__thu": [
+			{
+				"course": "数据库技术",
+				"weeks": "",
+				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+				"teacher": "张荣",
+				"color": "#8f9eff"
+			}
+		],
+		"p_group_4__sat": [
+			{
+				"course": "职场通用英语II 专科英语",
+				"weeks": "",
+				"location": "一合楼-4楼-J402阶梯教室(J402)",
+				"teacher": "马悦",
+				"color": "#95dc5d"
 			}
 		]
 	},

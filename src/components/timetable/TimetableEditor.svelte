@@ -145,6 +145,7 @@
 		dayGroups: [],
 		matchedCellKeys: {},
 	};
+	let weeklyCourseCount = 0;
 
 	const courseKey = (periodId: string, day: DayKey) => `${periodId}__${day}`;
 
@@ -568,6 +569,13 @@
 		weeklyMode;
 		searchState = buildSearchState(searchQuery);
 	}
+	$: {
+		currentWeek;
+		periods;
+		courses;
+		weeklyMode;
+		weeklyCourseCount = countVisibleCoursesForWeek();
+	}
 
 	function prevWeek() {
 		currentWeek = Math.max(1, currentWeek - 1);
@@ -970,6 +978,16 @@
 		return noWeekRule || null;
 	}
 
+	function countVisibleCoursesForWeek(): number {
+		let count = 0;
+		for (const period of periods) {
+			for (const day of DISPLAY_DAYS) {
+				if (getDisplayCourse(period.id, day)) count += 1;
+			}
+		}
+		return count;
+	}
+
 	function buildSearchState(keyword: string): SearchState {
 		const normalizedKeyword = keyword.trim();
 		if (!normalizedKeyword) {
@@ -1303,7 +1321,7 @@
 	<header class="tt-header">
 		<div>
 			<h1>{termName}</h1>
-			<p>共 {totalWeeks} 周</p>
+			<p>共 {totalWeeks} 周 · 本周一共 {weeklyCourseCount} 节课</p>
 		</div>
 		<a href="/" class="home-btn" data-no-swup>
 			<svg class="home-btn-icon icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -1689,6 +1707,7 @@
 		align-items: center;
 		gap: 10px;
 	}
+
 
 	.read-only-tip {
 		margin: 0;
@@ -2219,6 +2238,10 @@
 		.week-label {
 			font-size: 1.1rem;
 			min-width: 80px;
+		}
+
+		.week-row {
+			flex-wrap: wrap;
 		}
 
 		th {

@@ -1691,58 +1691,33 @@
 		"11": {
 			"periods": [
 				{
-					"id": "p_import_1",
-					"label": "1",
-					"time": ""
+					"id": "p_group_1",
+					"label": "1-2",
+					"time": "08:30 - 10:00"
 				},
 				{
-					"id": "p_import_2",
-					"label": "2",
-					"time": ""
+					"id": "p_group_2",
+					"label": "3-4",
+					"time": "10:20 - 11:50"
 				},
 				{
-					"id": "p_import_3",
-					"label": "3",
-					"time": ""
+					"id": "p_group_3",
+					"label": "5-6",
+					"time": "13:00 - 14:25"
 				},
 				{
-					"id": "p_import_4",
-					"label": "4",
-					"time": ""
+					"id": "p_group_4",
+					"label": "6-8",
+					"time": "14:45 - 16:10"
 				},
 				{
-					"id": "p_import_5",
-					"label": "5",
-					"time": ""
-				},
-				{
-					"id": "p_import_6",
-					"label": "6",
-					"time": ""
-				},
-				{
-					"id": "p_import_7",
-					"label": "7",
-					"time": ""
-				},
-				{
-					"id": "p_import_8",
-					"label": "8",
-					"time": ""
-				},
-				{
-					"id": "p_import_9",
-					"label": "9",
-					"time": ""
-				},
-				{
-					"id": "p_import_10",
-					"label": "10",
-					"time": ""
+					"id": "p_group_5",
+					"label": "9-10",
+					"time": "18:30 - 20:00"
 				}
 			],
 			"courses": {
-				"p_import_1__mon": [
+				"p_group_1__mon": [
 					{
 						"course": "心理健康教育II",
 						"weeks": "",
@@ -1752,7 +1727,7 @@
 						"searchTags": []
 					}
 				],
-				"p_import_1__tue": [
+				"p_group_1__tue": [
 					{
 						"course": "Vue应用程序开发",
 						"weeks": "",
@@ -1762,7 +1737,7 @@
 						"searchTags": []
 					}
 				],
-				"p_import_1__wed": [
+				"p_group_1__wed": [
 					{
 						"course": "毛概 2",
 						"weeks": "",
@@ -1772,7 +1747,7 @@
 						"searchTags": []
 					}
 				],
-				"p_import_1__thu": [
+				"p_group_1__thu": [
 					{
 						"course": "鸿蒙初级应用开发",
 						"weeks": "",
@@ -1782,7 +1757,7 @@
 						"searchTags": []
 					}
 				],
-				"p_import_3__mon": [
+				"p_group_2__mon": [
 					{
 						"course": "Vue应用程序开发",
 						"weeks": "",
@@ -1792,7 +1767,7 @@
 						"searchTags": []
 					}
 				],
-				"p_import_3__tue": [
+				"p_group_2__tue": [
 					{
 						"course": "职业素质与职业发展规划",
 						"weeks": "",
@@ -1802,7 +1777,7 @@
 						"searchTags": []
 					}
 				],
-				"p_import_5__mon": [
+				"p_group_3__mon": [
 					{
 						"course": "web程序设计基础",
 						"weeks": "",
@@ -1812,7 +1787,7 @@
 						"searchTags": []
 					}
 				],
-				"p_import_5__tue": [
+				"p_group_3__tue": [
 					{
 						"course": "职场通用英语II 专科英语",
 						"weeks": "",
@@ -1822,7 +1797,7 @@
 						"searchTags": []
 					}
 				],
-				"p_import_5__thu": [
+				"p_group_3__thu": [
 					{
 						"course": "鸿蒙初级应用开发",
 						"weeks": "",
@@ -1832,7 +1807,7 @@
 						"searchTags": []
 					}
 				],
-				"p_import_7__mon": [
+				"p_group_4__mon": [
 					{
 						"course": "web程序设计基础",
 						"weeks": "",
@@ -1842,7 +1817,7 @@
 						"searchTags": []
 					}
 				],
-				"p_import_7__tue": [
+				"p_group_4__tue": [
 					{
 						"course": "国家安全教育",
 						"weeks": "",
@@ -1852,7 +1827,7 @@
 						"searchTags": []
 					}
 				],
-				"p_import_7__thu": [
+				"p_group_4__thu": [
 					{
 						"course": "数据库技术",
 						"weeks": "",

@@ -146,6 +146,15 @@
 		matchedCellKeys: {},
 	};
 	let weeklyCourseCount = 0;
+	let dayDateLabels: Record<DayKey, string> = {
+		mon: "--/--",
+		tue: "--/--",
+		wed: "--/--",
+		thu: "--/--",
+		fri: "--/--",
+		sat: "--/--",
+		sun: "--/--",
+	};
 
 	const courseKey = (periodId: string, day: DayKey) => `${periodId}__${day}`;
 
@@ -576,6 +585,11 @@
 		weeklyMode;
 		weeklyCourseCount = countVisibleCoursesForWeek();
 	}
+	$: {
+		termStartDate;
+		currentWeek;
+		dayDateLabels = buildDayDateLabels();
+	}
 
 	function prevWeek() {
 		currentWeek = Math.max(1, currentWeek - 1);
@@ -610,9 +624,6 @@
 		importError = "";
 		importMessage = `已按日期自动定位到第 ${currentWeek} 周`;
 		syncViewFromWeekly();
-		await saveNow({
-			successMessage: `已按日期自动定位到第 ${currentWeek} 周，并保存`,
-		});
 	}
 
 	function addPeriod() {
@@ -986,6 +997,36 @@
 			}
 		}
 		return count;
+	}
+
+	function formatDateLabel(date: Date): string {
+		const month = date.getMonth() + 1;
+		const day = date.getDate();
+		return `${month.toString().padStart(2, "0")}/${day.toString().padStart(2, "0")}`;
+	}
+
+	function buildDayDateLabels(): Record<DayKey, string> {
+		const empty: Record<DayKey, string> = {
+			mon: "--/--",
+			tue: "--/--",
+			wed: "--/--",
+			thu: "--/--",
+			fri: "--/--",
+			sat: "--/--",
+			sun: "--/--",
+		};
+		if (!termStartDate) return empty;
+		const start = new Date(`${termStartDate}T00:00:00`);
+		if (Number.isNaN(start.getTime())) return empty;
+
+		const labels: Record<DayKey, string> = { ...empty };
+		for (const day of DAY_ORDER) {
+			const date = new Date(start);
+			const offsetDays = (currentWeek - 1) * 7 + (DAY_INDEX[day] - 1);
+			date.setDate(start.getDate() + offsetDays);
+			labels[day] = formatDateLabel(date);
+		}
+		return labels;
 	}
 
 	function buildSearchState(keyword: string): SearchState {
@@ -1389,9 +1430,16 @@
 		<table class="timetable">
 			<thead>
 				<tr>
-					<th class="period-col">节次</th>
+					<th class="period-col">
+						<div class="period-head">节次</div>
+					</th>
 					{#each DISPLAY_DAYS as day}
-						<th>{DAY_LABELS[day]}</th>
+						<th>
+							<div class="day-head">
+								<span class="day-name">{DAY_LABELS[day]}</span>
+								<span class="day-date">{dayDateLabels[day]}</span>
+							</div>
+						</th>
 					{/each}
 				</tr>
 			</thead>
@@ -1912,13 +1960,48 @@
 
 
 	th {
-		height: 68px;
+		height: 74px;
 		padding: 0 16px;
 		font-size: 1.75rem;
 		font-weight: 700;
 		text-align: left;
+		vertical-align: middle;
 		background: var(--tt-surface);
 		color: var(--tt-text);
+	}
+
+	th:not(.period-col) {
+		text-align: center;
+	}
+
+	.day-head {
+		display: grid;
+		gap: 2px;
+		height: 100%;
+		align-content: center;
+		justify-items: center;
+	}
+
+	.period-head {
+		height: 100%;
+		display: grid;
+		place-items: center;
+		white-space: nowrap;
+	}
+
+	.day-name {
+		font-size: 1.75rem;
+		font-weight: 700;
+		line-height: 1;
+		white-space: nowrap;
+	}
+
+	.day-date {
+		font-size: 0.78rem;
+		font-weight: 600;
+		color: var(--tt-subtle);
+		line-height: 1.1;
+		white-space: nowrap;
 	}
 
 	.period-col {
@@ -2246,6 +2329,14 @@
 
 		th {
 			font-size: 1.02rem;
+		}
+
+		.day-name {
+			font-size: 1.02rem;
+		}
+
+		.day-date {
+			font-size: 0.72rem;
 		}
 
 		.period-title,

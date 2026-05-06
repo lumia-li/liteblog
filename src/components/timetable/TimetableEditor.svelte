@@ -105,6 +105,8 @@
 		dayLabel: string;
 		periodLabel: string;
 		periodTime: string;
+		statusText: "已上完" | "未上课";
+		statusClass: "done" | "upcoming";
 		item: CourseItem;
 	};
 
@@ -145,6 +147,16 @@
 	};
 
 	const courseKey = (periodId: string, day: DayKey) => `${periodId}__${day}`;
+
+	const DAY_INDEX: Record<DayKey, number> = {
+		mon: 1,
+		tue: 2,
+		wed: 3,
+		thu: 4,
+		fri: 5,
+		sat: 6,
+		sun: 7,
+	};
 
 	function normalizeSearchTag(tag: string): string {
 		return tag.replace(/\s+/g, " ").trim();
@@ -987,12 +999,15 @@
 				if (!item) continue;
 				if (!courseMatchesQuery(item, normalizedKeyword)) continue;
 				const key = courseKey(period.id, day);
+				const status = getSearchHitStatus(day, period.time);
 				dayHits[day].push({
 					key,
 					day,
 					dayLabel: DAY_LABELS[day],
 					periodLabel: period.label,
 					periodTime: period.time,
+					statusText: status.text,
+					statusClass: status.className,
 					item,
 				});
 				matchedCellKeys[key] = true;
@@ -1023,6 +1038,49 @@
 	function isSearchMatchedCell(periodId: string, day: DayKey): boolean {
 		if (!searchState.keyword) return false;
 		return !!searchState.matchedCellKeys[courseKey(periodId, day)];
+	}
+
+	function parsePeriodEndMinutes(periodTime: string): number | null {
+		const match = periodTime.match(/(\d{1,2}):(\d{2})\s*[-~]\s*(\d{1,2}):(\d{2})/);
+		if (!match) return null;
+		const endHour = Number(match[3]);
+		const endMinute = Number(match[4]);
+		if (!Number.isFinite(endHour) || !Number.isFinite(endMinute)) return null;
+		return endHour * 60 + endMinute;
+	}
+
+	function getSearchHitStatus(
+		day: DayKey,
+		periodTime: string,
+	): { text: "已上完" | "未上课"; className: "done" | "upcoming" } {
+		const dayIndex = DAY_INDEX[day];
+		const now = new Date();
+		const nowDay = now.getDay() === 0 ? 7 : now.getDay();
+		const nowMinutes = now.getHours() * 60 + now.getMinutes();
+		const endMinutes = parsePeriodEndMinutes(periodTime);
+		const liveWeek = getCurrentWeekByDateUnsafe();
+
+		if (currentWeek < liveWeek) {
+			return { text: "已上完", className: "done" };
+		}
+
+		if (currentWeek > liveWeek) {
+			return { text: "未上课", className: "upcoming" };
+		}
+
+		if (dayIndex < nowDay) return { text: "已上完", className: "done" };
+		if (dayIndex > nowDay) return { text: "未上课", className: "upcoming" };
+		if (endMinutes !== null && nowMinutes >= endMinutes) return { text: "已上完", className: "done" };
+		return { text: "未上课", className: "upcoming" };
+	}
+
+	function getCurrentWeekByDateUnsafe(): number {
+		if (!termStartDate) return currentWeek;
+		const start = new Date(`${termStartDate}T00:00:00`);
+		if (Number.isNaN(start.getTime())) return currentWeek;
+		const now = new Date();
+		const dayDiff = Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+		return Math.max(1, Math.min(totalWeeks, Math.floor(dayDiff / 7) + 1));
 	}
 
 	function detectCurrentWeekByDate(): number | null {
@@ -1290,15 +1348,16 @@
 					{#each searchState.dayGroups as group (group.day)}
 						<section class="search-day-group">
 							<h3>{group.label} · {group.count} 节</h3>
-							<ul>
+							<div class="search-day-list">
 								{#each group.hits as hit (hit.key)}
-									<li>
+									<article class="search-hit-row">
+										<span class={`search-status-badge ${hit.statusClass}`}>{hit.statusText}</span>
 										<strong>{hit.item.course}</strong>
 										<span>{hit.periodLabel}（{hit.periodTime || "时间未填写"}）</span>
 										<span>教室：{hit.item.location || "未填写"} · 教师：{hit.item.teacher || "未填写"}</span>
-									</li>
+									</article>
 								{/each}
-							</ul>
+							</div>
 						</section>
 					{/each}
 				</div>
@@ -1684,9 +1743,9 @@
 	}
 
 	.search-shell {
-		border: 1px solid var(--tt-border-strong);
-		border-radius: 14px;
-		background: var(--tt-surface-panel);
+		border: 1px solid var(--tt-border);
+		border-radius: 12px;
+		background: var(--tt-surface);
 		padding: 12px;
 		display: grid;
 		gap: 10px;
@@ -1715,39 +1774,76 @@
 	}
 
 	.search-day-group {
-		padding: 8px 10px;
-		border: 1px solid var(--tt-border);
-		border-radius: 10px;
-		background: var(--tt-surface);
+		padding: 0;
+		border: 0;
+		border-top: 1px solid var(--tt-border);
+		padding-top: 10px;
 	}
 
 	.search-day-group h3 {
-		margin: 0;
-		font-size: 0.96rem;
+		margin: 0 0 8px;
+		font-size: 0.94rem;
 		font-weight: 800;
 		color: var(--tt-text);
 	}
 
-	.search-day-group ul {
-		margin: 8px 0 0;
-		padding-left: 18px;
+	.search-day-list {
 		display: grid;
-		gap: 5px;
+		gap: 0;
 	}
 
-	.search-day-group li {
+	.search-hit-row {
 		display: grid;
-		gap: 1px;
+		gap: 2px;
 		color: var(--tt-muted);
+		position: relative;
+		padding: 8px 6px;
+		border-top: 1px dashed var(--tt-border);
 	}
 
-	.search-day-group li strong {
+	.search-day-list .search-hit-row:first-child {
+		border-top: none;
+	}
+
+	.search-hit-row strong {
 		color: var(--tt-text);
-		font-size: 0.95rem;
+		font-size: 0.93rem;
 	}
 
-	.search-day-group li span {
+	.search-hit-row span {
 		font-size: 0.84rem;
+	}
+
+	.search-status-badge {
+		position: absolute;
+		top: 10px;
+		right: 10px;
+		padding: 2px 10px;
+		border-radius: 999px;
+		font-size: 0.75rem;
+		font-weight: 700;
+		line-height: 1.3;
+		border: 1px solid transparent;
+	}
+
+	.search-status-badge.done {
+		background: color-mix(in srgb, #22c55e 25%, transparent);
+		color: #14532d;
+		border-color: color-mix(in srgb, #22c55e 40%, transparent);
+	}
+
+	.search-status-badge.upcoming {
+		background: color-mix(in srgb, #2563eb 22%, transparent);
+		color: #1e3a8a;
+		border-color: color-mix(in srgb, #2563eb 38%, transparent);
+	}
+
+	:global(html.dark) .search-status-badge.done {
+		color: #bbf7d0;
+	}
+
+	:global(html.dark) .search-status-badge.upcoming {
+		color: #bfdbfe;
 	}
 
 	.search-empty {

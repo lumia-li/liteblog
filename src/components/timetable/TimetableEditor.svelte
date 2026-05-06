@@ -12,6 +12,7 @@
 		location: string;
 		teacher: string;
 		color: string;
+		searchTags?: string[];
 	};
 
 	type PeriodItem = {
@@ -44,6 +45,25 @@
 		sun: "周日",
 	};
 	const CARD_COLORS = ["#68dfcd", "#8f9eff", "#ddb8ea", "#e9da77", "#95dc5d", "#82cbff", "#9ddfcd"];
+	const COURSE_SEARCH_TAG_PRESETS: Record<string, string[]> = {
+		鸿蒙初级应用开发: ["鸿蒙", "华为"],
+		鸿蒙初级应用开发实训: ["鸿蒙", "华为"],
+		Vue应用程序开发: ["vue", "前端", "JavaScript"],
+		web程序设计基础: ["web", "python"],
+		人工智能大模型实践与应用: ["人工智能", "AI", "大模型"],
+		数据库技术: ["数据库", "SQL", "MySQL"],
+		职场通用英语II专科英语: ["英语", "English", "职业英语", "专科英语"],
+		专业英语II: ["英语", "English", "专业英语"],
+		职业素质与职业发展规划: ["职业素质", "职业发展", "生涯规划"],
+		毛概2: ["毛概", "思政", "政治理论"],
+		毛泽东思想和中国特色社会主义理论体系概论: ["毛泽东", "毛概"],
+		形势与政策II: ["形势与政策", "时政", "形政"],
+		体育与健康II: ["体育", "健康"],
+		美育II: ["美育", "艺术"],
+		心理健康教育II: ["心理", "心理健康"],
+		国家安全教育: ["国家安全", "安全教育"],
+		劳动教育: ["劳动教育", "劳动"],
+	};
 	const IMPORT_PERIOD_GROUPS: Array<{ label: string; slots: number[]; time: string }> = [
 		{ label: "1-2", slots: [1, 2], time: "08:30 - 10:00" },
 		{ label: "3-4", slots: [3, 4], time: "10:20 - 11:50" },
@@ -76,6 +96,32 @@
 	let detectedCurrentWeek: number | null = null;
 	let isViewingDetectedWeek = false;
 	let hasSyncedDetectedWeek = false;
+	let searchQuery = "";
+	let editingSearchTags = "";
+
+	type SearchHit = {
+		key: string;
+		day: DayKey;
+		dayLabel: string;
+		periodLabel: string;
+		periodTime: string;
+		item: CourseItem;
+	};
+
+	type SearchDayGroup = {
+		day: DayKey;
+		label: string;
+		hits: SearchHit[];
+		count: number;
+	};
+
+	type SearchState = {
+		keyword: string;
+		total: number;
+		dayCount: number;
+		dayGroups: SearchDayGroup[];
+		matchedCellKeys: Record<string, true>;
+	};
 
 	let modalOpen = false;
 	let editingKey = "";
@@ -87,9 +133,88 @@
 		location: "",
 		teacher: "",
 		color: CARD_COLORS[0],
+		searchTags: [],
+	};
+
+	let searchState: SearchState = {
+		keyword: "",
+		total: 0,
+		dayCount: 0,
+		dayGroups: [],
+		matchedCellKeys: {},
 	};
 
 	const courseKey = (periodId: string, day: DayKey) => `${periodId}__${day}`;
+
+	function normalizeSearchTag(tag: string): string {
+		return tag.replace(/\s+/g, " ").trim();
+	}
+
+	function normalizeCourseNameForPreset(value: string): string {
+		return value
+			.replace(/\s+/g, "")
+			.replace(/[()（）【】\[\]·,.，\-—_]/g, "")
+			.trim()
+			.toLowerCase();
+	}
+
+	function parseSearchTags(input: unknown): string[] {
+		if (!input) return [];
+		if (Array.isArray(input)) {
+			return Array.from(
+				new Set(
+					input
+						.map((item) => (typeof item === "string" ? normalizeSearchTag(item) : ""))
+						.filter(Boolean),
+				),
+			);
+		}
+		if (typeof input === "string") {
+			return Array.from(
+				new Set(
+					input
+						.split(/[，,、;；\n]/)
+						.map((item) => normalizeSearchTag(item))
+						.filter(Boolean),
+				),
+			);
+		}
+		return [];
+	}
+
+	function deriveCourseSearchTags(item: { course?: string }): string[] {
+		const courseName = normalizeCourseNameForPreset(item.course || "");
+		if (!courseName) return [];
+		for (const [name, tags] of Object.entries(COURSE_SEARCH_TAG_PRESETS)) {
+			if (normalizeCourseNameForPreset(name) !== courseName) continue;
+			return tags.map((tag) => normalizeSearchTag(tag)).filter(Boolean);
+		}
+		return [];
+	}
+
+	function buildCourseSearchKeywords(item: CourseItem): string[] {
+		const base = [
+			item.course || "",
+			item.location || "",
+			item.teacher || "",
+			...(item.searchTags || []),
+			...deriveCourseSearchTags(item),
+		];
+		return Array.from(
+			new Set(
+				base
+					.map((part) => normalizeSearchTag(part))
+					.filter(Boolean)
+					.map((part) => part.toLowerCase()),
+			),
+		);
+	}
+
+	function courseMatchesQuery(item: CourseItem, keyword: string): boolean {
+		const q = keyword.trim().toLowerCase();
+		if (!q) return false;
+		return buildCourseSearchKeywords(item).some((part) => part.includes(q));
+	}
 
 	function clonePeriods(input: PeriodItem[]): PeriodItem[] {
 		return input.map((item) => ({ id: item.id, label: item.label, time: item.time }));
@@ -125,6 +250,12 @@
 								typeof rawItem.color === "string" && rawItem.color.trim()
 									? rawItem.color
 									: CARD_COLORS[0],
+							searchTags: parseSearchTags(
+								(rawItem as { searchTags?: unknown; searchTag?: unknown; keywords?: unknown })
+									.searchTags ??
+									(rawItem as { searchTag?: unknown }).searchTag ??
+									(rawItem as { keywords?: unknown }).keywords,
+							),
 						};
 					});
 				continue;
@@ -141,6 +272,12 @@
 							typeof rawItem.color === "string" && rawItem.color.trim()
 								? rawItem.color
 								: CARD_COLORS[0],
+						searchTags: parseSearchTags(
+							(rawItem as { searchTags?: unknown; searchTag?: unknown; keywords?: unknown })
+								.searchTags ??
+								(rawItem as { searchTag?: unknown }).searchTag ??
+								(rawItem as { keywords?: unknown }).keywords,
+						),
 					},
 				];
 			}
@@ -411,6 +548,14 @@
 		courses;
 		forceGroupCurrentStateIfNeeded();
 	}
+	$: {
+		searchQuery;
+		currentWeek;
+		periods;
+		courses;
+		weeklyMode;
+		searchState = buildSearchState(searchQuery);
+	}
 
 	function prevWeek() {
 		currentWeek = Math.max(1, currentWeek - 1);
@@ -494,7 +639,9 @@
 					location: "",
 					teacher: "",
 					color: CARD_COLORS[Math.floor(Math.random() * CARD_COLORS.length)] || CARD_COLORS[0],
+					searchTags: [],
 				};
+		editingSearchTags = (editingForm.searchTags || []).join("，");
 		modalOpen = true;
 	}
 
@@ -515,6 +662,7 @@
 					weeks: editingForm.weeks.trim(),
 					location: editingForm.location.trim(),
 					teacher: editingForm.teacher.trim(),
+					searchTags: parseSearchTags(editingSearchTags),
 				},
 				],
 		};
@@ -610,6 +758,7 @@
 						location: second.trim(),
 						teacher: third.trim(),
 						color: CARD_COLORS[Math.floor(Math.random() * CARD_COLORS.length)] || CARD_COLORS[0],
+						searchTags: [],
 					},
 				];
 			}
@@ -692,6 +841,7 @@
 				location,
 				teacher,
 				color: CARD_COLORS[Math.floor(Math.random() * CARD_COLORS.length)] || CARD_COLORS[0],
+				searchTags: [],
 			};
 		};
 
@@ -806,6 +956,73 @@
 		if (active) return active;
 		const noWeekRule = entries.find((item) => !item.weeks.trim());
 		return noWeekRule || null;
+	}
+
+	function buildSearchState(keyword: string): SearchState {
+		const normalizedKeyword = keyword.trim();
+		if (!normalizedKeyword) {
+			return {
+				keyword: "",
+				total: 0,
+				dayCount: 0,
+				dayGroups: [],
+				matchedCellKeys: {},
+			};
+		}
+
+		const dayHits: Record<DayKey, SearchHit[]> = {
+			mon: [],
+			tue: [],
+			wed: [],
+			thu: [],
+			fri: [],
+			sat: [],
+			sun: [],
+		};
+		const matchedCellKeys: Record<string, true> = {};
+
+		for (const period of periods) {
+			for (const day of DISPLAY_DAYS) {
+				const item = getDisplayCourse(period.id, day);
+				if (!item) continue;
+				if (!courseMatchesQuery(item, normalizedKeyword)) continue;
+				const key = courseKey(period.id, day);
+				dayHits[day].push({
+					key,
+					day,
+					dayLabel: DAY_LABELS[day],
+					periodLabel: period.label,
+					periodTime: period.time,
+					item,
+				});
+				matchedCellKeys[key] = true;
+			}
+		}
+
+		const dayGroups = DISPLAY_DAYS
+			.map((day) => {
+				const hits = dayHits[day];
+				return {
+					day,
+					label: DAY_LABELS[day],
+					hits,
+					count: hits.length,
+				};
+			})
+			.filter((group) => group.count > 0);
+
+		return {
+			keyword: normalizedKeyword,
+			total: dayGroups.reduce((sum, group) => sum + group.count, 0),
+			dayCount: dayGroups.length,
+			dayGroups,
+			matchedCellKeys,
+		};
+	}
+
+	function isSearchMatchedCell(periodId: string, day: DayKey): boolean {
+		if (!searchState.keyword) return false;
+		return !!searchState.matchedCellKeys[courseKey(periodId, day)];
 	}
 
 	function detectCurrentWeekByDate(): number | null {
@@ -1053,6 +1270,44 @@
 		</button>
 	</div>
 
+	<section class="search-shell">
+		<div class="search-row">
+			<input
+				class="search-input"
+				bind:value={searchQuery}
+				placeholder="搜索课程/老师/教室/词条，例如：鸿蒙、华为、数据库"
+			/>
+			{#if searchQuery.trim()}
+				<button type="button" class="plain-btn" on:click={() => (searchQuery = "")}>清空</button>
+			{/if}
+		</div>
+		{#if searchState.keyword}
+			<div class="search-summary">
+				<p>“{searchState.keyword}”共命中 {searchState.total} 节课，分布在 {searchState.dayCount} 天。</p>
+			</div>
+			{#if searchState.total > 0}
+				<div class="search-groups">
+					{#each searchState.dayGroups as group (group.day)}
+						<section class="search-day-group">
+							<h3>{group.label} · {group.count} 节</h3>
+							<ul>
+								{#each group.hits as hit (hit.key)}
+									<li>
+										<strong>{hit.item.course}</strong>
+										<span>{hit.periodLabel}（{hit.periodTime || "时间未填写"}）</span>
+										<span>教室：{hit.item.location || "未填写"} · 教师：{hit.item.teacher || "未填写"}</span>
+									</li>
+								{/each}
+							</ul>
+						</section>
+					{/each}
+				</div>
+			{:else}
+				<p class="search-empty">没有匹配到课程，试试更短关键词或补充课程词条。</p>
+			{/if}
+		{/if}
+	</section>
+
 	<section class="table-shell">
 		<table class="timetable">
 			<thead>
@@ -1071,9 +1326,10 @@
 							<div class="period-time">{period.time || "--:-- - --:--"}</div>
 						</td>
 						{#each DISPLAY_DAYS as day}
-							{@const key = courseKey(period.id, day)}
 							{@const item = getDisplayCourse(period.id, day)}
-							<td class={`course-cell${!!item && !isActiveCourse(item) ? " inactive" : ""}`}>
+							<td
+								class={`course-cell${!!item && !isActiveCourse(item) ? " inactive" : ""}${isSearchMatchedCell(period.id, day) ? " search-hit" : ""}`}
+							>
 								{#if item}
 									<button
 										type="button"
@@ -1176,6 +1432,10 @@
 			<label>
 				<span>教师</span>
 				<input bind:value={editingForm.teacher} placeholder="如：张老师" />
+			</label>
+			<label>
+				<span>搜索词条</span>
+				<input bind:value={editingSearchTags} placeholder="如：鸿蒙，华为，OpenHarmony" />
 			</label>
 			<div>
 				<span class="color-title">颜色</span>
@@ -1423,6 +1683,80 @@
 		opacity: 1;
 	}
 
+	.search-shell {
+		border: 1px solid var(--tt-border-strong);
+		border-radius: 14px;
+		background: var(--tt-surface-panel);
+		padding: 12px;
+		display: grid;
+		gap: 10px;
+	}
+
+	.search-row {
+		display: flex;
+		gap: 8px;
+		align-items: center;
+	}
+
+	.search-input {
+		flex: 1;
+	}
+
+	.search-summary p {
+		margin: 0;
+		font-size: 0.92rem;
+		font-weight: 700;
+		color: var(--tt-muted);
+	}
+
+	.search-groups {
+		display: grid;
+		gap: 8px;
+	}
+
+	.search-day-group {
+		padding: 8px 10px;
+		border: 1px solid var(--tt-border);
+		border-radius: 10px;
+		background: var(--tt-surface);
+	}
+
+	.search-day-group h3 {
+		margin: 0;
+		font-size: 0.96rem;
+		font-weight: 800;
+		color: var(--tt-text);
+	}
+
+	.search-day-group ul {
+		margin: 8px 0 0;
+		padding-left: 18px;
+		display: grid;
+		gap: 5px;
+	}
+
+	.search-day-group li {
+		display: grid;
+		gap: 1px;
+		color: var(--tt-muted);
+	}
+
+	.search-day-group li strong {
+		color: var(--tt-text);
+		font-size: 0.95rem;
+	}
+
+	.search-day-group li span {
+		font-size: 0.84rem;
+	}
+
+	.search-empty {
+		margin: 0;
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--tt-subtle);
+	}
+
 	.table-shell {
 		overflow: auto;
 		border: 1px solid var(--tt-border-strong);
@@ -1564,6 +1898,10 @@
 		min-height: 122px;
 		padding: 0 !important;
 		vertical-align: middle;
+	}
+
+	.course-cell.search-hit .course-slot {
+		background: color-mix(in srgb, var(--tt-current-target-bg) 18%, transparent);
 	}
 
 	.tools-panel {

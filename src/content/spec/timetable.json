@@ -2,7 +2,7 @@
 	"termName": "大一下2",
 	"totalWeeks": 19,
 	"currentWeek": 1,
-	"termStartDate": "",
+	"termStartDate": "2026-03-02",
 	"periods": [
 		{
 			"id": "p_group_1",

@@ -66,7 +66,7 @@
 	};
 	const IMPORT_PERIOD_GROUPS: Array<{ label: string; slots: number[]; time: string }> = [
 		{ label: "1-2", slots: [1, 2], time: "08:30 - 09:55" },
-		{ label: "3-4", slots: [3, 4], time: "10:10 - 11:35" },
+		{ label: "3-4", slots: [3, 4], time: "10:10 - 11:50" },
 		{ label: "5-6", slots: [5, 6], time: "13:00 - 14:25" },
 		{ label: "6-8", slots: [6, 7, 8], time: "14:45 - 16:10" },
 		{ label: "9-10", slots: [9, 10], time: "18:30 - 20:00" },

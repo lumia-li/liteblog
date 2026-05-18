@@ -140,6 +140,16 @@
 				"color": "#e9da77",
 				"searchTags": []
 			}
+		],
+		"p_group_2__tue": [
+			{
+				"course": "体育课",
+				"weeks": "",
+				"location": "八楼",
+				"teacher": "",
+				"color": "#95dc5d",
+				"searchTags": []
+			}
 		]
 	},
 	"weeklySheets": {
@@ -1790,6 +1800,16 @@
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "张荣",
 						"color": "#e9da77",
+						"searchTags": []
+					}
+				],
+				"p_group_2__tue": [
+					{
+						"course": "体育课",
+						"weeks": "",
+						"location": "八楼",
+						"teacher": "",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				]

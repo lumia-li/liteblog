@@ -1,13 +1,13 @@
 {
 	"termName": "大一下2",
 	"totalWeeks": 19,
-	"currentWeek": 12,
+	"currentWeek": 13,
 	"termStartDate": "2026-03-02",
 	"periods": [
 		{
 			"id": "p_group_1",
 			"label": "1-2",
-			"time": "08:30 - 10:00"
+			"time": "08:30 -, 10:00"
 		},
 		{
 			"id": "p_group_2",
@@ -37,17 +37,17 @@
 				"weeks": "",
 				"location": "一合楼-4楼-J401阶梯教室(J401)",
 				"teacher": "仇百辉",
-				"color": "#68dfcd",
+				"color": "#ddb8ea",
 				"searchTags": []
 			}
 		],
 		"p_group_1__tue": [
 			{
-				"course": "Vue应用程序开发",
+				"course": "web程序设计基础",
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
-				"teacher": "刘晓龙",
-				"color": "#82cbff",
+				"teacher": "赵湘元",
+				"color": "#ddb8ea",
 				"searchTags": []
 			}
 		],
@@ -57,7 +57,7 @@
 				"weeks": "",
 				"location": "一合楼-4楼-J402阶梯教室(J402)",
 				"teacher": "仇百辉",
-				"color": "#82cbff",
+				"color": "#e9da77",
 				"searchTags": []
 			}
 		],
@@ -67,7 +67,7 @@
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "刘晓龙",
-				"color": "#68dfcd",
+				"color": "#ddb8ea",
 				"searchTags": []
 			}
 		],
@@ -77,57 +77,57 @@
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "刘晓龙",
-				"color": "#ddb8ea",
-				"searchTags": []
-			}
-		],
-		"p_group_3__mon": [
-			{
-				"course": "web程序设计基础",
-				"weeks": "",
-				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
-				"teacher": "赵湘元",
 				"color": "#9ddfcd",
 				"searchTags": []
 			}
 		],
-		"p_group_3__tue": [
+		"p_group_2__tue": [
+			{
+				"course": "职业素质与职业发展规划",
+				"weeks": "",
+				"location": "一合楼-4楼-J402阶梯教室(J402)",
+				"teacher": "李宁",
+				"color": "#9ddfcd",
+				"searchTags": []
+			}
+		],
+		"p_group_2__fri": [
 			{
 				"course": "职场通用英语II 专科英语",
 				"weeks": "",
 				"location": "一合楼-4楼-J402阶梯教室(J402)",
 				"teacher": "马悦",
-				"color": "#8f9eff",
+				"color": "#e9da77",
 				"searchTags": []
 			}
 		],
-		"p_group_3__thu": [
+		"p_group_3__tue": [
 			{
-				"course": "鸿蒙初级应用开发",
+				"course": "美育II",
 				"weeks": "",
-				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
-				"teacher": "刘晓龙",
+				"location": "一合楼-4楼-J401阶梯教室(J401)",
+				"teacher": "谭仙鹤",
+				"color": "#ddb8ea",
+				"searchTags": []
+			}
+		],
+		"p_group_3__fri": [
+			{
+				"course": "职场通用英语II 专科英语",
+				"weeks": "",
+				"location": "一合楼-4楼-J402阶梯教室(J402)",
+				"teacher": "马悦",
 				"color": "#82cbff",
 				"searchTags": []
 			}
 		],
 		"p_group_4__mon": [
 			{
-				"course": "web程序设计基础",
+				"course": "毛泽东思想和中国特色社会主义理论体系概论",
 				"weeks": "",
-				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
-				"teacher": "赵湘元",
-				"color": "#82cbff",
-				"searchTags": []
-			}
-		],
-		"p_group_4__tue": [
-			{
-				"course": "国家安全教育",
-				"weeks": "",
-				"location": "一合楼-4楼-J404阶梯教室(J404)",
-				"teacher": "郝荣娟",
-				"color": "#82cbff",
+				"location": "善工楼-2楼-SG219(219)",
+				"teacher": "仇百辉",
+				"color": "#8f9eff",
 				"searchTags": []
 			}
 		],
@@ -137,17 +137,7 @@
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "张荣",
-				"color": "#e9da77",
-				"searchTags": []
-			}
-		],
-		"p_group_2__tue": [
-			{
-				"course": "体育课",
-				"weeks": "",
-				"location": "八楼",
-				"teacher": "",
-				"color": "#95dc5d",
+				"color": "#9ddfcd",
 				"searchTags": []
 			}
 		]
@@ -158,12 +148,12 @@
 				{
 					"id": "p_group_1",
 					"label": "1-2",
-					"time": "08:30 - 09:55"
+					"time": "08:30 -, 10:00"
 				},
 				{
 					"id": "p_group_2",
 					"label": "3-4",
-					"time": "10:10 - 11:50"
+					"time": "10:20 - 11:50"
 				},
 				{
 					"id": "p_group_3",
@@ -329,12 +319,12 @@
 				{
 					"id": "p_group_1",
 					"label": "1-2",
-					"time": "08:30 - 09:55"
+					"time": "08:30 -, 10:00"
 				},
 				{
 					"id": "p_group_2",
 					"label": "3-4",
-					"time": "10:10 - 11:50"
+					"time": "10:20 - 11:50"
 				},
 				{
 					"id": "p_group_3",
@@ -480,12 +470,12 @@
 				{
 					"id": "p_group_1",
 					"label": "1-2",
-					"time": "08:30 - 09:55"
+					"time": "08:30 -, 10:00"
 				},
 				{
 					"id": "p_group_2",
 					"label": "3-4",
-					"time": "10:10 - 11:50"
+					"time": "10:20 - 11:50"
 				},
 				{
 					"id": "p_group_3",
@@ -621,12 +611,12 @@
 				{
 					"id": "p_group_1",
 					"label": "1-2",
-					"time": "08:30 - 09:55"
+					"time": "08:30 -, 10:00"
 				},
 				{
 					"id": "p_group_2",
 					"label": "3-4",
-					"time": "10:10 - 11:50"
+					"time": "10:20 - 11:50"
 				},
 				{
 					"id": "p_group_3",
@@ -762,12 +752,12 @@
 				{
 					"id": "p_group_1",
 					"label": "1-2",
-					"time": "08:30 - 09:55"
+					"time": "08:30 -, 10:00"
 				},
 				{
 					"id": "p_group_2",
 					"label": "3-4",
-					"time": "10:10 - 11:50"
+					"time": "10:20 - 11:50"
 				},
 				{
 					"id": "p_group_3",
@@ -893,12 +883,12 @@
 				{
 					"id": "p_group_1",
 					"label": "1-2",
-					"time": "08:30 - 09:55"
+					"time": "08:30 -, 10:00"
 				},
 				{
 					"id": "p_group_2",
 					"label": "3-4",
-					"time": "10:10 - 11:50"
+					"time": "10:20 - 11:50"
 				},
 				{
 					"id": "p_group_3",
@@ -1004,12 +994,12 @@
 				{
 					"id": "p_group_1",
 					"label": "1-2",
-					"time": "08:30 - 09:55"
+					"time": "08:30 -, 10:00"
 				},
 				{
 					"id": "p_group_2",
 					"label": "3-4",
-					"time": "10:10 - 11:50"
+					"time": "10:20 - 11:50"
 				},
 				{
 					"id": "p_group_3",
@@ -1125,12 +1115,12 @@
 				{
 					"id": "p_group_1",
 					"label": "1-2",
-					"time": "08:30 - 09:55"
+					"time": "08:30 -, 10:00"
 				},
 				{
 					"id": "p_group_2",
 					"label": "3-4",
-					"time": "10:10 - 11:50"
+					"time": "10:20 - 11:50"
 				},
 				{
 					"id": "p_group_3",
@@ -1266,12 +1256,12 @@
 				{
 					"id": "p_group_1",
 					"label": "1-2",
-					"time": "08:30 - 09:55"
+					"time": "08:30 -, 10:00"
 				},
 				{
 					"id": "p_group_2",
 					"label": "3-4",
-					"time": "10:10 - 11:50"
+					"time": "10:20 - 11:50"
 				},
 				{
 					"id": "p_group_3",
@@ -1397,12 +1387,12 @@
 				{
 					"id": "p_group_1",
 					"label": "1-2",
-					"time": "08:30 - 09:55"
+					"time": "08:30 -, 10:00"
 				},
 				{
 					"id": "p_group_2",
 					"label": "3-4",
-					"time": "10:10 - 11:50"
+					"time": "10:20 - 11:50"
 				},
 				{
 					"id": "p_group_3",
@@ -1508,12 +1498,12 @@
 				{
 					"id": "p_group_1",
 					"label": "1-2",
-					"time": "08:30 - 09:55"
+					"time": "08:30 -, 10:00"
 				},
 				{
 					"id": "p_group_2",
 					"label": "3-4",
-					"time": "10:10 - 11:50"
+					"time": "10:20 - 11:50"
 				},
 				{
 					"id": "p_group_3",
@@ -1669,12 +1659,12 @@
 				{
 					"id": "p_group_1",
 					"label": "1-2",
-					"time": "08:30 - 09:55"
+					"time": "08:30 -, 10:00"
 				},
 				{
 					"id": "p_group_2",
 					"label": "3-4",
-					"time": "10:10 - 11:50"
+					"time": "10:20 - 11:50"
 				},
 				{
 					"id": "p_group_3",
@@ -1820,12 +1810,12 @@
 				{
 					"id": "p_group_1",
 					"label": "1-2",
-					"time": "08:30 - 09:55"
+					"time": "08:30 -, 10:00"
 				},
 				{
 					"id": "p_group_2",
 					"label": "3-4",
-					"time": "10:10 - 11:50"
+					"time": "10:20 - 11:50"
 				},
 				{
 					"id": "p_group_3",
@@ -1961,12 +1951,12 @@
 				{
 					"id": "p_group_1",
 					"label": "1-2",
-					"time": "08:30 - 09:55"
+					"time": "08:30 -, 10:00"
 				},
 				{
 					"id": "p_group_2",
 					"label": "3-4",
-					"time": "10:10 - 11:50"
+					"time": "10:20 - 11:50"
 				},
 				{
 					"id": "p_group_3",
@@ -2092,12 +2082,12 @@
 				{
 					"id": "p_group_1",
 					"label": "1-2",
-					"time": "08:30 - 09:55"
+					"time": "08:30 -, 10:00"
 				},
 				{
 					"id": "p_group_2",
 					"label": "3-4",
-					"time": "10:10 - 11:50"
+					"time": "10:20 - 11:50"
 				},
 				{
 					"id": "p_group_3",
@@ -2223,12 +2213,12 @@
 				{
 					"id": "p_group_1",
 					"label": "1-2",
-					"time": "08:30 - 09:55"
+					"time": "08:30 -, 10:00"
 				},
 				{
 					"id": "p_group_2",
 					"label": "3-4",
-					"time": "10:10 - 11:50"
+					"time": "10:20 - 11:50"
 				},
 				{
 					"id": "p_group_3",
@@ -2324,12 +2314,12 @@
 				{
 					"id": "p_group_1",
 					"label": "1-2",
-					"time": "08:30 - 09:55"
+					"time": "08:30 -, 10:00"
 				},
 				{
 					"id": "p_group_2",
 					"label": "3-4",
-					"time": "10:10 - 11:50"
+					"time": "10:20 - 11:50"
 				},
 				{
 					"id": "p_group_3",
@@ -2435,12 +2425,12 @@
 				{
 					"id": "p_group_1",
 					"label": "1-2",
-					"time": "08:30 - 09:55"
+					"time": "08:30 -, 10:00"
 				},
 				{
 					"id": "p_group_2",
 					"label": "3-4",
-					"time": "10:10 - 11:50"
+					"time": "10:20 - 11:50"
 				},
 				{
 					"id": "p_group_3",
@@ -2586,12 +2576,12 @@
 				{
 					"id": "p_group_1",
 					"label": "1-2",
-					"time": "08:30 - 09:55"
+					"time": "08:30 -, 10:00"
 				},
 				{
 					"id": "p_group_2",
 					"label": "3-4",
-					"time": "10:10 - 11:50"
+					"time": "10:20 - 11:50"
 				},
 				{
 					"id": "p_group_3",

@@ -1,7 +1,7 @@
 {
 	"termName": "大一下2",
 	"totalWeeks": 19,
-	"currentWeek": 13,
+	"currentWeek": 14,
 	"termStartDate": "2026-03-02",
 	"periods": [
 		{
@@ -33,11 +33,11 @@
 	"courses": {
 		"p_group_1__mon": [
 			{
-				"course": "心理健康教育II",
+				"course": "鸿蒙初级应用开发",
 				"weeks": "",
-				"location": "一合楼-4楼-J401阶梯教室(J401)",
-				"teacher": "仇百辉",
-				"color": "#ddb8ea",
+				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+				"teacher": "刘晓龙",
+				"color": "#68dfcd",
 				"searchTags": []
 			}
 		],
@@ -47,7 +47,7 @@
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "赵湘元",
-				"color": "#ddb8ea",
+				"color": "#95dc5d",
 				"searchTags": []
 			}
 		],
@@ -57,47 +57,37 @@
 				"weeks": "",
 				"location": "一合楼-4楼-J402阶梯教室(J402)",
 				"teacher": "仇百辉",
-				"color": "#e9da77",
+				"color": "#68dfcd",
 				"searchTags": []
 			}
 		],
 		"p_group_1__thu": [
 			{
-				"course": "鸿蒙初级应用开发",
+				"course": "Vue应用程序开发",
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "刘晓龙",
-				"color": "#ddb8ea",
+				"color": "#82cbff",
 				"searchTags": []
 			}
 		],
 		"p_group_2__mon": [
 			{
-				"course": "Vue应用程序开发",
+				"course": "鸿蒙初级应用开发",
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "刘晓龙",
-				"color": "#9ddfcd",
+				"color": "#e9da77",
 				"searchTags": []
 			}
 		],
 		"p_group_2__tue": [
 			{
-				"course": "职业素质与职业发展规划",
+				"course": "国家安全教育",
 				"weeks": "",
-				"location": "一合楼-4楼-J402阶梯教室(J402)",
-				"teacher": "李宁",
-				"color": "#9ddfcd",
-				"searchTags": []
-			}
-		],
-		"p_group_2__fri": [
-			{
-				"course": "职场通用英语II 专科英语",
-				"weeks": "",
-				"location": "一合楼-4楼-J402阶梯教室(J402)",
-				"teacher": "马悦",
-				"color": "#e9da77",
+				"location": "一合楼-4楼-J404阶梯教室(J404)",
+				"teacher": "郝荣娟",
+				"color": "#95dc5d",
 				"searchTags": []
 			}
 		],
@@ -107,27 +97,27 @@
 				"weeks": "",
 				"location": "一合楼-4楼-J401阶梯教室(J401)",
 				"teacher": "谭仙鹤",
-				"color": "#ddb8ea",
+				"color": "#95dc5d",
 				"searchTags": []
 			}
 		],
-		"p_group_3__fri": [
+		"p_group_3__thu": [
 			{
-				"course": "职场通用英语II 专科英语",
+				"course": "Vue应用程序开发",
 				"weeks": "",
-				"location": "一合楼-4楼-J402阶梯教室(J402)",
-				"teacher": "马悦",
-				"color": "#82cbff",
+				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+				"teacher": "刘晓龙",
+				"color": "#e9da77",
 				"searchTags": []
 			}
 		],
-		"p_group_4__mon": [
+		"p_group_4__wed": [
 			{
-				"course": "毛泽东思想和中国特色社会主义理论体系概论",
+				"course": "毛概 2",
 				"weeks": "",
 				"location": "善工楼-2楼-SG219(219)",
 				"teacher": "仇百辉",
-				"color": "#8f9eff",
+				"color": "#e9da77",
 				"searchTags": []
 			}
 		],
@@ -137,7 +127,7 @@
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "张荣",
-				"color": "#9ddfcd",
+				"color": "#ddb8ea",
 				"searchTags": []
 			}
 		]

@@ -7,6 +7,8 @@ tags:
   - ""
 category: ""
 draft: false
+trashed: true
+trashedAt: "2026-06-11T07:54:35.142Z"
 ---
 
 ## 1. 开通 Cloudflare R2

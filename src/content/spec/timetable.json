@@ -1,5 +1,5 @@
 {
-	"termName": "大一下2",
+	"termName": "2025-2026 第2学期",
 	"totalWeeks": 19,
 	"currentWeek": 15,
 	"termStartDate": "2026-03-02",
@@ -37,7 +37,7 @@
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "刘晓龙",
-				"color": "#e9da77",
+				"color": "#ddb8ea",
 				"searchTags": []
 			}
 		],
@@ -47,7 +47,7 @@
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "赵湘元",
-				"color": "#ddb8ea",
+				"color": "#9ddfcd",
 				"searchTags": []
 			}
 		],
@@ -57,7 +57,7 @@
 				"weeks": "",
 				"location": "一合楼-4楼-J402阶梯教室(J402)",
 				"teacher": "仇百辉",
-				"color": "#e9da77",
+				"color": "#8f9eff",
 				"searchTags": []
 			}
 		],
@@ -67,7 +67,7 @@
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "刘晓龙",
-				"color": "#95dc5d",
+				"color": "#e9da77",
 				"searchTags": []
 			}
 		],
@@ -77,7 +77,7 @@
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "刘晓龙",
-				"color": "#e9da77",
+				"color": "#9ddfcd",
 				"searchTags": []
 			}
 		],
@@ -97,7 +97,7 @@
 				"weeks": "",
 				"location": "一合楼-4楼-J401阶梯教室(J401)",
 				"teacher": "谭仙鹤",
-				"color": "#8f9eff",
+				"color": "#95dc5d",
 				"searchTags": []
 			}
 		],
@@ -107,7 +107,7 @@
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "刘晓龙",
-				"color": "#e9da77",
+				"color": "#68dfcd",
 				"searchTags": []
 			}
 		],
@@ -117,7 +117,7 @@
 				"weeks": "",
 				"location": "一合楼-4楼-J402阶梯教室(J402)",
 				"teacher": "李宁",
-				"color": "#9ddfcd",
+				"color": "#ddb8ea",
 				"searchTags": []
 			}
 		],
@@ -137,7 +137,7 @@
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "张荣",
-				"color": "#82cbff",
+				"color": "#68dfcd",
 				"searchTags": []
 			}
 		]
@@ -178,7 +178,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#82cbff",
+						"color": "#68dfcd",
 						"searchTags": []
 					}
 				],
@@ -188,7 +188,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#95dc5d",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -198,7 +198,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#8f9eff",
+						"color": "#e9da77",
 						"searchTags": []
 					}
 				],
@@ -208,7 +208,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#95dc5d",
+						"color": "#68dfcd",
 						"searchTags": []
 					}
 				],
@@ -218,7 +218,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "张荣",
-						"color": "#e9da77",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -228,7 +228,7 @@
 						"weeks": "",
 						"location": "行知楼-2楼-数字剪辑实训室(9217)",
 						"teacher": "蹇赫",
-						"color": "#8f9eff",
+						"color": "#9ddfcd",
 						"searchTags": []
 					}
 				],
@@ -238,7 +238,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#68dfcd",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				],
@@ -248,7 +248,7 @@
 						"weeks": "",
 						"location": "善工楼-3楼-SG318(318)",
 						"teacher": "李宁",
-						"color": "#95dc5d",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -258,7 +258,7 @@
 						"weeks": "",
 						"location": "善工楼-3楼-SG318(318)",
 						"teacher": "仲晨星",
-						"color": "#82cbff",
+						"color": "#9ddfcd",
 						"searchTags": []
 					}
 				],
@@ -268,7 +268,7 @@
 						"weeks": "",
 						"location": "四季运动场-1楼-活动区15(0121)",
 						"teacher": "赵家乐",
-						"color": "#e9da77",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -278,7 +278,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#68dfcd",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -288,7 +288,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-网络安全实训室(313-1)",
 						"teacher": "徐金戈",
-						"color": "#ddb8ea",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -298,7 +298,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "张荣",
-						"color": "#ddb8ea",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -349,7 +349,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#95dc5d",
+						"color": "#68dfcd",
 						"searchTags": []
 					}
 				],
@@ -359,7 +359,7 @@
 						"weeks": "",
 						"location": "善工楼-3楼-SG318(318)",
 						"teacher": "仲晨星",
-						"color": "#9ddfcd",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				],
@@ -369,7 +369,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#ddb8ea",
+						"color": "#68dfcd",
 						"searchTags": []
 					}
 				],
@@ -379,7 +379,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#68dfcd",
+						"color": "#e9da77",
 						"searchTags": []
 					}
 				],
@@ -389,7 +389,7 @@
 						"weeks": "",
 						"location": "善工楼-3楼-SG316（汽车创客体验中心）(SG316)",
 						"teacher": "仇百辉",
-						"color": "#ddb8ea",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				],
@@ -399,7 +399,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#ddb8ea",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -409,7 +409,7 @@
 						"weeks": "",
 						"location": "行知楼-2楼-数字剪辑实训室(9217)",
 						"teacher": "蹇赫",
-						"color": "#95dc5d",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -419,7 +419,7 @@
 						"weeks": "",
 						"location": "四季运动场-1楼-活动区15(0121)",
 						"teacher": "赵家乐",
-						"color": "#9ddfcd",
+						"color": "#68dfcd",
 						"searchTags": []
 					}
 				],
@@ -429,7 +429,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#8f9eff",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -439,7 +439,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#9ddfcd",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -449,7 +449,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-网络安全实训室(313-1)",
 						"teacher": "徐金戈",
-						"color": "#68dfcd",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -459,7 +459,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "张荣",
-						"color": "#82cbff",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				]
@@ -500,7 +500,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#82cbff",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				],
@@ -510,7 +510,7 @@
 						"weeks": "",
 						"location": "善工楼-3楼-SG318(318)",
 						"teacher": "仲晨星",
-						"color": "#e9da77",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -520,7 +520,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#82cbff",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -540,7 +540,7 @@
 						"weeks": "",
 						"location": "善工楼-3楼-SG316（汽车创客体验中心）(SG316)",
 						"teacher": "仇百辉",
-						"color": "#9ddfcd",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -550,7 +550,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#8f9eff",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -560,7 +560,7 @@
 						"weeks": "",
 						"location": "四季运动场-1楼-活动区15(0121)",
 						"teacher": "赵家乐",
-						"color": "#68dfcd",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				],
@@ -570,7 +570,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#82cbff",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -580,7 +580,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#82cbff",
+						"color": "#e9da77",
 						"searchTags": []
 					}
 				],
@@ -600,7 +600,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "张荣",
-						"color": "#82cbff",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				]
@@ -641,7 +641,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#e9da77",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -651,7 +651,7 @@
 						"weeks": "",
 						"location": "善工楼-3楼-SG318(318)",
 						"teacher": "仲晨星",
-						"color": "#82cbff",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -661,7 +661,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#e9da77",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -671,7 +671,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#ddb8ea",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -691,7 +691,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#82cbff",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -701,7 +701,7 @@
 						"weeks": "",
 						"location": "行知楼-2楼-数字剪辑实训室(9217)",
 						"teacher": "蹇赫",
-						"color": "#68dfcd",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				],
@@ -711,7 +711,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#8f9eff",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -721,7 +721,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#82cbff",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -731,7 +731,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-网络安全实训室(313-1)",
 						"teacher": "徐金戈",
-						"color": "#ddb8ea",
+						"color": "#e9da77",
 						"searchTags": []
 					}
 				],
@@ -782,7 +782,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#8f9eff",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -792,7 +792,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#ddb8ea",
+						"color": "#9ddfcd",
 						"searchTags": []
 					}
 				],
@@ -812,7 +812,7 @@
 						"weeks": "",
 						"location": "行知楼-2楼-数字剪辑实训室(9217)",
 						"teacher": "蹇赫",
-						"color": "#8f9eff",
+						"color": "#9ddfcd",
 						"searchTags": []
 					}
 				],
@@ -822,7 +822,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#9ddfcd",
+						"color": "#68dfcd",
 						"searchTags": []
 					}
 				],
@@ -832,7 +832,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "马悦",
-						"color": "#8f9eff",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -842,7 +842,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#95dc5d",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -852,7 +852,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J404阶梯教室(J404)",
 						"teacher": "郝荣娟",
-						"color": "#95dc5d",
+						"color": "#9ddfcd",
 						"searchTags": []
 					}
 				],
@@ -862,7 +862,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J404阶梯教室(J404)",
 						"teacher": "仇百辉",
-						"color": "#ddb8ea",
+						"color": "#9ddfcd",
 						"searchTags": []
 					}
 				],
@@ -923,7 +923,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#9ddfcd",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -933,7 +933,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "李宁",
-						"color": "#95dc5d",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -943,7 +943,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-网络安全实训室(313-1)",
 						"teacher": "徐金戈",
-						"color": "#68dfcd",
+						"color": "#9ddfcd",
 						"searchTags": []
 					}
 				],
@@ -953,7 +953,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "马悦",
-						"color": "#82cbff",
+						"color": "#e9da77",
 						"searchTags": []
 					}
 				],
@@ -973,7 +973,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J404阶梯教室(J404)",
 						"teacher": "郝荣娟",
-						"color": "#e9da77",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -1024,7 +1024,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#8f9eff",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -1044,7 +1044,7 @@
 						"weeks": "",
 						"location": "行知楼-2楼-像素矩阵艺术实训室(9203)",
 						"teacher": "刘晓龙",
-						"color": "#9ddfcd",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -1054,7 +1054,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#8f9eff",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -1064,7 +1064,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "李宁",
-						"color": "#82cbff",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -1074,7 +1074,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-网络安全实训室(313-1)",
 						"teacher": "徐金戈",
-						"color": "#95dc5d",
+						"color": "#68dfcd",
 						"searchTags": []
 					}
 				],
@@ -1084,7 +1084,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#95dc5d",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -1094,7 +1094,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "仇百辉",
-						"color": "#9ddfcd",
+						"color": "#68dfcd",
 						"searchTags": []
 					}
 				],
@@ -1145,7 +1145,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#e9da77",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -1155,7 +1155,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#8f9eff",
+						"color": "#e9da77",
 						"searchTags": []
 					}
 				],
@@ -1165,7 +1165,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "张荣",
-						"color": "#68dfcd",
+						"color": "#9ddfcd",
 						"searchTags": []
 					}
 				],
@@ -1195,7 +1195,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "李宁",
-						"color": "#ddb8ea",
+						"color": "#e9da77",
 						"searchTags": []
 					}
 				],
@@ -1205,7 +1205,7 @@
 						"weeks": "",
 						"location": "行知楼-2楼-数字剪辑实训室(9217)",
 						"teacher": "蹇赫",
-						"color": "#ddb8ea",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				],
@@ -1215,7 +1215,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#95dc5d",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				],
@@ -1225,7 +1225,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "仇百辉",
-						"color": "#8f9eff",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -1235,7 +1235,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#e9da77",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -1245,7 +1245,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J404阶梯教室(J404)",
 						"teacher": "郝荣娟",
-						"color": "#e9da77",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				]
@@ -1286,7 +1286,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#95dc5d",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				],
@@ -1306,7 +1306,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#95dc5d",
+						"color": "#e9da77",
 						"searchTags": []
 					}
 				],
@@ -1316,7 +1316,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#e9da77",
+						"color": "#68dfcd",
 						"searchTags": []
 					}
 				],
@@ -1326,7 +1326,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "张荣",
-						"color": "#ddb8ea",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				],
@@ -1336,7 +1336,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#e9da77",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -1346,7 +1346,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#e9da77",
+						"color": "#9ddfcd",
 						"searchTags": []
 					}
 				],
@@ -1356,7 +1356,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J404阶梯教室(J404)",
 						"teacher": "吕影",
-						"color": "#82cbff",
+						"color": "#68dfcd",
 						"searchTags": []
 					}
 				],
@@ -1417,7 +1417,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#82cbff",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -1427,7 +1427,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "仇百辉",
-						"color": "#82cbff",
+						"color": "#68dfcd",
 						"searchTags": []
 					}
 				],
@@ -1437,7 +1437,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#8f9eff",
+						"color": "#e9da77",
 						"searchTags": []
 					}
 				],
@@ -1447,7 +1447,7 @@
 						"weeks": "",
 						"location": "行知楼-2楼-数字剪辑实训室(9217)",
 						"teacher": "蹇赫",
-						"color": "#9ddfcd",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				],
@@ -1457,7 +1457,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#95dc5d",
+						"color": "#e9da77",
 						"searchTags": []
 					}
 				],
@@ -1467,7 +1467,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "李宁",
-						"color": "#8f9eff",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -1477,7 +1477,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "张荣",
-						"color": "#82cbff",
+						"color": "#9ddfcd",
 						"searchTags": []
 					}
 				],
@@ -1487,7 +1487,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "马悦",
-						"color": "#8f9eff",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				]
@@ -1528,7 +1528,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J401阶梯教室(J401)",
 						"teacher": "仇百辉",
-						"color": "#ddb8ea",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				],
@@ -1538,7 +1538,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#8f9eff",
+						"color": "#9ddfcd",
 						"searchTags": []
 					}
 				],
@@ -1548,7 +1548,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "仇百辉",
-						"color": "#9ddfcd",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -1558,7 +1558,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#68dfcd",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -1568,7 +1568,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#9ddfcd",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -1578,7 +1578,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "李宁",
-						"color": "#95dc5d",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -1588,7 +1588,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#9ddfcd",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -1598,7 +1598,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "马悦",
-						"color": "#82cbff",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -1608,7 +1608,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#68dfcd",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -1618,7 +1618,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#9ddfcd",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				],
@@ -1638,7 +1638,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J404阶梯教室(J404)",
 						"teacher": "郝荣娟",
-						"color": "#ddb8ea",
+						"color": "#e9da77",
 						"searchTags": []
 					}
 				],
@@ -1648,7 +1648,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "张荣",
-						"color": "#82cbff",
+						"color": "#9ddfcd",
 						"searchTags": []
 					}
 				]
@@ -1689,7 +1689,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J401阶梯教室(J401)",
 						"teacher": "仇百辉",
-						"color": "#9ddfcd",
+						"color": "#e9da77",
 						"searchTags": []
 					}
 				],
@@ -1699,7 +1699,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#95dc5d",
+						"color": "#e9da77",
 						"searchTags": []
 					}
 				],
@@ -1709,7 +1709,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "仇百辉",
-						"color": "#ddb8ea",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -1719,7 +1719,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#9ddfcd",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -1729,7 +1729,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#95dc5d",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -1739,7 +1739,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#ddb8ea",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -1749,7 +1749,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "马悦",
-						"color": "#9ddfcd",
+						"color": "#e9da77",
 						"searchTags": []
 					}
 				],
@@ -1759,7 +1759,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#8f9eff",
+						"color": "#9ddfcd",
 						"searchTags": []
 					}
 				],
@@ -1769,7 +1769,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#8f9eff",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -1779,7 +1779,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#ddb8ea",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -1789,7 +1789,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J404阶梯教室(J404)",
 						"teacher": "郝荣娟",
-						"color": "#68dfcd",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				],
@@ -1799,7 +1799,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "张荣",
-						"color": "#68dfcd",
+						"color": "#9ddfcd",
 						"searchTags": []
 					}
 				]
@@ -1840,7 +1840,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J401阶梯教室(J401)",
 						"teacher": "仇百辉",
-						"color": "#9ddfcd",
+						"color": "#68dfcd",
 						"searchTags": []
 					}
 				],
@@ -1850,7 +1850,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#82cbff",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -1860,7 +1860,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "仇百辉",
-						"color": "#8f9eff",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -1870,7 +1870,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#8f9eff",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -1880,7 +1880,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#e9da77",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -1900,7 +1900,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "马悦",
-						"color": "#ddb8ea",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				],
@@ -1920,7 +1920,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "马悦",
-						"color": "#e9da77",
+						"color": "#9ddfcd",
 						"searchTags": []
 					}
 				],
@@ -1930,7 +1930,7 @@
 						"weeks": "",
 						"location": "善工楼-2楼-SG219(219)",
 						"teacher": "仇百辉",
-						"color": "#8f9eff",
+						"color": "#68dfcd",
 						"searchTags": []
 					}
 				],
@@ -1940,7 +1940,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#ddb8ea",
+						"color": "#9ddfcd",
 						"searchTags": []
 					}
 				],
@@ -1950,7 +1950,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "张荣",
-						"color": "#68dfcd",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				]
@@ -1991,7 +1991,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#82cbff",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -2001,7 +2001,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#8f9eff",
+						"color": "#9ddfcd",
 						"searchTags": []
 					}
 				],
@@ -2011,7 +2011,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "仇百辉",
-						"color": "#8f9eff",
+						"color": "#9ddfcd",
 						"searchTags": []
 					}
 				],
@@ -2021,7 +2021,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#ddb8ea",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -2031,7 +2031,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#ddb8ea",
+						"color": "#68dfcd",
 						"searchTags": []
 					}
 				],
@@ -2041,7 +2041,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J404阶梯教室(J404)",
 						"teacher": "郝荣娟",
-						"color": "#68dfcd",
+						"color": "#e9da77",
 						"searchTags": []
 					}
 				],
@@ -2061,7 +2061,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#8f9eff",
+						"color": "#e9da77",
 						"searchTags": []
 					}
 				],
@@ -2071,7 +2071,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#9ddfcd",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				],
@@ -2081,7 +2081,7 @@
 						"weeks": "",
 						"location": "善工楼-2楼-SG219(219)",
 						"teacher": "仇百辉",
-						"color": "#ddb8ea",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -2091,7 +2091,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "张荣",
-						"color": "#ddb8ea",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				]
@@ -2132,7 +2132,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#e9da77",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -2142,7 +2142,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#ddb8ea",
+						"color": "#9ddfcd",
 						"searchTags": []
 					}
 				],
@@ -2152,7 +2152,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "仇百辉",
-						"color": "#e9da77",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				],
@@ -2162,7 +2162,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#95dc5d",
+						"color": "#e9da77",
 						"searchTags": []
 					}
 				],
@@ -2172,7 +2172,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#e9da77",
+						"color": "#9ddfcd",
 						"searchTags": []
 					}
 				],
@@ -2192,7 +2192,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J401阶梯教室(J401)",
 						"teacher": "谭仙鹤",
-						"color": "#8f9eff",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -2202,7 +2202,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#e9da77",
+						"color": "#68dfcd",
 						"searchTags": []
 					}
 				],
@@ -2212,7 +2212,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "李宁",
-						"color": "#9ddfcd",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -2232,7 +2232,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "张荣",
-						"color": "#82cbff",
+						"color": "#68dfcd",
 						"searchTags": []
 					}
 				]
@@ -2273,7 +2273,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#e9da77",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -2283,7 +2283,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#ddb8ea",
+						"color": "#68dfcd",
 						"searchTags": []
 					}
 				],
@@ -2293,7 +2293,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "仇百辉",
-						"color": "#68dfcd",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -2303,7 +2303,7 @@
 						"weeks": "",
 						"location": "行知楼-2楼-数字剪辑实训室(9217)",
 						"teacher": "蹇赫",
-						"color": "#82cbff",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				],
@@ -2313,7 +2313,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#9ddfcd",
+						"color": "#68dfcd",
 						"searchTags": []
 					}
 				],
@@ -2323,7 +2323,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#68dfcd",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -2333,7 +2333,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J401阶梯教室(J401)",
 						"teacher": "谭仙鹤",
-						"color": "#e9da77",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -2343,7 +2343,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "张荣",
-						"color": "#e9da77",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				]
@@ -2384,7 +2384,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#68dfcd",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				],
@@ -2394,7 +2394,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#e9da77",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				],
@@ -2404,7 +2404,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#ddb8ea",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -2414,7 +2414,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#8f9eff",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -2424,7 +2424,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#e9da77",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -2434,7 +2434,7 @@
 						"weeks": "",
 						"location": "行知楼-2楼-数字剪辑实训室(9217)",
 						"teacher": "蹇赫",
-						"color": "#e9da77",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -2444,7 +2444,7 @@
 						"weeks": "",
 						"location": "一合楼-4楼-J402阶梯教室(J402)",
 						"teacher": "李宁",
-						"color": "#82cbff",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -2464,7 +2464,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#82cbff",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				]
@@ -2505,7 +2505,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#ddb8ea",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -2515,7 +2515,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#e9da77",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -2535,7 +2535,7 @@
 						"weeks": "",
 						"location": "行知楼-2楼-数字剪辑实训室(9217)",
 						"teacher": "蹇赫",
-						"color": "#ddb8ea",
+						"color": "#e9da77",
 						"searchTags": []
 					}
 				],
@@ -2565,7 +2565,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#8f9eff",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -2585,7 +2585,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#68dfcd",
+						"color": "#9ddfcd",
 						"searchTags": []
 					}
 				],
@@ -2595,7 +2595,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "赵湘元",
-						"color": "#82cbff",
+						"color": "#68dfcd",
 						"searchTags": []
 					}
 				],
@@ -2605,7 +2605,7 @@
 						"weeks": "",
 						"location": "行知楼-2楼-数字剪辑实训室(9217)",
 						"teacher": "蹇赫",
-						"color": "#8f9eff",
+						"color": "#ddb8ea",
 						"searchTags": []
 					}
 				],
@@ -2615,7 +2615,7 @@
 						"weeks": "",
 						"location": "行知楼-2楼-数字剪辑实训室(9217)",
 						"teacher": "蹇赫",
-						"color": "#68dfcd",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -2666,7 +2666,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#ddb8ea",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -2676,7 +2676,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#9ddfcd",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -2686,7 +2686,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#8f9eff",
+						"color": "#68dfcd",
 						"searchTags": []
 					}
 				],
@@ -2706,7 +2706,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#9ddfcd",
+						"color": "#95dc5d",
 						"searchTags": []
 					}
 				],
@@ -2716,7 +2716,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#e9da77",
+						"color": "#82cbff",
 						"searchTags": []
 					}
 				],
@@ -2726,7 +2726,7 @@
 						"weeks": "",
 						"location": "行知楼-2楼-数字剪辑实训室(9217)",
 						"teacher": "蹇赫",
-						"color": "#95dc5d",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				],
@@ -2736,7 +2736,7 @@
 						"weeks": "",
 						"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 						"teacher": "刘晓龙",
-						"color": "#82cbff",
+						"color": "#8f9eff",
 						"searchTags": []
 					}
 				]

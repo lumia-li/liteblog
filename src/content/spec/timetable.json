@@ -1,8 +1,8 @@
 {
 	"termName": "2025-2026 第2学期",
 	"totalWeeks": 19,
-	"currentWeek": 1,
-	"termStartDate": "2026-06-07",
+	"currentWeek": 15,
+	"termStartDate": "2026-02-28",
 	"periods": [
 		{
 			"id": "p_import_1",
@@ -33,6 +33,36 @@
 	"courses": {
 		"p_import_1__mon": [
 			{
+				"course": "鸿蒙初级应用开发",
+				"weeks": "",
+				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+				"teacher": "刘晓龙",
+				"color": "#8f9eff",
+				"searchTags": []
+			}
+		],
+		"p_import_1__tue": [
+			{
+				"course": "web程序设计基础",
+				"weeks": "",
+				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+				"teacher": "赵湘元",
+				"color": "#9ddfcd",
+				"searchTags": []
+			}
+		],
+		"p_import_1__wed": [
+			{
+				"course": "毛概 2",
+				"weeks": "",
+				"location": "一合楼-4楼-J402阶梯教室(J402)",
+				"teacher": "仇百辉",
+				"color": "#9ddfcd",
+				"searchTags": []
+			}
+		],
+		"p_import_1__thu": [
+			{
 				"course": "Vue应用程序开发",
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
@@ -41,43 +71,13 @@
 				"searchTags": []
 			}
 		],
-		"p_import_1__thu": [
-			{
-				"course": "鸿蒙初级应用开发",
-				"weeks": "",
-				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
-				"teacher": "刘晓龙",
-				"color": "#8f9eff",
-				"searchTags": []
-			}
-		],
 		"p_import_2__mon": [
 			{
-				"course": "Vue应用程序开发",
+				"course": "鸿蒙初级应用开发",
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "刘晓龙",
 				"color": "#68dfcd",
-				"searchTags": []
-			}
-		],
-		"p_import_2__tue": [
-			{
-				"course": "鸿蒙初级应用开发",
-				"weeks": "",
-				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
-				"teacher": "刘晓龙",
-				"color": "#8f9eff",
-				"searchTags": []
-			}
-		],
-		"p_import_2__wed": [
-			{
-				"course": "数据库技术",
-				"weeks": "",
-				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
-				"teacher": "张荣",
-				"color": "#9ddfcd",
 				"searchTags": []
 			}
 		],
@@ -87,67 +87,47 @@
 				"weeks": "",
 				"location": "行知楼-2楼-数字剪辑实训室(9217)",
 				"teacher": "蹇赫",
-				"color": "#68dfcd",
-				"searchTags": []
-			}
-		],
-		"p_import_3__mon": [
-			{
-				"course": "web程序设计基础",
-				"weeks": "",
-				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
-				"teacher": "赵湘元",
-				"color": "#8f9eff",
+				"color": "#95dc5d",
 				"searchTags": []
 			}
 		],
 		"p_import_3__tue": [
 			{
-				"course": "劳动教育",
+				"course": "美育II",
 				"weeks": "",
-				"location": "善工楼-3楼-SG318(318)",
-				"teacher": "李宁",
-				"color": "#68dfcd",
-				"searchTags": []
-			}
-		],
-		"p_import_3__wed": [
-			{
-				"course": "形势与政策II",
-				"weeks": "",
-				"location": "善工楼-3楼-SG318(318)",
-				"teacher": "仲晨星",
-				"color": "#68dfcd",
+				"location": "一合楼-4楼-J401阶梯教室(J401)",
+				"teacher": "谭仙鹤",
+				"color": "#8f9eff",
 				"searchTags": []
 			}
 		],
 		"p_import_3__thu": [
 			{
-				"course": "体育与健康II",
+				"course": "Vue应用程序开发",
 				"weeks": "",
-				"location": "四季运动场-1楼-活动区15(0121)",
-				"teacher": "赵家乐",
-				"color": "#e9da77",
+				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
+				"teacher": "刘晓龙",
+				"color": "#9ddfcd",
 				"searchTags": []
 			}
 		],
-		"p_import_4__mon": [
+		"p_import_3__fri": [
 			{
-				"course": "web程序设计基础",
+				"course": "职业素质与职业发展规划",
+				"weeks": "",
+				"location": "一合楼-4楼-J402阶梯教室(J402)",
+				"teacher": "李宁",
+				"color": "#95dc5d",
+				"searchTags": []
+			}
+		],
+		"p_import_4__wed": [
+			{
+				"course": "AIGC应用实战 AI智能体与工作流搭建",
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "赵湘元",
-				"color": "#ddb8ea",
-				"searchTags": []
-			}
-		],
-		"p_import_4__tue": [
-			{
-				"course": "专业英语II",
-				"weeks": "",
-				"location": "一合楼-3楼-网络安全实训室(313-1)",
-				"teacher": "徐金戈",
-				"color": "#68dfcd",
+				"color": "#95dc5d",
 				"searchTags": []
 			}
 		],
@@ -157,16 +137,6 @@
 				"weeks": "",
 				"location": "一合楼-3楼-OpenHarmony软件开发实训室(305)",
 				"teacher": "张荣",
-				"color": "#68dfcd",
-				"searchTags": []
-			}
-		],
-		"p_import_4__fri": [
-			{
-				"course": "毛泽东思想和中国特色社会主义理论体系概论",
-				"weeks": "",
-				"location": "善工楼-3楼-SG316（汽车创客体验中心）(SG316)",
-				"teacher": "仇百辉",
 				"color": "#68dfcd",
 				"searchTags": []
 			}

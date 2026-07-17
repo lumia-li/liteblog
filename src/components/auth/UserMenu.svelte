@@ -262,24 +262,24 @@ onMount(() => {
 	min-width 120px
 
 .user-dropdown-item
-  display inline-flex
-  align-items center
-  gap 10px
-  padding 7px 10px
-  border-radius 10px
-  color var(--capsule-text, #1d2838)
-  font-size 0.84rem
-  font-weight 600
-  text-decoration none
-  cursor pointer
-  transition background-color 0.15s ease, transform 0.15s ease
+	display inline-flex
+	align-items center
+	gap 10px
+	padding 7px 10px
+	border-radius 10px
+	color var(--capsule-text, #1d2838)
+	font-size 0.84rem
+	font-weight 600
+	text-decoration none
+	cursor pointer
+	transition background-color 0.15s ease, transform 0.15s ease
 
 .user-dropdown-item:hover
-  background var(--capsule-btn-hover, rgba(28, 39, 56, 0.08))
+	background var(--capsule-btn-hover, rgba(28, 39, 56, 0.08))
 
 .user-dropdown-item:active
-  background var(--capsule-btn-hover, rgba(28, 39, 56, 0.14))
-  transform scale(0.97)
+	background var(--capsule-btn-hover, rgba(28, 39, 56, 0.14))
+	transform scale(0.97)
 
 .user-dropdown-item svg
 	width 18px

@@ -12,6 +12,7 @@ const user = session?.user ?? null;
 	<div class="profile-card">
 		{user ? (
 			<>
+				<div class="profile-cover"></div>
 				<div class="profile-header">
 					{user.avatar_url ? (
 						<img src={user.avatar_url} alt={user.display_name || user.username} class="profile-avatar" />
@@ -21,34 +22,37 @@ const user = session?.user ?? null;
 						</div>
 					)}
 				<div class="profile-titles">
-					<h1 class="profile-name">{user.display_name || user.username}</h1>
-					<p class="profile-username">@{user.username}</p>
-					{(["1", "4"] as string[]).includes(user.id) ? (
-						<div class="profile-role-row">
+					<div class="profile-name-row">
+						<h1 class="profile-name">{user.display_name || user.username}</h1>
+						{(["1", "4"] as string[]).includes(user.id) ? (
 							<span class="profile-role profile-role-cat" id="profile-role-badge">
 								{user.id === "1" ? "猫猫管理员" : "璃猫猫"}
 							</span>
-							<div id="kaomoji-container" class="kaomoji-box">
-								<span id="kaomoji-text" class="kaomoji-text"></span>
-							</div>
+						) : (
+							<span class="profile-role">{user.role === "admin" ? "管理员" : "普通用户"}</span>
+						)}
+						<div id="kaomoji-container" class="kaomoji-box">
+							<span id="kaomoji-text" class="kaomoji-text"></span>
 						</div>
-					) : (
-						<span class="profile-role">{user.role === "admin" ? "管理员" : "普通用户"}</span>
-					)}
+					</div>
+					<p class="profile-username">@{user.username}</p>
 				</div>
 				</div>
-				<div class="profile-body">
-					<div class="profile-field">
-						<span class="profile-label">用户 ID</span>
-						<span class="profile-value">{user.id}</span>
-					</div>
-					<div class="profile-field">
-						<span class="profile-label">邮箱</span>
-						<span class="profile-value">{user.email}</span>
-					</div>
-					<div class="profile-field">
-						<span class="profile-label">用户名</span>
-						<span class="profile-value">{user.username}</span>
+				<div class="profile-section">
+					<h2 class="profile-section-title">基本信息</h2>
+					<div class="profile-body">
+						<div class="profile-field">
+							<span class="profile-label">用户 ID</span>
+							<span class="profile-value">{user.id}</span>
+						</div>
+						<div class="profile-field">
+							<span class="profile-label">邮箱</span>
+							<span class="profile-value">{user.email || "未设置"}</span>
+						</div>
+						<div class="profile-field">
+							<span class="profile-label">用户名</span>
+							<span class="profile-value">{user.username}</span>
+						</div>
 					</div>
 				</div>
 				<div class="profile-actions">
@@ -165,11 +169,6 @@ const user = session?.user ?? null;
 		border: 1px solid var(--surface-border, #dddddd);
 	}
 
-	.profile-role-row {
-		display: flex;
-		align-items: center;
-	}
-
 	.profile-role-cat {
 		background: #dbeafe;
 		color: #1e40af;
@@ -189,20 +188,17 @@ const user = session?.user ?? null;
 	}
 
 	.kaomoji-box {
-		display: inline-flex;
-		align-items: center;
 		overflow: hidden;
 		max-width: 0;
-		opacity: 0;
-		transition: max-width 0.35s ease, opacity 0.35s ease;
+		transition: max-width 0.4s ease;
 	}
 
 	.kaomoji-box.visible {
 		max-width: 180px;
-		opacity: 1;
 	}
 
 	.kaomoji-text {
+		display: inline-block;
 		padding-left: 0.5rem;
 		font-size: 1rem;
 		white-space: nowrap;
@@ -316,6 +312,37 @@ const user = session?.user ?? null;
 		color: color-mix(in oklab, var(--text-color, #111111) 68%, transparent);
 	}
 
+	.profile-cover {
+		height: 5rem;
+		margin: -1.5rem -1.5rem 0;
+		border-radius: 1.25rem 1.25rem 0 0;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	}
+
+	:root.dark .profile-cover {
+		background: linear-gradient(135deg, #1a1a3e 0%, #2d1b4e 100%);
+	}
+
+	.profile-name-row {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.profile-section {
+		margin-top: 1.5rem;
+	}
+
+	.profile-section-title {
+		margin: 0 0 0.65rem;
+		font-size: 0.78rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: color-mix(in oklab, var(--text-color, #111111) 56%, transparent);
+	}
+
 	:root.dark .profile-btn-primary {
 		background: var(--text-color, #f5f7fb);
 		color: var(--page-bg, #0f1218);
@@ -325,6 +352,12 @@ const user = session?.user ?? null;
 		.profile-card {
 			padding: 1.15rem;
 			margin-top: 1rem;
+		}
+
+		.profile-cover {
+			height: 3.5rem;
+			margin: -1.15rem -1.15rem 0;
+			border-radius: 1.25rem 1.25rem 0 0;
 		}
 
 		.profile-avatar {

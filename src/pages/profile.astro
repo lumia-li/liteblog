@@ -171,10 +171,9 @@ const user = session?.user ?? null;
 		position: relative;
 		background:
 			linear-gradient(#dbeafe, #dbeafe),
-			linear-gradient(#dbeafe 50%, rgba(219, 238, 254, 0.6) 80%, rgba(219, 238, 254, 0)),
 			linear-gradient(90deg, var(--rc1), var(--rc5), var(--rc3), var(--rc4), var(--rc2), var(--rc1));
 		background-size: 200% 100%;
-		background-clip: padding-box, border-box, border-box;
+		background-clip: padding-box, border-box;
 		background-origin: border-box;
 		border: 2px solid transparent;
 		animation: rainbow-move 4s linear infinite;
@@ -201,7 +200,6 @@ const user = session?.user ?? null;
 	:root.dark .profile-role-rainbow {
 		background:
 			linear-gradient(rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.2)),
-			linear-gradient(rgba(59, 130, 246, 0.2) 50%, rgba(59, 130, 246, 0.1) 80%, rgba(59, 130, 246, 0)),
 			linear-gradient(90deg, var(--rc1), var(--rc5), var(--rc3), var(--rc4), var(--rc2), var(--rc1));
 		color: #bfdbfe;
 	}

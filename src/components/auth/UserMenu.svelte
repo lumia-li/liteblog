@@ -1,7 +1,6 @@
 <script lang="ts">
 import { onMount } from "svelte";
-import { cubicOut } from "svelte/easing";
-import { fade, scale } from "svelte/transition";
+import { fade } from "svelte/transition";
 
 type User = {
 	id: number;
@@ -116,14 +115,10 @@ onMount(() => {
 		{#if open}
 			<div
 				bind:this={menuElement}
-				class="user-dropdown"
+				class="user-dropdown user-dropdown-loggedin"
 				role="menu"
 				transition:fade={{ duration: 120 }}
 			>
-				<div class="user-dropdown-header" transition:scale={{ duration: 160, easing: cubicOut, start: 0.96 }}>
-					<p class="user-dropdown-name">{user.display_name || user.username}</p>
-				</div>
-				<div class="user-dropdown-divider"></div>
 				<a href="/profile" class="user-dropdown-item" role="menuitem" on:click={closeMenu}>
 					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="currentColor"/></svg>
 					个人资料
@@ -261,22 +256,10 @@ onMount(() => {
 	gap 2px
 	z-index 100
 
-.user-dropdown-login
+.user-dropdown-login,
+.user-dropdown-loggedin
 	width max-content
 	min-width 120px
-
-.user-dropdown-header
-	padding 4px 10px
-
-.user-dropdown-name
-	margin 0
-	font-size 0.88rem
-	font-weight 700
-	color var(--capsule-text, #1d2838)
-
-.user-dropdown-divider
-	height 1px
-	background unquote("color-mix(in oklab, var(--capsule-text, #1d2838) 12%, transparent)")
 
 .user-dropdown-item
 	display inline-flex

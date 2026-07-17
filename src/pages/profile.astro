@@ -188,26 +188,28 @@ const user = session?.user ?? null;
 
 	.kaomoji-box {
 		display: inline-flex;
+		align-items: center;
 		overflow: hidden;
-		max-width: 0;
+		width: 0;
 		opacity: 0;
-		transition: max-width 0.45s ease, opacity 0.2s ease;
+		margin-left: 0;
+		transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease, margin-left 0.45s ease;
 	}
 
 	.kaomoji-box.visible {
-		max-width: 180px;
+		width: 140px;
 		opacity: 1;
+		margin-left: 0.25rem;
 	}
 
 	.kaomoji-text {
 		display: inline-block;
-		padding-left: 0.5rem;
 		font-size: 1rem;
 		white-space: nowrap;
 		font-weight: 600;
-		transform: translateX(-100%);
+		transform: translateX(-40px);
 		opacity: 0;
-		transition: transform 0.45s ease, opacity 0.3s ease;
+		transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
 	}
 
 	.kaomoji-box.visible .kaomoji-text {

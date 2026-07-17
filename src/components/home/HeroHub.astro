@@ -1319,6 +1319,10 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 		outline: none;
 	}
 
+	.hero-avatar-link:active {
+		transform: scale(0.97);
+	}
+
 	.hero-avatar :global(img) {
 		-webkit-user-drag: none;
 		user-drag: none;
@@ -1629,6 +1633,10 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 		-webkit-user-drag: none;
 		user-select: none;
 	}
+	.hero-pill:active {
+		transform: scale(0.97);
+		background: color-mix(in oklab, var(--hero-pill-bg) 94%, black);
+	}
 
 	.hero-pill-icon {
 		font-size: 1.1rem;
@@ -1663,10 +1671,19 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 		user-select: none;
 	}
 
+	.hero-chip:active:not(.hero-chip-active) {
+		transform: scale(0.97);
+		background: color-mix(in oklab, var(--hero-chip-bg) 94%, black);
+	}
+
 	.hero-chip-active {
 		background: var(--hero-chip-active-bg);
 		border-color: var(--hero-chip-active-border);
 		color: var(--hero-chip-active-text);
+	}
+
+	.hero-chip-active:active {
+		transform: scale(0.97);
 	}
 
 	.hero-chip-badge {

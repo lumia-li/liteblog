@@ -353,6 +353,9 @@ onMount(() => {
     background unquote('color-mix(in oklab, var(--primary) 88%, white 12%)')
     box-shadow unquote('0 14px 30px color-mix(in oklab, var(--primary) 46%, transparent), 0 1px 0 color-mix(in oklab, white 34%, transparent) inset')
 
+  &:active
+    transform scale(0.97)
+
 .empty-tip
   border 1px dashed var(--btn-regular-bg-hover)
   border-radius 0.9rem
@@ -422,10 +425,16 @@ onMount(() => {
     transform translateY(-1px)
     filter brightness(1.03)
 
+  &:active
+    transform scale(0.97)
+
 .action-btn.danger
   border-color unquote('color-mix(in oklab, rgb(244, 63, 94) 88%, var(--primary))')
   background unquote('color-mix(in oklab, rgb(244, 63, 94) 72%, var(--primary))')
   color rgb(255, 255, 255)
+
+  &:active
+    transform scale(0.97)
 
   &::after
     content ""

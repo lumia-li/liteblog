@@ -273,6 +273,10 @@ onMount(() => {
     background rgba(239, 68, 68, 0.16)
     transform translateY(-1px)
 
+  &:active:not(:disabled)
+    background rgba(239, 68, 68, 0.28)
+    transform scale(0.97)
+
   &:disabled
     opacity 0.58
     cursor not-allowed

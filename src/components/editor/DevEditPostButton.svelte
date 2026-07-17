@@ -159,6 +159,10 @@ onMount(() => {
     background rgba(59, 130, 246, 0.18)
     transform translateY(-1px)
 
+  &:active
+    background rgba(59, 130, 246, 0.26)
+    transform scale(0.97)
+
 .dev-edit-slot.compact .edit-btn
   min-width 2rem
   width 2rem

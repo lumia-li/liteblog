@@ -357,6 +357,9 @@ onMount(() => {
   &:hover:not(:disabled)
     transform translateY(-1px)
 
+  &:active:not(:disabled)
+    transform scale(0.97)
+
   &:disabled
     opacity 0.58
     cursor not-allowed

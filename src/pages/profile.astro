@@ -184,9 +184,17 @@ const user = session?.user ?? null;
 		transform: translateY(-1px);
 	}
 
+	.profile-btn:active {
+		transform: scale(0.97);
+	}
+
 	.profile-btn-primary {
 		background: var(--text-color, #111111);
 		color: var(--page-bg, #ffffff);
+	}
+
+	.profile-btn-primary:active {
+		background: color-mix(in oklab, var(--text-color, #111111) 88%, transparent);
 	}
 
 	.profile-btn-default {
@@ -195,10 +203,18 @@ const user = session?.user ?? null;
 		border: 1px solid var(--surface-border, #dddddd);
 	}
 
+	.profile-btn-default:active {
+		background: var(--btn-regular-bg-active, #ebebeb);
+	}
+
 	.profile-btn-danger {
 		background: rgba(220, 38, 38, 0.1);
 		color: #dc2626;
 		border: 1px solid rgba(220, 38, 38, 0.25);
+	}
+
+	.profile-btn-danger:active {
+		background: rgba(220, 38, 38, 0.2);
 	}
 
 	.profile-guest {

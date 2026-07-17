@@ -858,10 +858,14 @@ onMount(() => {
   padding 0.45rem 0.8rem
   color var(--btn-content)
   font-weight 700
+  transition transform 0.18s ease, border-color 0.18s ease, background 0.18s ease
 
   &:disabled
     opacity 0.6
     cursor not-allowed
+
+  &:active:not(:disabled)
+    transform scale(0.97)
 
 .trash-sections
   display grid
@@ -1018,6 +1022,9 @@ onMount(() => {
 
   &:hover:not(:disabled)
     transform translateY(-1px)
+
+  &:active:not(:disabled)
+    transform scale(0.97)
 
 .action-btn.danger
   border-color rgba(239, 68, 68, 0.75)

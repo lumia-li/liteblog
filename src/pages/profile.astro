@@ -108,6 +108,9 @@ const user = session?.user ?? null;
 		object-fit: cover;
 		background: var(--btn-regular-bg, #f7f7f7);
 		border: 1px solid var(--surface-border, #dddddd);
+		-webkit-user-drag: none;
+		user-drag: none;
+		user-select: none;
 	}
 
 	.profile-avatar-fallback {
@@ -130,6 +133,7 @@ const user = session?.user ?? null;
 		font-size: 1.5rem;
 		font-weight: 800;
 		color: var(--text-color, #111111);
+		user-select: none;
 	}
 
 	.profile-username {
@@ -148,6 +152,7 @@ const user = session?.user ?? null;
 		background: var(--btn-regular-bg, #f7f7f7);
 		color: var(--text-color, #111111);
 		border: 1px solid var(--surface-border, #dddddd);
+		user-select: none;
 	}
 
 	.profile-role-cat {

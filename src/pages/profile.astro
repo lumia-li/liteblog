@@ -12,7 +12,6 @@ const user = session?.user ?? null;
 	<div class="profile-card">
 		{user ? (
 			<>
-				<div class="profile-cover"></div>
 				<div class="profile-header">
 					{user.avatar_url ? (
 						<img src={user.avatar_url} alt={user.display_name || user.username} class="profile-avatar" />
@@ -188,17 +187,16 @@ const user = session?.user ?? null;
 	}
 
 	.kaomoji-box {
-		overflow: hidden;
-		max-width: 0;
-		transition: max-width 0.4s ease;
+		display: inline-flex;
+		clip-path: inset(0 100% 0 0);
+		transition: clip-path 0.4s ease;
 	}
 
 	.kaomoji-box.visible {
-		max-width: 180px;
+		clip-path: inset(0 0% 0 0);
 	}
 
 	.kaomoji-text {
-		display: inline-block;
 		padding-left: 0.5rem;
 		font-size: 1rem;
 		white-space: nowrap;
@@ -312,17 +310,6 @@ const user = session?.user ?? null;
 		color: color-mix(in oklab, var(--text-color, #111111) 68%, transparent);
 	}
 
-	.profile-cover {
-		height: 5rem;
-		margin: -1.5rem -1.5rem 0;
-		border-radius: 1.25rem 1.25rem 0 0;
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-	}
-
-	:root.dark .profile-cover {
-		background: linear-gradient(135deg, #1a1a3e 0%, #2d1b4e 100%);
-	}
-
 	.profile-name-row {
 		display: flex;
 		align-items: center;
@@ -335,12 +322,10 @@ const user = session?.user ?? null;
 	}
 
 	.profile-section-title {
-		margin: 0 0 0.65rem;
-		font-size: 0.78rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: color-mix(in oklab, var(--text-color, #111111) 56%, transparent);
+		margin: 0 0 0.75rem;
+		font-size: 0.95rem;
+		font-weight: 800;
+		color: var(--text-color, #111111);
 	}
 
 	:root.dark .profile-btn-primary {
@@ -352,12 +337,6 @@ const user = session?.user ?? null;
 		.profile-card {
 			padding: 1.15rem;
 			margin-top: 1rem;
-		}
-
-		.profile-cover {
-			height: 3.5rem;
-			margin: -1.15rem -1.15rem 0;
-			border-radius: 1.25rem 1.25rem 0 0;
 		}
 
 		.profile-avatar {

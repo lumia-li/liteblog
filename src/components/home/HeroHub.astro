@@ -824,11 +824,31 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 
 		const setThemeFromCapsule = (mode) => {
 			const nextMode = mode === DARK_MODE ? DARK_MODE : LIGHT_MODE;
-			root.classList.toggle("dark", nextMode === DARK_MODE);
-			root.setAttribute("data-theme", nextMode === DARK_MODE ? "github-dark" : "github-light");
-			localStorage.setItem("theme", nextMode);
-			const capsule = document.querySelector(CAPSULE_SELECTOR);
-			reflectThemeState(capsule);
+			const apply = () => {
+				root.classList.toggle("dark", nextMode === DARK_MODE);
+				root.setAttribute("data-theme", nextMode === DARK_MODE ? "github-dark" : "github-light");
+				localStorage.setItem("theme", nextMode);
+				const capsule = document.querySelector(CAPSULE_SELECTOR);
+				reflectThemeState(capsule);
+			};
+
+			const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+			const doc = document;
+			if (!prefersReducedMotion && typeof doc.startViewTransition === "function") {
+				try {
+					const transition = doc.startViewTransition(apply);
+					transition.finished?.catch(() => {});
+				} catch {
+					apply();
+				}
+				return;
+			}
+
+			root.classList.add("theme-switching-soft");
+			apply();
+			window.setTimeout(() => {
+				root.classList.remove("theme-switching-soft");
+			}, 360);
 		};
 
 		const closeMenu = (capsule) => {

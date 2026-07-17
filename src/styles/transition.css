@@ -101,3 +101,22 @@ body,
     transition: none !important;
     scroll-behavior: auto !important;
 }
+
+/* Soft theme transition: temporarily re-enable transitions for color-related properties */
+html.theme-switching-soft,
+html.theme-switching-soft body,
+html.theme-switching-soft #swup-container,
+html.theme-switching-soft #content-wrapper,
+html.theme-switching-soft #content-wrapper * {
+    transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, fill 0.35s ease, stroke 0.35s ease !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html.theme-switching-soft,
+    html.theme-switching-soft body,
+    html.theme-switching-soft #swup-container,
+    html.theme-switching-soft #content-wrapper,
+    html.theme-switching-soft #content-wrapper * {
+        transition: none !important;
+    }
+}

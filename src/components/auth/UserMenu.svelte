@@ -135,12 +135,35 @@ onMount(() => {
 			</div>
 		{/if}
 	{:else}
-		<a href="/api/auth/login" class="user-login-button">
+		<button
+			bind:this={buttonElement}
+			type="button"
+			class="user-menu-button user-menu-button-login"
+			aria-haspopup="true"
+			aria-expanded={open}
+			on:click={toggleMenu}
+		>
 			<svg viewBox="0 0 24 24" aria-hidden="true">
 				<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="currentColor"/>
 			</svg>
-			登录
-		</a>
+			<span class="user-name">登录</span>
+			<svg class="user-menu-chevron" class:open viewBox="0 0 24 24" aria-hidden="true">
+				<path d="M7 10l5 5 5-5H7z" fill="currentColor" />
+			</svg>
+		</button>
+		{#if open}
+			<div
+				bind:this={menuElement}
+				class="user-dropdown user-dropdown-login"
+				role="menu"
+				transition:fade={{ duration: 120 }}
+			>
+				<a href="/api/auth/login" class="user-dropdown-item" role="menuitem" on:click={closeMenu}>
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z" fill="currentColor"/></svg>
+					使用 Airliny 登录
+				</a>
+			</div>
+		{/if}
 	{/if}
 </div>
 
@@ -154,14 +177,14 @@ onMount(() => {
 .user-login-button
 	display inline-flex
 	align-items center
-	gap 0.5rem
-	height 40px
-	padding 0 0.6rem 0 0.35rem
+	gap 0.35rem
+	height 36px
+	padding 0 0.45rem 0 0.3rem
 	border-radius 999px
-	border 1px solid var(--capsule-border, rgba(205, 213, 224, 0.95))
+	border none
 	background var(--capsule-bg, rgba(255, 255, 255, 0.76))
 	color var(--capsule-text, #1d2838)
-	font-size 0.9rem
+	font-size 0.82rem
 	font-weight 600
 	cursor pointer
 	transition background-color 0.2s ease, transform 0.15s ease
@@ -173,6 +196,18 @@ onMount(() => {
 
 .user-menu-button:active
 	transform scale(0.96)
+
+.user-menu-button-login
+	min-width max-content
+	padding 0 0.75rem 0 0.45rem
+
+.user-menu-button-login .user-name
+	flex-shrink 0
+
+.user-menu-button-login svg:not(.user-menu-chevron)
+	width 18px
+	height 18px
+	flex-shrink 0
 
 .user-login-button
 	text-decoration none
@@ -215,23 +250,27 @@ onMount(() => {
 	position absolute
 	top calc(100% + 8px)
 	right 0
-	width min(86vw, 240px)
-	padding 10px
+	width min(86vw, 160px)
+	padding 6px
 	border-radius 14px
 	border 1px solid var(--capsule-menu-border, rgba(214, 222, 233, 0.95))
 	background var(--capsule-menu-bg, rgba(255, 255, 255, 0.96))
 	box-shadow 0 14px 28px rgba(2, 6, 23, 0.28)
 	display flex
 	flex-direction column
-	gap 6px
+	gap 2px
 	z-index 100
 
+.user-dropdown-login
+	width max-content
+	min-width 120px
+
 .user-dropdown-header
-	padding 8px 10px
+	padding 4px 10px
 
 .user-dropdown-name
 	margin 0
-	font-size 0.96rem
+	font-size 0.88rem
 	font-weight 700
 	color var(--capsule-text, #1d2838)
 
@@ -243,10 +282,10 @@ onMount(() => {
 	display inline-flex
 	align-items center
 	gap 10px
-	padding 9px 10px
+	padding 7px 10px
 	border-radius 10px
 	color var(--capsule-text, #1d2838)
-	font-size 0.88rem
+	font-size 0.84rem
 	font-weight 600
 	text-decoration none
 	transition background-color 0.15s ease

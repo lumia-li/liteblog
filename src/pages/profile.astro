@@ -24,15 +24,12 @@ const user = session?.user ?? null;
 					<div class="profile-name-row">
 						<h1 class="profile-name">{user.display_name || user.username}</h1>
 						{(["1", "4"] as string[]).includes(user.id) ? (
-							<span class="profile-role profile-role-cat" id="profile-role-badge">
+							<span class="profile-role profile-role-cat">
 								{user.id === "1" ? "猫猫管理员" : "璃猫猫"}
 							</span>
 						) : (
 							<span class="profile-role">{user.role === "admin" ? "管理员" : "普通用户"}</span>
 						)}
-						<div id="kaomoji-container" class="kaomoji-box">
-							<span id="kaomoji-text" class="kaomoji-text"></span>
-						</div>
 					</div>
 					<p class="profile-username">@{user.username}</p>
 				</div>
@@ -73,35 +70,7 @@ const user = session?.user ?? null;
 	</div>
 </MainGridLayout>
 
-<script>
-	const badge = document.getElementById("profile-role-badge");
-	const container = document.getElementById("kaomoji-container");
-	const text = document.getElementById("kaomoji-text");
 
-	if (badge && container && text) {
-		const kaomojiList = [
-			"ฅ^•ﻌ•^ฅ",
-			"(=ↀωↀ=)",
-			"ᓚ₍⑅^..^₎♡",
-			"ฅ(^◕ᴥ◕^)ฅ",
-			"/ᐠ｡ꞈ｡ᐟ\\",
-			"(ΦωΦ)",
-			"₍˄·͈༝·͈˄₎ฅ˒˒",
-			"ᓚᘏᗢ",
-		];
-		let index = 0;
-
-		badge.addEventListener("click", () => {
-			text.textContent = kaomojiList[index % kaomojiList.length];
-			container.classList.add("visible");
-			index++;
-
-			setTimeout(() => {
-				container.classList.remove("visible");
-			}, 2500);
-		});
-	}
-</script>
 
 <style>
 	.profile-card {
@@ -172,7 +141,6 @@ const user = session?.user ?? null;
 		background: #dbeafe;
 		color: #1e40af;
 		border-color: #93c5fd;
-		cursor: pointer;
 		transition: background-color 0.15s ease, transform 0.15s ease;
 	}
 
@@ -184,37 +152,6 @@ const user = session?.user ?? null;
 
 	.profile-role-cat:active {
 		transform: scale(0.95);
-	}
-
-	.kaomoji-box {
-		display: inline-flex;
-		align-items: center;
-		overflow: hidden;
-		width: 0;
-		opacity: 0;
-		margin-left: 0;
-		transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease, margin-left 0.45s ease;
-	}
-
-	.kaomoji-box.visible {
-		width: 140px;
-		opacity: 1;
-		margin-left: 0.25rem;
-	}
-
-	.kaomoji-text {
-		display: inline-block;
-		font-size: 1rem;
-		white-space: nowrap;
-		font-weight: 600;
-		transform: translateX(-40px);
-		opacity: 0;
-		transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
-	}
-
-	.kaomoji-box.visible .kaomoji-text {
-		transform: translateX(0);
-		opacity: 1;
 	}
 
 	.profile-body {

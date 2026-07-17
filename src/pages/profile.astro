@@ -41,6 +41,7 @@ const user = session?.user ?? null;
 					</div>
 				</div>
 				<div class="profile-actions">
+					<a href="/" class="profile-btn profile-btn-default">返回首页</a>
 					<a href="/api/auth/logout" class="profile-btn profile-btn-danger">退出登录</a>
 				</div>
 			</>
@@ -49,7 +50,10 @@ const user = session?.user ?? null;
 				<div class="profile-avatar profile-avatar-fallback">?</div>
 				<h1 class="profile-name">未登录</h1>
 				<p class="profile-hint">登录后查看你的个人资料</p>
-				<a href="/api/auth/login" class="profile-btn profile-btn-primary">使用 Airliny 登录</a>
+				<div class="profile-guest-actions">
+					<a href="/" class="profile-btn profile-btn-default">返回首页</a>
+					<a href="/api/auth/login" class="profile-btn profile-btn-primary">使用 Airliny 登录</a>
+				</div>
 			</div>
 		)}
 	</div>
@@ -154,6 +158,13 @@ const user = session?.user ?? null;
 		margin-top: 1.5rem;
 		display: flex;
 		justify-content: flex-end;
+		gap: 0.5rem;
+	}
+
+	.profile-guest-actions {
+		display: flex;
+		gap: 0.5rem;
+		justify-content: center;
 	}
 
 	.profile-btn {
@@ -176,6 +187,12 @@ const user = session?.user ?? null;
 	.profile-btn-primary {
 		background: var(--text-color, #111111);
 		color: var(--page-bg, #ffffff);
+	}
+
+	.profile-btn-default {
+		background: var(--btn-regular-bg, #f7f7f7);
+		color: var(--text-color, #111111);
+		border: 1px solid var(--surface-border, #dddddd);
 	}
 
 	.profile-btn-danger {

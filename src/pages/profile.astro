@@ -20,11 +20,22 @@ const user = session?.user ?? null;
 							{(user.display_name || user.username).charAt(0).toUpperCase()}
 						</div>
 					)}
-					<div class="profile-titles">
-						<h1 class="profile-name">{user.display_name || user.username}</h1>
-						<p class="profile-username">@{user.username}</p>
+				<div class="profile-titles">
+					<h1 class="profile-name">{user.display_name || user.username}</h1>
+					<p class="profile-username">@{user.username}</p>
+					{(["1", "4"] as string[]).includes(user.id) ? (
+						<div class="profile-role-row">
+							<span class="profile-role profile-role-cat" id="profile-role-badge">
+								{user.id === "1" ? "猫猫管理员" : "璃猫猫"}
+							</span>
+							<div id="kaomoji-container" class="kaomoji-box">
+								<span id="kaomoji-text" class="kaomoji-text"></span>
+							</div>
+						</div>
+					) : (
 						<span class="profile-role">{user.role === "admin" ? "管理员" : "普通用户"}</span>
-					</div>
+					)}
+				</div>
 				</div>
 				<div class="profile-body">
 					<div class="profile-field">
@@ -58,6 +69,36 @@ const user = session?.user ?? null;
 		)}
 	</div>
 </MainGridLayout>
+
+<script>
+	const badge = document.getElementById("profile-role-badge");
+	const container = document.getElementById("kaomoji-container");
+	const text = document.getElementById("kaomoji-text");
+
+	if (badge && container && text) {
+		const kaomojiList = [
+			"ฅ^•ﻌ•^ฅ",
+			"(=ↀωↀ=)",
+			"ᓚ₍⑅^..^₎♡",
+			"ฅ(^◕ᴥ◕^)ฅ",
+			"/ᐠ｡ꞈ｡ᐟ\\",
+			"(ΦωΦ)",
+			"₍˄·͈༝·͈˄₎ฅ˒˒",
+			"ᓚᘏᗢ",
+		];
+		let index = 0;
+
+		badge.addEventListener("click", () => {
+			text.textContent = kaomojiList[index % kaomojiList.length];
+			container.classList.add("visible");
+			index++;
+
+			setTimeout(() => {
+				container.classList.remove("visible");
+			}, 2500);
+		});
+	}
+</script>
 
 <style>
 	.profile-card {
@@ -122,6 +163,50 @@ const user = session?.user ?? null;
 		background: var(--btn-regular-bg, #f7f7f7);
 		color: var(--text-color, #111111);
 		border: 1px solid var(--surface-border, #dddddd);
+	}
+
+	.profile-role-row {
+		display: flex;
+		align-items: center;
+	}
+
+	.profile-role-cat {
+		background: #dbeafe;
+		color: #1e40af;
+		border-color: #93c5fd;
+		cursor: pointer;
+		transition: background-color 0.15s ease, transform 0.15s ease;
+	}
+
+	:root.dark .profile-role-cat {
+		background: rgba(59, 130, 246, 0.2);
+		color: #bfdbfe;
+		border-color: rgba(96, 165, 250, 0.5);
+	}
+
+	.profile-role-cat:active {
+		transform: scale(0.95);
+	}
+
+	.kaomoji-box {
+		display: inline-flex;
+		align-items: center;
+		overflow: hidden;
+		max-width: 0;
+		opacity: 0;
+		transition: max-width 0.35s ease, opacity 0.35s ease;
+	}
+
+	.kaomoji-box.visible {
+		max-width: 180px;
+		opacity: 1;
+	}
+
+	.kaomoji-text {
+		padding-left: 0.5rem;
+		font-size: 1rem;
+		white-space: nowrap;
+		font-weight: 600;
 	}
 
 	.profile-body {

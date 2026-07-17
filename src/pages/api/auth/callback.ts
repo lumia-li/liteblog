@@ -35,12 +35,13 @@ export const GET: APIRoute = async ({ request }) => {
 
 	try {
 		const config = getOAuthConfig();
-		const tokenData = await exchangeCodeForToken(code, config);
-		if (!tokenData?.access_token) {
-			return redirectResponse("/?auth_error=token_exchange_failed");
+		const tokenResult = await exchangeCodeForToken(code, config);
+		if (!tokenResult.success) {
+			console.error("[OAuth] Token exchange failed:", tokenResult.error);
+			return redirectResponse(`/?auth_error=token_exchange_failed:${encodeURIComponent(tokenResult.error)}`);
 		}
 
-		const user = await fetchUserInfo(tokenData.access_token, config);
+		const user = await fetchUserInfo(tokenResult.data.access_token, config);
 		if (!user?.id) {
 			return redirectResponse("/?auth_error=userinfo_failed");
 		}
@@ -49,12 +50,13 @@ export const GET: APIRoute = async ({ request }) => {
 		response = clearState(response, request);
 		response = setSession(response, {
 			user,
-			accessToken: tokenData.access_token,
-			expiresAt: Date.now() + tokenData.expires_in * 1000,
+			accessToken: tokenResult.data.access_token,
+			expiresAt: Date.now() + tokenResult.data.expires_in * 1000,
 		}, request);
 		return response;
 	} catch (error) {
 		const message = error instanceof Error ? error.message : "登录失败";
+		console.error("[OAuth] Callback error:", error);
 		return redirectResponse(`/?auth_error=${encodeURIComponent(message)}`);
 	}
 };

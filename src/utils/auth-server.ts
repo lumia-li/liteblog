@@ -187,7 +187,7 @@ export function clearState(response: Response, request?: Request): Response {
 export async function exchangeCodeForToken(
 	code: string,
 	config: ReturnType<typeof getOAuthConfig>,
-): Promise<{ access_token: string; expires_in: number; scope: string; token_type: string } | null> {
+): Promise<{ success: true; data: { access_token: string; expires_in: number; scope: string; token_type: string } } | { success: false; error: string }> {
 	const url = `${config.base}/oauth/token`;
 	console.log("[OAuth] Token exchange request:", { url, client_id: config.clientId, redirect_uri: config.callback });
 	
@@ -205,20 +205,27 @@ export async function exchangeCodeForToken(
 		});
 
 		console.log("[OAuth] Token exchange response status:", response.status);
+		const text = await response.text();
+		console.log("[OAuth] Token exchange response body:", text);
+		
 		if (!response.ok) {
-			const text = await response.text();
-			console.log("[OAuth] Token exchange error body:", text);
-			return null;
+			return { success: false, error: `HTTP ${response.status}: ${text}` };
 		}
-		return (await response.json()) as {
-			access_token: string;
-			expires_in: number;
-			scope: string;
-			token_type: string;
-		};
+		
+		try {
+			const data = JSON.parse(text) as {
+				access_token: string;
+				expires_in: number;
+				scope: string;
+				token_type: string;
+			};
+			return { success: true, data };
+		} catch (parseError) {
+			return { success: false, error: `JSON parse failed: ${parseError}` };
+		}
 	} catch (error) {
 		console.error("[OAuth] Token exchange fetch failed:", error);
-		return null;
+		return { success: false, error: `Fetch failed: ${error}` };
 	}
 }
 

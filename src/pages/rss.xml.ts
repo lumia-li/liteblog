@@ -1,8 +1,8 @@
 import rss from "@astrojs/rss";
-import type { APIRoute } from "astro";
-import { siteConfig } from "@/config";
 import { getSortedPosts } from "@utils/content-utils";
 import { getPostUrlBySlug } from "@utils/url-utils";
+import type { APIRoute } from "astro";
+import { siteConfig } from "@/config";
 
 export const GET: APIRoute = async (context) => {
 	const posts = await getSortedPosts();

@@ -48,7 +48,9 @@ if (r < page.lastPage) pages.push(page.lastPage);
 
 const normalizeBasePath = (path: string) => {
 	const withLeadingSlash = path.startsWith("/") ? path : `/${path}`;
-	return withLeadingSlash.endsWith("/") ? withLeadingSlash : `${withLeadingSlash}/`;
+	return withLeadingSlash.endsWith("/")
+		? withLeadingSlash
+		: `${withLeadingSlash}/`;
 };
 
 const resolvedBasePath = normalizeBasePath(basePath);

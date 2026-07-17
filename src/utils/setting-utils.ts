@@ -85,7 +85,9 @@ function applyThemeWithTransitions(theme: LIGHT_DARK_MODE): void {
 		"(prefers-reduced-motion: reduce)",
 	).matches;
 	const doc = document as Document & {
-		startViewTransition?: (callback: () => void) => { finished?: Promise<void> };
+		startViewTransition?: (callback: () => void) => {
+			finished?: Promise<void>;
+		};
 	};
 
 	if (!prefersReducedMotion && typeof doc.startViewTransition === "function") {

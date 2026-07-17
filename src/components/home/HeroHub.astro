@@ -1,4 +1,5 @@
-﻿---
+---
+import UserMenu from "@components/auth/UserMenu.svelte";
 import { navBarConfig, profileConfig, siteConfig } from "@/config";
 import { Icon } from "astro-icon/components";
 import ImageWrapper from "@components/misc/ImageWrapper.astro";
@@ -14,6 +15,7 @@ const statsHref =
 	statsExternalLink && typeof statsExternalLink === "object"
 		? statsExternalLink.url
 		: "#";
+const timetableApiUrl = "/api/timetable";
 
 const functionLinks = [
 	{ name: "博客", icon: "material-symbols:article-outline-rounded", href: url("/posts/?scrollTo=posts"), active: true, scrollToPosts: true },
@@ -26,7 +28,7 @@ const functionLinks = [
 const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 ---
 
-<section class="hero-hub">
+<section class="hero-hub" data-timetable-api-url={timetableApiUrl}>
 	<div class="hero-control-capsule" data-home-capsule data-mode="light">
 		<button
 			type="button"
@@ -80,6 +82,10 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 			/>
 			<div class="hero-decrypt-output" data-decrypt-output>等待输入</div>
 		</div>
+		<div class="hero-control-divider" aria-hidden="true"></div>
+		<div class="hero-control-user-menu">
+			<UserMenu client:only="svelte" />
+		</div>
 	</div>
 
 	{isHomePage ? (
@@ -107,9 +113,13 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 		<div class="hero-class-headline-row">
 			<span id="hero-class-status" class="hero-class-status" data-state="idle">暂无课程</span>
 		</div>
-		<p class="hero-class-main">
-			<span id="hero-class-highlight" class="hero-class-highlight">未设置课程</span>
-		</p>
+		<div id="hero-class-main" class="hero-class-main" data-has-course="false">
+			<span id="hero-class-color" class="hero-class-color" aria-hidden="true"></span>
+			<span class="hero-class-copy">
+				<strong id="hero-class-course" class="hero-class-course">未设置课程</strong>
+				<small id="hero-class-detail" class="hero-class-detail"></small>
+			</span>
+		</div>
 		<div class="hero-class-meta-row">
 			<p id="hero-class-countdown-row" class="hero-class-countdown">
 				<span id="hero-class-countdown-label">距上课还有:</span>
@@ -154,14 +164,17 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 		const classTitleTarget = document.getElementById("hero-class-title");
 		const statusTarget = document.getElementById("hero-class-status");
 		const weekLineTarget = document.getElementById("hero-class-weekline");
-		const classHighlightTarget = document.getElementById("hero-class-highlight");
+		const classMainTarget = document.getElementById("hero-class-main");
+		const classCourseTarget = document.getElementById("hero-class-course");
+		const classDetailTarget = document.getElementById("hero-class-detail");
 		const countdownRowTarget = document.getElementById("hero-class-countdown-row");
 		const countdownLabelTarget = document.getElementById("hero-class-countdown-label");
 		const countdownTarget = document.getElementById("hero-class-countdown-value");
 		const tempId = "hero-busuanzi-temp";
 		const scriptId = "hero-busuanzi-script";
 		const src = "https://cdn.busuanzi.cc/busuanzi/3.6.9/busuanzi.min.js";
-		const TIMETABLE_API_URL = "/api/timetable";
+		const heroRoot = document.querySelector(".hero-hub");
+		const TIMETABLE_API_URL = heroRoot?.getAttribute("data-timetable-api-url") || "/api/timetable";
 		const TIMETABLE_REFRESH_MS = 30_000;
 		const TIMETABLE_RETRY_MS = 120_000;
 		let cachedTimetable = null;
@@ -469,13 +482,36 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 			if (!el) return;
 			el.classList.toggle("is-hidden", !visible);
 		};
+		const normalizeCourseColor = (course) => {
+			const raw = typeof course?.color === "string" ? course.color.trim() : "";
+			if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(raw)) return raw;
+			return "#ff9500";
+		};
+		const renderClassCourse = (entry, fallbackText) => {
+			if (!classMainTarget || !classCourseTarget || !classDetailTarget) return;
+			const fallback = String(fallbackText || "点击设置课程表").trim();
+			if (!entry?.course?.course) {
+				classMainTarget.dataset.hasCourse = "false";
+				classMainTarget.style.removeProperty("--course-color");
+				classCourseTarget.textContent = fallback;
+				classDetailTarget.textContent = "";
+				return;
+			}
+			const course = entry.course;
+			const location = course.location?.trim();
+			const detail = [entry.periodLabel, entry.timeText, location].filter(Boolean).join(" · ");
+			classMainTarget.dataset.hasCourse = "true";
+			classMainTarget.style.setProperty("--course-color", normalizeCourseColor(course));
+			classCourseTarget.textContent = course.course;
+			classDetailTarget.textContent = detail;
+		};
 		const applyStateBadge = (state, text) => {
 			if (!statusTarget) return;
 			statusTarget.dataset.state = state;
 			statusTarget.textContent = text;
 		};
 		const updateCourseCard = () => {
-			if (!countdownTarget || !classHighlightTarget) return;
+			if (!countdownTarget || !classCourseTarget) return;
 			if (classTitleTarget) classTitleTarget.textContent = "今日课程";
 			const table = cachedTimetable;
 			const now = new Date();
@@ -488,7 +524,7 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 			}
 			if (!table || table.periods.length === 0) {
 				applyStateBadge("idle", "未设置");
-				classHighlightTarget.textContent = "点击设置课程表";
+				renderClassCourse(null, "点击设置课程表");
 				if (countdownLabelTarget) countdownLabelTarget.textContent = "距上课还有:";
 				countdownTarget.textContent = "--";
 				toggleVisible(countdownRowTarget, false);
@@ -505,6 +541,7 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 				todayEntries.length > 0 && todayEntries.every((item) => item.endMinutes <= nowMinute);
 			let statusState = "idle";
 			let highlightText = "点击设置课程表";
+			let highlightEntry = null;
 			let countdownLabel = "距上课还有:";
 			let countdownValue = "--";
 			let showCountdown = true;
@@ -512,6 +549,7 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 			if (currentEntry) {
 				statusState = "active";
 				countdownLabel = "距下课还有:";
+				highlightEntry = currentEntry;
 				highlightText = currentEntry.course.location?.trim()
 					? `${currentEntry.course.course} - ${currentEntry.course.location.trim()}`
 					: currentEntry.course.course;
@@ -521,6 +559,7 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 			} else if (nextTodayEntry) {
 				statusState = doneTodayEntries.length > 0 ? "break" : "pending";
 				countdownLabel = "距上课还有:";
+				highlightEntry = nextTodayEntry;
 				highlightText = nextTodayEntry.course.location?.trim()
 					? `${nextTodayEntry.course.course} - ${nextTodayEntry.course.location.trim()}`
 					: nextTodayEntry.course.course;
@@ -541,11 +580,13 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 					highlightText = nextAny.entry.course.location?.trim()
 						? `${nextAny.entry.course.course} - ${nextAny.entry.course.location.trim()}`
 						: nextAny.entry.course.course;
+					highlightEntry = nextAny.entry;
 					countdownLabel = "距上课还有:";
 					countdownValue = formatDuration((nextAny.nextAt.getTime() - Date.now()) / 1000);
 				} else {
 					statusState = "idle";
 					highlightText = "本周暂无可识别课程";
+					highlightEntry = null;
 					countdownLabel = "距上课还有:";
 					countdownValue = "";
 					showCountdown = false;
@@ -569,7 +610,7 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 						? "本周课毕"
 						: "今日课程";
 			}
-			classHighlightTarget.textContent = highlightText;
+			renderClassCourse(highlightEntry, highlightText);
 			if (countdownLabelTarget) countdownLabelTarget.textContent = countdownLabel;
 			countdownTarget.textContent = countdownValue;
 			toggleVisible(countdownRowTarget, showCountdown);
@@ -1151,6 +1192,11 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 		display: none;
 	}
 
+	.hero-control-user-menu {
+		display: inline-flex;
+		align-items: center;
+	}
+
 	.hero-dev-header {
 		display: flex;
 		align-items: center;
@@ -1442,20 +1488,72 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 
 	.hero-class-main {
 		margin-top: 10px;
-		padding: 10px 12px;
+		min-height: 70px;
+		padding: 12px 14px;
 		border-radius: 10px;
 		background: var(--hero-card-main-bg);
 		border: 1px solid var(--hero-card-main-border);
-		line-height: 1.55;
+		display: grid;
+		grid-template-columns: 8px minmax(0, 1fr);
+		gap: 12px;
+		align-items: center;
+		text-align: left;
+		line-height: 1.45;
 	}
 
-	.hero-class-highlight {
+	.hero-class-main[data-has-course="false"] {
+		grid-template-columns: 1fr;
+		text-align: center;
+	}
+
+	.hero-class-color {
+		width: 8px;
+		height: 100%;
+		min-height: 42px;
+		border-radius: 999px;
+		background: var(--course-color, #ff9500);
+		box-shadow: 0 0 0 1px color-mix(in srgb, var(--course-color, #ff9500) 42%, transparent);
+	}
+
+	.hero-class-main[data-has-course="false"] .hero-class-color {
+		display: none;
+	}
+
+	.hero-class-copy {
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.hero-class-main[data-has-course="true"] .hero-class-copy {
+		align-items: flex-start;
+	}
+
+	.hero-class-course {
 		color: var(--hero-card-highlight);
 		font-size: var(--hero-class-highlight-size);
-		font-weight: 600;
-		line-height: 1.6;
+		font-weight: 700;
+		line-height: 1.45;
 		word-break: break-word;
 		text-wrap: pretty;
+	}
+
+	.hero-class-main[data-has-course="true"] .hero-class-course {
+		color: var(--course-color, #ff9500) !important;
+		font-weight: 900;
+	}
+
+	.hero-class-detail {
+		max-width: 100%;
+		color: var(--hero-card-week);
+		font-size: 0.78rem;
+		font-weight: 600;
+		line-height: 1.35;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.hero-class-meta-row {

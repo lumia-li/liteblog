@@ -1,14 +1,15 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import { Icon } from "astro-icon/components";
 import HomeBatchDeleteToolbar from "@components/editor/HomeBatchDeleteToolbar.svelte";
 import { getPostUrlBySlug } from "@utils/url-utils";
+import { Icon } from "astro-icon/components";
 import PostCard from "./PostCard.astro";
 
 const { page } = Astro.props;
 const clientPagination = Boolean(Astro.props.clientPagination);
 const pageSize = Number(Astro.props.pageSize ?? 8);
-const toPostItemAnchorId = (slug: string) => `post-item-${encodeURIComponent(slug).replace(/%/g, "_")}`;
+const toPostItemAnchorId = (slug: string) =>
+	`post-item-${encodeURIComponent(slug).replace(/%/g, "_")}`;
 
 let delay = 0;
 const interval = 50;

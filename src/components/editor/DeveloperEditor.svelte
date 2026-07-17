@@ -3155,8 +3155,7 @@ async function confirmDeleteImageFile(): Promise<void> {
 		pendingDeleteImageAlt = "";
 		pendingDeleteImageRepoPath = "";
 	} catch (error) {
-		const message =
-			error instanceof Error ? error.message : "删除图片文件失败";
+		const message = error instanceof Error ? error.message : "删除图片文件失败";
 		showNotice(message, "error");
 	} finally {
 		imageDeleteBusy = false;

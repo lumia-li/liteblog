@@ -21,7 +21,9 @@ function json(status: number, payload: Record<string, unknown>) {
 	});
 }
 
-async function parseDeleteImageRequest(request: Request): Promise<DeleteImageRequest> {
+async function parseDeleteImageRequest(
+	request: Request,
+): Promise<DeleteImageRequest> {
 	const raw = await request.text();
 	if (!raw) return {};
 	try {

@@ -122,8 +122,6 @@ onMount(() => {
 			>
 				<div class="user-dropdown-header" transition:scale={{ duration: 160, easing: cubicOut, start: 0.96 }}>
 					<p class="user-dropdown-name">{user.display_name || user.username}</p>
-					<p class="user-dropdown-email">{user.email}</p>
-					<span class="user-dropdown-role">{user.role === "admin" ? "管理员" : "用户"}</span>
 				</div>
 				<div class="user-dropdown-divider"></div>
 				<a href="/profile" class="user-dropdown-item" role="menuitem" on:click={closeMenu}>
@@ -236,22 +234,6 @@ onMount(() => {
 	font-size 0.96rem
 	font-weight 700
 	color var(--capsule-text, #1d2838)
-
-.user-dropdown-email
-	margin 4px 0 0
-	font-size 0.78rem
-	color unquote("color-mix(in oklab, var(--capsule-text, #1d2838) 72%, transparent)")
-	word-break break-all
-
-.user-dropdown-role
-	display inline-flex
-	margin-top 6px
-	padding 2px 8px
-	border-radius 999px
-	font-size 0.72rem
-	font-weight 700
-	background var(--capsule-accent-soft, rgba(47, 157, 91, 0.12))
-	color var(--capsule-accent, #2f9d5b)
 
 .user-dropdown-divider
 	height 1px

@@ -1,7 +1,7 @@
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 
 export type OAuthUser = {
-	id: number;
+	id: string;
 	username: string;
 	email: string;
 	display_name: string;
@@ -156,13 +156,14 @@ export function readState(request: Request): string | null {
 	return decodeToken<{ state: string }>(decodeURIComponent(match[1]))?.state ?? null;
 }
 
-export function setState(response: Response): { response: Response; state: string } {
+export function setState(response: Response, request?: Request): { response: Response; state: string } {
 	const state = randomBytes(16).toString("hex");
+	const secure = isSecureContext(request);
 	const token = encodeToken({ state, issuedAt: Date.now() });
 	const cookie = serializeCookie(STATE_COOKIE, encodeURIComponent(token), {
 		maxAge: 60 * 5, // 5 分钟
 		httpOnly: true,
-		secure: true,
+		secure,
 		sameSite: "lax",
 		path: "/api/auth/callback",
 	});
@@ -170,11 +171,12 @@ export function setState(response: Response): { response: Response; state: strin
 	return { response, state };
 }
 
-export function clearState(response: Response): Response {
+export function clearState(response: Response, request?: Request): Response {
+	const secure = isSecureContext(request);
 	const cookie = serializeCookie(STATE_COOKIE, "", {
 		maxAge: 0,
 		httpOnly: true,
-		secure: true,
+		secure,
 		sameSite: "lax",
 		path: "/api/auth/callback",
 	});
@@ -192,14 +194,14 @@ export async function exchangeCodeForToken(
 	try {
 		const response = await fetch(url, {
 			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
+			headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			body: new URLSearchParams({
 				client_id: config.clientId,
 				client_secret: config.clientSecret,
 				code,
 				grant_type: "authorization_code",
 				redirect_uri: config.callback,
-			}),
+			}).toString(),
 		});
 
 		console.log("[OAuth] Token exchange response status:", response.status);
@@ -230,7 +232,22 @@ export async function fetchUserInfo(
 
 	if (!response.ok) return null;
 	try {
-		return (await response.json()) as OAuthUser;
+		const data = await response.json() as {
+			sub: string;
+			username: string;
+			email?: string;
+			display_name?: string;
+			avatar_url?: string;
+			role?: string;
+		};
+		return {
+			id: data.sub,
+			username: data.username,
+			email: data.email || "",
+			display_name: data.display_name || data.username,
+			avatar_url: data.avatar_url || "",
+			role: data.role === "admin" ? "admin" : "user",
+		};
 	} catch {
 		return null;
 	}

@@ -46,12 +46,12 @@ export const GET: APIRoute = async ({ request }) => {
 		}
 
 		let response = redirectResponse("/profile");
-		response = clearState(response);
+		response = clearState(response, request);
 		response = setSession(response, {
 			user,
 			accessToken: tokenData.access_token,
 			expiresAt: Date.now() + tokenData.expires_in * 1000,
-		});
+		}, request);
 		return response;
 	} catch (error) {
 		const message = error instanceof Error ? error.message : "登录失败";

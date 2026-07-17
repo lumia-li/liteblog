@@ -3,17 +3,18 @@ import { getOAuthConfig, setState } from "@utils/auth-server";
 
 export const prerender = false;
 
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ request }) => {
 	try {
 		const config = getOAuthConfig();
 		const response = new Response(null, { status: 302 });
-		const { response: withState, state } = setState(response);
+		const { response: withState, state } = setState(response, request);
 
 		const params = new URLSearchParams({
 			client_id: config.clientId,
 			redirect_uri: config.callback,
+			response_type: "code",
 			state,
-			scope: "verify",
+			scope: "verify userinfo email profile",
 		});
 
 		withState.headers.set("Location", `${config.base}/oauth/authorize?${params.toString()}`);

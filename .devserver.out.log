@@ -1,0 +1,177 @@
+
+> liyueblog@2.0.0 dev C:\Users\liyueovo\Desktop\li-liteblog
+> astro dev "--" "--host" "0.0.0.0" "--port" "4321"
+
+[2m23:08:16[22m [34m[types][39m Generated [2m2ms[22m
+[2m23:08:17[22m [34m[content][39m Syncing content
+[2m23:08:17[22m [34m[content][39m Synced content
+[2m23:08:17[22m [34m[vite][39m Forced re-optimization of dependencies
+
+[42m[1m astro [22m[49m [32mv5.17.1[39m [2mready in[22m 5847 [2mms[22m
+
+[2m┃[22m Local    [36mhttp://localhost:4321/[39m
+[2m┃[22m Network  [2muse --host to expose[22m
+
+[2m23:08:17[22m [32mwatching for file changes...[39m
+23:08:19 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1487:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+[2m23:08:24[22m [34m[200][39m /timetable [2m1301ms[22m
+23:08:24 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1487:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+[2m23:08:25[22m [34m[200][39m /api/timetable [2m3ms[22m
+[2m23:08:25[22m [34m[vite][39m [32m✨ new dependencies optimized: [33m@swup/astro/serialise, @swup/astro/idle, @swup/astro/client/Swup, @swup/astro/client/SwupA11yPlugin, @swup/astro/client/SwupScrollPlugin, @swup/astro/client/SwupHeadPlugin, @swup/astro/client/SwupScriptsPlugin[32m[39m
+[2m23:08:25[22m [34m[vite][39m [32m✨ optimized dependencies changed. reloading[39m
+[2m23:08:25[22m [34m[200][39m /timetable [2m60ms[22m
+23:08:25 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1487:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+[2m23:08:25[22m [34m[200][39m /api/timetable [2m6ms[22m
+[2m23:08:39[22m [34m[200][39m [34mPOST[39m /api/dev/verify [2m3ms[22m
+[2m23:08:41[22m [34m[200][39m /timetable [2m30ms[22m
+[2m23:08:41[22m [34m[200][39m /api/timetable [2m2ms[22m
+[2m23:21:57[22m [34m[watch][39m /src/components/timetable/TimetableEditor.svelte?svelte&type=style&lang.css, /src/components/timetable/TimetableEditor.svelte, /node_modules/.pnpm/@astrojs+tailwind@6.0.2_ast_b04bca06dddab49752a5a97875cf2f69/node_modules/@astrojs/tailwind/base.css, /src/layouts/Layout.astro?astro&type=style&index=0&lang.css
+23:21:57 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1536:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+23:21:58 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1536:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+[2m23:21:58[22m [34m[200][39m /api/timetable [2m4ms[22m
+[2m23:21:58[22m [34m[200][39m /timetable [2m201ms[22m
+[2m23:21:58[22m [34m[200][39m /api/timetable [2m2ms[22m
+[2m23:27:15[22m [34m[200][39m [34mPOST[39m /api/timetable [2m17ms[22m
+[2m23:27:15[22m [34m[glob-loader][39m Reloaded data from [32mtimetable.json[39m
+[2m23:27:16[22m [34m[200][39m /timetable [2m20ms[22m
+[2m23:27:16[22m [34m[200][39m /api/timetable [2m2ms[22m
+[2m23:27:16[22m [34m[200][39m /timetable [2m25ms[22m
+[2m23:27:16[22m [34m[200][39m /api/timetable [2m3ms[22m
+23:27:28 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1536:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+[2m23:27:28[22m [34m[watch][39m /src/components/timetable/TimetableEditor.svelte?svelte&type=style&lang.css
+23:27:28 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1536:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+[2m23:27:29[22m [34m[200][39m /timetable [2m142ms[22m
+23:27:29 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1536:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+[2m23:27:29[22m [34m[200][39m /api/timetable [2m2ms[22m
+[2m23:27:47[22m [34m[200][39m /timetable [2m26ms[22m
+[2m23:27:47[22m [34m[200][39m /api/timetable [2m2ms[22m
+23:28:46 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1536:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+[2m23:28:46[22m [34m[watch][39m /src/components/timetable/TimetableEditor.svelte?svelte&type=style&lang.css
+23:28:46 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1536:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+[2m23:28:46[22m [34m[200][39m /timetable [2m161ms[22m
+23:28:47 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1536:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+[2m23:28:47[22m [34m[200][39m /api/timetable [2m2ms[22m
+[2m23:29:49[22m [34m[200][39m /timetable [2m16ms[22m
+[2m23:29:50[22m [34m[200][39m /api/timetable [2m1ms[22m
+[2m23:30:16[22m [34m[200][39m [34mPOST[39m /api/timetable [2m13ms[22m
+[2m23:30:16[22m [34m[glob-loader][39m Reloaded data from [32mtimetable.json[39m
+[2m23:30:16[22m [34m[200][39m /timetable [2m19ms[22m
+[2m23:30:16[22m [34m[200][39m /api/timetable [2m1ms[22m
+[2m23:30:18[22m [34m[200][39m [34mPOST[39m /api/timetable [2m11ms[22m
+[2m23:30:18[22m [34m[glob-loader][39m Reloaded data from [32mtimetable.json[39m
+[2m23:30:18[22m [34m[200][39m /timetable [2m17ms[22m
+[2m23:30:18[22m [34m[200][39m /api/timetable [2m1ms[22m
+[2m23:30:20[22m [34m[200][39m [34mPOST[39m /api/timetable [2m9ms[22m
+[2m23:30:20[22m [34m[glob-loader][39m Reloaded data from [32mtimetable.json[39m
+[2m23:30:20[22m [34m[200][39m /timetable [2m19ms[22m
+[2m23:30:20[22m [34m[200][39m /api/timetable [2m2ms[22m
+[2m23:30:31[22m [34m[200][39m [34mPOST[39m /api/timetable [2m15ms[22m
+[2m23:30:31[22m [34m[glob-loader][39m Reloaded data from [32mtimetable.json[39m
+[2m23:30:31[22m [34m[200][39m /timetable [2m17ms[22m
+[2m23:30:31[22m [34m[200][39m /api/timetable [2m2ms[22m
+[2m23:30:33[22m [34m[200][39m [34mPOST[39m /api/timetable [2m8ms[22m
+[2m23:30:33[22m [34m[glob-loader][39m Reloaded data from [32mtimetable.json[39m
+[2m23:30:33[22m [34m[200][39m /timetable [2m16ms[22m
+[2m23:30:33[22m [34m[200][39m /api/timetable [2m1ms[22m
+[2m23:30:35[22m [34m[200][39m [34mPOST[39m /api/timetable [2m15ms[22m
+[2m23:30:35[22m [34m[glob-loader][39m Reloaded data from [32mtimetable.json[39m
+[2m23:30:35[22m [34m[200][39m /timetable [2m17ms[22m
+[2m23:30:35[22m [34m[200][39m /api/timetable [2m2ms[22m
+[2m23:30:38[22m [34m[200][39m [34mPOST[39m /api/timetable [2m15ms[22m
+[2m23:30:38[22m [34m[glob-loader][39m Reloaded data from [32mtimetable.json[39m
+[2m23:30:38[22m [34m[200][39m /timetable [2m16ms[22m
+[2m23:30:38[22m [34m[200][39m /api/timetable [2m2ms[22m
+[2m23:30:47[22m [34m[200][39m [34mPOST[39m /api/timetable [2m15ms[22m
+[2m23:30:47[22m [34m[glob-loader][39m Reloaded data from [32mtimetable.json[39m
+[2m23:30:47[22m [34m[200][39m /timetable [2m18ms[22m
+[2m23:30:47[22m [34m[200][39m /api/timetable [2m2ms[22m
+[2m23:30:49[22m [34m[200][39m [34mPOST[39m /api/timetable [2m13ms[22m
+[2m23:30:49[22m [34m[glob-loader][39m Reloaded data from [32mtimetable.json[39m
+[2m23:30:49[22m [34m[200][39m /timetable [2m18ms[22m
+[2m23:30:49[22m [34m[200][39m /api/timetable [2m2ms[22m
+[2m23:30:51[22m [34m[200][39m [34mPOST[39m /api/timetable [2m14ms[22m
+[2m23:30:51[22m [34m[glob-loader][39m Reloaded data from [32mtimetable.json[39m
+[2m23:30:51[22m [34m[200][39m /timetable [2m20ms[22m
+[2m23:30:51[22m [34m[200][39m /api/timetable [2m1ms[22m
+[2m23:30:52[22m [34m[200][39m [34mPOST[39m /api/timetable [2m12ms[22m
+[2m23:30:52[22m [34m[glob-loader][39m Reloaded data from [32mtimetable.json[39m
+[2m23:30:52[22m [34m[200][39m /timetable [2m21ms[22m
+[2m23:30:53[22m [34m[200][39m /api/timetable [2m2ms[22m
+23:31:20 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1536:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+[2m23:31:20[22m [34m[watch][39m /src/components/timetable/TimetableEditor.svelte?svelte&type=style&lang.css
+23:31:20 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1536:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+[2m23:31:20[22m [34m[200][39m /timetable [2m158ms[22m
+23:31:21 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1536:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+[2m23:31:21[22m [34m[200][39m /api/timetable [2m2ms[22m
+[2m23:32:11[22m [34m[200][39m [34mPOST[39m /api/timetable [2m14ms[22m
+[2m23:32:11[22m [34m[glob-loader][39m Reloaded data from [32mtimetable.json[39m
+[2m23:32:11[22m [34m[200][39m /timetable [2m17ms[22m
+[2m23:32:11[22m [34m[200][39m /api/timetable [2m2ms[22m
+[2m23:32:13[22m [34m[200][39m [34mPOST[39m /api/timetable [2m16ms[22m
+[2m23:32:13[22m [34m[glob-loader][39m Reloaded data from [32mtimetable.json[39m
+[2m23:32:14[22m [34m[200][39m /timetable [2m22ms[22m
+[2m23:32:14[22m [34m[200][39m /api/timetable [2m2ms[22m
+[2m23:32:15[22m [34m[200][39m [34mPOST[39m /api/timetable [2m12ms[22m
+[2m23:32:15[22m [34m[glob-loader][39m Reloaded data from [32mtimetable.json[39m
+[2m23:32:15[22m [34m[200][39m /timetable [2m19ms[22m
+[2m23:32:15[22m [34m[200][39m /api/timetable [2m1ms[22m
+[2m23:32:16[22m [34m[200][39m [34mPOST[39m /api/timetable [2m13ms[22m
+[2m23:32:16[22m [34m[glob-loader][39m Reloaded data from [32mtimetable.json[39m
+[2m23:32:16[22m [34m[200][39m /timetable [2m18ms[22m
+[2m23:32:16[22m [34m[200][39m /api/timetable [2m1ms[22m
+[2m23:32:18[22m [34m[200][39m /timetable [2m18ms[22m
+[2m23:32:18[22m [34m[200][39m /api/timetable [2m2ms[22m
+[2m23:32:30[22m [34m[200][39m [34mPOST[39m /api/timetable [2m15ms[22m
+[2m23:32:30[22m [34m[glob-loader][39m Reloaded data from [32mtimetable.json[39m
+[2m23:32:30[22m [34m[200][39m /timetable [2m24ms[22m
+[2m23:32:30[22m [34m[200][39m /api/timetable [2m2ms[22m
+[2m23:35:41[22m [34m[watch][39m /src/components/timetable/TimetableEditor.svelte, /node_modules/.pnpm/@astrojs+tailwind@6.0.2_ast_b04bca06dddab49752a5a97875cf2f69/node_modules/@astrojs/tailwind/base.css, /src/layouts/Layout.astro?astro&type=style&index=0&lang.css
+23:35:41 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1533:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+23:35:41 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1533:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+[2m23:35:41[22m [34m[200][39m /api/timetable [2m5ms[22m
+[2m23:35:41[22m [34m[200][39m /timetable [2m135ms[22m
+[2m23:35:41[22m [34m[200][39m /api/timetable [2m2ms[22m
+23:41:37 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1533:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+[2m23:41:37[22m [34m[watch][39m /src/components/timetable/TimetableEditor.svelte?svelte&type=style&lang.css
+23:41:37 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1533:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+[2m23:41:37[22m [34m[200][39m /timetable [2m138ms[22m
+23:41:38 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1533:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+[2m23:41:38[22m [34m[200][39m /api/timetable [2m1ms[22m
+[2m23:42:23[22m [34m[200][39m /timetable [2m19ms[22m
+[2m23:42:23[22m [34m[200][39m /api/timetable [2m3ms[22m
+23:42:36 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1533:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+[2m23:42:36[22m [34m[watch][39m /src/components/timetable/TimetableEditor.svelte?svelte&type=style&lang.css
+23:42:37 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1533:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+[2m23:42:37[22m [34m[200][39m /timetable [2m136ms[22m
+23:42:37 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1533:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+[2m23:42:37[22m [34m[200][39m /api/timetable [2m1ms[22m
+[2m23:43:04[22m [34m[watch][39m /src/components/timetable/TimetableEditor.svelte?svelte&type=style&lang.css, /src/components/timetable/TimetableEditor.svelte, /node_modules/.pnpm/@astrojs+tailwind@6.0.2_ast_b04bca06dddab49752a5a97875cf2f69/node_modules/@astrojs/tailwind/base.css, /src/layouts/Layout.astro?astro&type=style&index=0&lang.css
+23:43:04 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1535:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+23:43:05 [vite-plugin-svelte] src/components/timetable/TimetableEditor.svelte:1535:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+[2m23:43:05[22m [34m[200][39m /api/timetable [2m2ms[22m
+[2m23:43:05[22m [34m[200][39m /timetable [2m128ms[22m
+[2m23:43:05[22m [34m[200][39m /api/timetable [2m1ms[22m

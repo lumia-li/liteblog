@@ -1,0 +1,33 @@
+[31m[1m00:05:15[22m [ERROR][39m [31m[UnhandledRejection][39m Astro detected an unhandled rejection. Here's the stack trace:
+Error: ECANCELED: operation canceled, watch
+    at FSWatcher._handle.onchange (node:internal/fs/watchers:214:21)
+    at FSEvent.callbackTrampoline (node:internal/async_hooks:130:17)
+  [1mHint:[22m
+[33m    Make sure your promises all have an `await` or a `.catch()` handler.[39m
+  [1mError reference:[22m
+    [36m[4mhttps://docs.astro.build/en/reference/errors/unhandled-rejection/[24m[39m
+  [1mStack trace:[22m
+[2m    at FSWatcher._handle.onchange (node:internal/fs/watchers:214:21)
+    [...] See full stack trace in the browser, or rerun with --verbose.[22m
+[31m[1m00:05:15[22m [ERROR][39m [31m[UnhandledRejection][39m Astro detected an unhandled rejection. Here's the stack trace:
+Error: ECANCELED: operation canceled, watch
+    at FSWatcher._handle.onchange (node:internal/fs/watchers:214:21)
+    at FSEvent.callbackTrampoline (node:internal/async_hooks:130:17)
+  [1mHint:[22m
+[33m    Make sure your promises all have an `await` or a `.catch()` handler.[39m
+  [1mError reference:[22m
+    [36m[4mhttps://docs.astro.build/en/reference/errors/unhandled-rejection/[24m[39m
+  [1mStack trace:[22m
+[2m    at FSWatcher._handle.onchange (node:internal/fs/watchers:214:21)
+    [...] See full stack trace in the browser, or rerun with --verbose.[22m
+[31m[1m00:05:15[22m [ERROR][39m [31m[UnhandledRejection][39m Astro detected an unhandled rejection. Here's the stack trace:
+Error: ECANCELED: operation canceled, watch
+    at FSWatcher._handle.onchange (node:internal/fs/watchers:214:21)
+    at FSEvent.callbackTrampoline (node:internal/async_hooks:130:17)
+  [1mHint:[22m
+[33m    Make sure your promises all have an `await` or a `.catch()` handler.[39m
+  [1mError reference:[22m
+    [36m[4mhttps://docs.astro.build/en/reference/errors/unhandled-rejection/[24m[39m
+  [1mStack trace:[22m
+[2m    at FSWatcher._handle.onchange (node:internal/fs/watchers:214:21)
+    [...] See full stack trace in the browser, or rerun with --verbose.[22m

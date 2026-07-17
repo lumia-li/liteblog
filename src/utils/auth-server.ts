@@ -37,7 +37,9 @@ function base64UrlDecode(input: string): Buffer {
 }
 
 function sign(payload: string, secret: string): string {
-	return createHmac("sha256", secret).update(payload, "utf8").digest("base64url");
+	return createHmac("sha256", secret)
+		.update(payload, "utf8")
+		.digest("base64url");
 }
 
 function verify(payload: string, signature: string, secret: string): boolean {
@@ -74,7 +76,13 @@ function decodeToken<T>(token: string): T | null {
 function serializeCookie(
 	name: string,
 	value: string,
-	options: { maxAge?: number; httpOnly?: boolean; secure?: boolean; sameSite?: "strict" | "lax" | "none"; path?: string },
+	options: {
+		maxAge?: number;
+		httpOnly?: boolean;
+		secure?: boolean;
+		sameSite?: "strict" | "lax" | "none";
+		path?: string;
+	},
 ): string {
 	const parts = [`${name}=${value}`];
 	if (options.maxAge !== undefined) parts.push(`Max-Age=${options.maxAge}`);
@@ -94,10 +102,14 @@ export function getOAuthConfig(): {
 	const clientId = String(import.meta.env.OAUTH_CLIENT_ID || "").trim();
 	const clientSecret = String(import.meta.env.OAUTH_CLIENT_SECRET || "").trim();
 	const callback = String(import.meta.env.OAUTH_CALLBACK || "").trim();
-	const base = String(import.meta.env.OAUTH_BASE || "https://account.airliny.com").trim();
+	const base = String(
+		import.meta.env.OAUTH_BASE || "https://account.airliny.com",
+	).trim();
 
 	if (!clientId || !clientSecret || !callback) {
-		throw new Error("缺少 OAuth 配置：OAUTH_CLIENT_ID、OAUTH_CLIENT_SECRET、OAUTH_CALLBACK");
+		throw new Error(
+			"缺少 OAuth 配置：OAUTH_CLIENT_ID、OAUTH_CLIENT_SECRET、OAUTH_CALLBACK",
+		);
 	}
 
 	return { clientId, clientSecret, callback, base };
@@ -105,7 +117,9 @@ export function getOAuthConfig(): {
 
 export function readSession(request: Request): SessionPayload | null {
 	const cookieHeader = request.headers.get("cookie") || "";
-	const match = cookieHeader.match(new RegExp(`(?:^|\\s)${SESSION_COOKIE}=([^;]+)`));
+	const match = cookieHeader.match(
+		new RegExp(`(?:^|\\s)${SESSION_COOKIE}=([^;]+)`),
+	);
 	if (!match) return null;
 	const session = decodeToken<SessionPayload>(decodeURIComponent(match[1]));
 	if (!session || session.expiresAt < Date.now()) return null;
@@ -122,7 +136,11 @@ function isSecureContext(request?: Request): boolean {
 	}
 }
 
-export function setSession(response: Response, session: SessionPayload, request?: Request): Response {
+export function setSession(
+	response: Response,
+	session: SessionPayload,
+	request?: Request,
+): Response {
 	const token = encodeToken(session);
 	const secure = isSecureContext(request);
 	const cookie = serializeCookie(SESSION_COOKIE, encodeURIComponent(token), {
@@ -151,12 +169,19 @@ export function clearSession(response: Response, request?: Request): Response {
 
 export function readState(request: Request): string | null {
 	const cookieHeader = request.headers.get("cookie") || "";
-	const match = cookieHeader.match(new RegExp(`(?:^|\\s)${STATE_COOKIE}=([^;]+)`));
+	const match = cookieHeader.match(
+		new RegExp(`(?:^|\\s)${STATE_COOKIE}=([^;]+)`),
+	);
 	if (!match) return null;
-	return decodeToken<{ state: string }>(decodeURIComponent(match[1]))?.state ?? null;
+	return (
+		decodeToken<{ state: string }>(decodeURIComponent(match[1]))?.state ?? null
+	);
 }
 
-export function setState(response: Response, request?: Request): { response: Response; state: string } {
+export function setState(
+	response: Response,
+	request?: Request,
+): { response: Response; state: string } {
 	const state = randomBytes(16).toString("hex");
 	const secure = isSecureContext(request);
 	const token = encodeToken({ state, issuedAt: Date.now() });
@@ -187,10 +212,25 @@ export function clearState(response: Response, request?: Request): Response {
 export async function exchangeCodeForToken(
 	code: string,
 	config: ReturnType<typeof getOAuthConfig>,
-): Promise<{ success: true; data: { access_token: string; expires_in: number; scope: string; token_type: string } } | { success: false; error: string }> {
+): Promise<
+	| {
+			success: true;
+			data: {
+				access_token: string;
+				expires_in: number;
+				scope: string;
+				token_type: string;
+			};
+	  }
+	| { success: false; error: string }
+> {
 	const url = `${config.base}/oauth/token`;
-	console.log("[OAuth] Token exchange request:", { url, client_id: config.clientId, redirect_uri: config.callback });
-	
+	console.log("[OAuth] Token exchange request:", {
+		url,
+		client_id: config.clientId,
+		redirect_uri: config.callback,
+	});
+
 	try {
 		const response = await fetch(url, {
 			method: "POST",
@@ -207,11 +247,11 @@ export async function exchangeCodeForToken(
 		console.log("[OAuth] Token exchange response status:", response.status);
 		const text = await response.text();
 		console.log("[OAuth] Token exchange response body:", text);
-		
+
 		if (!response.ok) {
 			return { success: false, error: `HTTP ${response.status}: ${text}` };
 		}
-		
+
 		try {
 			const data = JSON.parse(text) as {
 				access_token: string;
@@ -229,17 +269,37 @@ export async function exchangeCodeForToken(
 	}
 }
 
+function decodeJwtPayload(accessToken: string): Record<string, unknown> | null {
+	try {
+		const payloadSegment = accessToken.split(".")[1];
+		if (!payloadSegment) return null;
+		return JSON.parse(
+			base64UrlDecode(payloadSegment).toString("utf8"),
+		) as Record<string, unknown>;
+	} catch {
+		return null;
+	}
+}
+
 export async function fetchUserInfo(
 	accessToken: string,
 	config: ReturnType<typeof getOAuthConfig>,
 ): Promise<OAuthUser | null> {
 	const response = await fetch(`${config.base}/oauth/userinfo`, {
-		headers: { Authorization: `Bearer ${accessToken}` },
+		method: "GET",
+		headers: {
+			Authorization: `Bearer ${accessToken}`,
+			Accept: "application/json",
+		},
 	});
+
+	console.log("[OAuth] UserInfo response status:", response.status);
+	const text = await response.text();
+	console.log("[OAuth] UserInfo response body:", text);
 
 	if (!response.ok) return null;
 	try {
-		const data = await response.json() as {
+		const data = JSON.parse(text) as {
 			sub: string;
 			username: string;
 			email?: string;
@@ -247,10 +307,21 @@ export async function fetchUserInfo(
 			avatar_url?: string;
 			role?: string;
 		};
+
+		// 如果 userinfo 没有返回邮箱，尝试从 JWT payload 里取 email claim 做兜底
+		let email = data.email || "";
+		if (!email) {
+			const jwtPayload = decodeJwtPayload(accessToken);
+			const jwtEmail = jwtPayload?.email;
+			if (typeof jwtEmail === "string") {
+				email = jwtEmail;
+			}
+		}
+
 		return {
 			id: data.sub,
 			username: data.username,
-			email: data.email || "",
+			email,
 			display_name: data.display_name || data.username,
 			avatar_url: data.avatar_url || "",
 			role: data.role === "admin" ? "admin" : "user",

@@ -180,9 +180,14 @@ const user = session?.user ?? null;
 		inset: -2px;
 		z-index: -1;
 		border-radius: inherit;
+		padding: 2px;
 		background: linear-gradient(90deg, var(--rc1), var(--rc5), var(--rc3), var(--rc4), var(--rc2), var(--rc1));
 		background-size: 200% 100%;
 		animation: rainbow-move 4s linear infinite;
+		-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+		-webkit-mask-composite: xor;
+		mask-composite: exclude;
+		pointer-events: none;
 	}
 
 	.profile-role-rainbow::after {

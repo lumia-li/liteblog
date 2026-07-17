@@ -169,18 +169,23 @@ const user = session?.user ?? null;
 
 	.profile-role-rainbow {
 		position: relative;
-		background:
-			linear-gradient(#dbeafe, #dbeafe),
-			linear-gradient(90deg, var(--rc1), var(--rc5), var(--rc3), var(--rc4), var(--rc2), var(--rc1));
-		background-size: 200% 100%;
-		background-clip: padding-box, border-box;
-		background-origin: border-box;
-		border: 2px solid transparent;
-		animation: rainbow-move 4s linear infinite;
+		background: #dbeafe;
 		color: #1e40af;
+		z-index: 0;
 	}
 
 	.profile-role-rainbow::before {
+		content: '';
+		position: absolute;
+		inset: -2px;
+		z-index: -1;
+		border-radius: inherit;
+		background: linear-gradient(90deg, var(--rc1), var(--rc5), var(--rc3), var(--rc4), var(--rc2), var(--rc1));
+		background-size: 200% 100%;
+		animation: rainbow-move 4s linear infinite;
+	}
+
+	.profile-role-rainbow::after {
 		content: '';
 		position: absolute;
 		bottom: -35%;
@@ -198,9 +203,7 @@ const user = session?.user ?? null;
 	}
 
 	:root.dark .profile-role-rainbow {
-		background:
-			linear-gradient(rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.2)),
-			linear-gradient(90deg, var(--rc1), var(--rc5), var(--rc3), var(--rc4), var(--rc2), var(--rc1));
+		background: rgba(59, 130, 246, 0.2);
 		color: #bfdbfe;
 	}
 

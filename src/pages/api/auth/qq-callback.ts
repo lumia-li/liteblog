@@ -66,7 +66,7 @@ export const GET: APIRoute = async ({ request }) => {
 		};
 
 		// 重定向到首页，并设置会话 cookie
-		const redirectResponse = new Response(null, {
+		let redirectResponse = new Response(null, {
 			status: 302,
 			headers: {
 				Location: "/",
@@ -74,7 +74,7 @@ export const GET: APIRoute = async ({ request }) => {
 		});
 
 		// 设置会话 cookie
-		setSession(redirectResponse, session, request);
+		redirectResponse = setSession(redirectResponse, session, request);
 
 		return redirectResponse;
 	} catch (error) {

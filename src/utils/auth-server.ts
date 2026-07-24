@@ -119,12 +119,12 @@ export function getQQLoginConfig(): {
 	token: string;
 	callback: string;
 } {
-	const token = String(import.meta.env.QQ_LOGIN_TOKEN || "").trim();
-	const callback = String(import.meta.env.QQ_LOGIN_CALLBACK || "").trim();
+	const token = String(import.meta.env.QQ_XYHULIAN_TOKEN || "").trim();
+	const callback = String(import.meta.env.QQ_XYHULIAN_CALLBACK || "").trim();
 
 	if (!token || !callback) {
 		throw new Error(
-			"缺少 QQ 登录配置：QQ_LOGIN_TOKEN、QQ_LOGIN_CALLBACK",
+			"缺少 QQ 登录配置：QQ_XYHULIAN_TOKEN、QQ_XYHULIAN_CALLBACK",
 		);
 	}
 

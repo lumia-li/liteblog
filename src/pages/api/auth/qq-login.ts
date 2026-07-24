@@ -1,6 +1,8 @@
 import type { APIRoute } from "astro";
 import { getQQLoginConfig } from "../../../utils/auth-server";
 
+export const prerender = false;
+
 export const GET: APIRoute = async () => {
 	try {
 		const { token } = getQQLoginConfig();

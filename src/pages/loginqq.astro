@@ -63,6 +63,7 @@ if (code) {
     {!code ? (
       <div class="error">
         <p>缺少登录凭证，请重新尝试登录。</p>
+        {msg && <p>错误信息: {msg}</p>}
         <p><a href="/" style="color: white;">返回首页</a></p>
       </div>
     ) : (

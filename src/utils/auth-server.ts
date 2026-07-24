@@ -115,6 +115,22 @@ export function getOAuthConfig(): {
 	return { clientId, clientSecret, callback, base };
 }
 
+export function getQQLoginConfig(): {
+	token: string;
+	callback: string;
+} {
+	const token = String(import.meta.env.QQ_LOGIN_TOKEN || "").trim();
+	const callback = String(import.meta.env.QQ_LOGIN_CALLBACK || "").trim();
+
+	if (!token || !callback) {
+		throw new Error(
+			"缺少 QQ 登录配置：QQ_LOGIN_TOKEN、QQ_LOGIN_CALLBACK",
+		);
+	}
+
+	return { token, callback };
+}
+
 export function readSession(request: Request): SessionPayload | null {
 	const cookieHeader = request.headers.get("cookie") || "";
 	const match = cookieHeader.match(

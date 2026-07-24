@@ -11,7 +11,9 @@ if (code) {
   const params = new URLSearchParams();
   params.set("code", code);
   if (msg) params.set("msg", msg);
-  return Astro.redirect(`/api/auth/qq-callback?${params.toString()}`);
+  const redirectUrl = `/api/auth/qq-callback?${params.toString()}`;
+  console.log("QQ 登录回调重定向:", redirectUrl);
+  return Astro.redirect(redirectUrl);
 }
 ---
 

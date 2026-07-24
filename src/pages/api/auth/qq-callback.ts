@@ -14,7 +14,9 @@ interface QQUserInfo {
 	};
 }
 
-export const GET: APIRoute = async ({ request, clientAddress }) => {
+export const prerender = false;
+
+export const GET: APIRoute = async ({ request }) => {
 	try {
 		const url = new URL(request.url);
 		const code = url.searchParams.get("code");

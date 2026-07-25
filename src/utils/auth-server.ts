@@ -465,3 +465,160 @@ export async function fetchGoogleUserInfo(
 		return null;
 	}
 }
+
+/* ─── GitHub OAuth ─── */
+
+export function getGitHubOAuthConfig(): {
+	clientId: string;
+	clientSecret: string;
+	callback: string;
+} {
+	const clientId = String(import.meta.env.GITHUB_CLIENT_ID || "").trim();
+	const clientSecret = String(import.meta.env.GITHUB_CLIENT_SECRET || "").trim();
+	const callback = String(import.meta.env.GITHUB_CALLBACK || "").trim();
+
+	if (!clientId || !clientSecret || !callback) {
+		throw new Error(
+			"缺少 GitHub 登录配置：GITHUB_CLIENT_ID、GITHUB_CLIENT_SECRET、GITHUB_CALLBACK",
+		);
+	}
+
+	return { clientId, clientSecret, callback };
+}
+
+export async function exchangeGitHubCodeForToken(
+	code: string,
+	config: ReturnType<typeof getGitHubOAuthConfig>,
+): Promise<
+	| {
+			success: true;
+			data: {
+				access_token: string;
+				token_type: string;
+				scope: string;
+			};
+	  }
+	| { success: false; error: string }
+> {
+	try {
+		const response = await fetch("https://github.com/login/oauth/access_token", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Accept: "application/json",
+			},
+			body: JSON.stringify({
+				client_id: config.clientId,
+				client_secret: config.clientSecret,
+				code,
+			}),
+		});
+
+		console.log("[GitHub OAuth] Token exchange status:", response.status);
+		const text = await response.text();
+		console.log("[GitHub OAuth] Token exchange body:", text);
+
+		if (!response.ok) {
+			return { success: false, error: `HTTP ${response.status}: ${text}` };
+		}
+
+		const data = JSON.parse(text) as {
+			access_token?: string;
+			token_type?: string;
+			scope?: string;
+			error?: string;
+			error_description?: string;
+		};
+
+		if (data.error) {
+			return { success: false, error: data.error_description || data.error };
+		}
+
+		if (!data.access_token) {
+			return { success: false, error: "No access_token in response" };
+		}
+
+		return {
+			success: true,
+			data: {
+				access_token: data.access_token,
+				token_type: data.token_type || "bearer",
+				scope: data.scope || "",
+			},
+		};
+	} catch (error) {
+		console.error("[GitHub OAuth] Token exchange failed:", error);
+		return { success: false, error: `Fetch failed: ${error}` };
+	}
+}
+
+export async function fetchGitHubUserInfo(
+	accessToken: string,
+): Promise<OAuthUser | null> {
+	try {
+		const response = await fetch("https://api.github.com/user", {
+			method: "GET",
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				Accept: "application/vnd.github+json",
+				"User-Agent": "LiteBlog-OAuth",
+			},
+		});
+
+		console.log("[GitHub OAuth] UserInfo status:", response.status);
+		const text = await response.text();
+		console.log("[GitHub OAuth] UserInfo body:", text);
+
+		if (!response.ok) return null;
+
+		const data = JSON.parse(text) as {
+			id: number;
+			login: string;
+			email?: string;
+			name?: string;
+			avatar_url?: string;
+		};
+
+		// GitHub 用户可能未公开邮箱，需要单独请求
+		let email = data.email || "";
+		if (!email) {
+			const emailsResponse = await fetch("https://api.github.com/user/emails", {
+				method: "GET",
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+					Accept: "application/vnd.github+json",
+					"User-Agent": "LiteBlog-OAuth",
+				},
+			});
+			if (emailsResponse.ok) {
+				const emails = (await emailsResponse.json()) as Array<{
+					email: string;
+					primary: boolean;
+					verified: boolean;
+				}>;
+				const primary = emails.find((e) => e.primary && e.verified);
+				if (primary) {
+					email = primary.email;
+				} else {
+					const verified = emails.find((e) => e.verified);
+					if (verified) email = verified.email;
+				}
+			}
+		}
+
+		const displayName = data.name || data.login;
+		const username = data.login;
+
+		return {
+			id: String(data.id),
+			username,
+			email,
+			display_name: displayName,
+			avatar_url: data.avatar_url || "",
+			role: "user",
+		};
+	} catch (error) {
+		console.error("[GitHub OAuth] Fetch userinfo failed:", error);
+		return null;
+	}
+}

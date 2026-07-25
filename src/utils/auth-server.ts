@@ -131,6 +131,24 @@ export function getQQLoginConfig(): {
 	return { token, callback };
 }
 
+export function getGoogleOAuthConfig(): {
+	clientId: string;
+	clientSecret: string;
+	callback: string;
+} {
+	const clientId = String(import.meta.env.GOOGLE_CLIENT_ID || "").trim();
+	const clientSecret = String(import.meta.env.GOOGLE_CLIENT_SECRET || "").trim();
+	const callback = String(import.meta.env.GOOGLE_CALLBACK || "").trim();
+
+	if (!clientId || !clientSecret || !callback) {
+		throw new Error(
+			"缺少 Google 登录配置：GOOGLE_CLIENT_ID、GOOGLE_CLIENT_SECRET、GOOGLE_CALLBACK",
+		);
+	}
+
+	return { clientId, clientSecret, callback };
+}
+
 export function readSession(request: Request): SessionPayload | null {
 	const cookieHeader = request.headers.get("cookie") || "";
 	const match = cookieHeader.match(
@@ -197,6 +215,7 @@ export function readState(request: Request): string | null {
 export function setState(
 	response: Response,
 	request?: Request,
+	path = "/api/auth/callback",
 ): { response: Response; state: string } {
 	const state = randomBytes(16).toString("hex");
 	const secure = isSecureContext(request);
@@ -206,20 +225,24 @@ export function setState(
 		httpOnly: true,
 		secure,
 		sameSite: "lax",
-		path: "/api/auth/callback",
+		path,
 	});
 	response.headers.append("Set-Cookie", cookie);
 	return { response, state };
 }
 
-export function clearState(response: Response, request?: Request): Response {
+export function clearState(
+	response: Response,
+	request?: Request,
+	path = "/api/auth/callback",
+): Response {
 	const secure = isSecureContext(request);
 	const cookie = serializeCookie(STATE_COOKIE, "", {
 		maxAge: 0,
 		httpOnly: true,
 		secure,
 		sameSite: "lax",
-		path: "/api/auth/callback",
+		path,
 	});
 	response.headers.append("Set-Cookie", cookie);
 	return response;
@@ -343,6 +366,102 @@ export async function fetchUserInfo(
 			role: data.role === "admin" ? "admin" : "user",
 		};
 	} catch {
+		return null;
+	}
+}
+
+export async function exchangeGoogleCodeForToken(
+	code: string,
+	config: ReturnType<typeof getGoogleOAuthConfig>,
+): Promise<
+	| {
+			success: true;
+			data: {
+				access_token: string;
+				expires_in: number;
+				scope: string;
+				token_type: string;
+			};
+	  }
+	| { success: false; error: string }
+> {
+	try {
+		const response = await fetch("https://oauth2.googleapis.com/token", {
+			method: "POST",
+			headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			body: new URLSearchParams({
+				client_id: config.clientId,
+				client_secret: config.clientSecret,
+				code,
+				grant_type: "authorization_code",
+				redirect_uri: config.callback,
+			}).toString(),
+		});
+
+		console.log("[Google OAuth] Token exchange status:", response.status);
+		const text = await response.text();
+		console.log("[Google OAuth] Token exchange body:", text);
+
+		if (!response.ok) {
+			return { success: false, error: `HTTP ${response.status}: ${text}` };
+		}
+
+		const data = JSON.parse(text) as {
+			access_token: string;
+			expires_in: number;
+			scope: string;
+			token_type: string;
+		};
+		return { success: true, data };
+	} catch (error) {
+		console.error("[Google OAuth] Token exchange failed:", error);
+		return { success: false, error: `Fetch failed: ${error}` };
+	}
+}
+
+export async function fetchGoogleUserInfo(
+	accessToken: string,
+): Promise<OAuthUser | null> {
+	try {
+		const response = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
+			method: "GET",
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				Accept: "application/json",
+			},
+		});
+
+		console.log("[Google OAuth] UserInfo status:", response.status);
+		const text = await response.text();
+		console.log("[Google OAuth] UserInfo body:", text);
+
+		if (!response.ok) return null;
+
+		const data = JSON.parse(text) as {
+			id: string;
+			email?: string;
+			verified_email?: boolean;
+			name?: string;
+			given_name?: string;
+			family_name?: string;
+			picture?: string;
+			locale?: string;
+		};
+
+		const email = data.email || "";
+		const displayName = data.name || data.given_name || email.split("@")[0] || "Google用户";
+		const username = email.split("@")[0] || displayName;
+
+		return {
+			id: data.id,
+			username,
+			email,
+			display_name: displayName,
+			avatar_url: data.picture || "",
+			role: "user",
+		};
+	} catch (error) {
+		console.error("[Google OAuth] Fetch userinfo failed:", error);
 		return null;
 	}
 }

@@ -7,4 +7,7 @@ interface ImportMetaEnv {
 	readonly KV_REST_API_TOKEN?: string;
 	readonly LOG_HISTORY_SERVER_URL?: string;
 	readonly LOG_HISTORY_SERVER_TOKEN?: string;
+	readonly GITHUB_TOKEN?: string;
+	readonly GITHUB_OWNER?: string;
+	readonly GITHUB_REPO?: string;
 }

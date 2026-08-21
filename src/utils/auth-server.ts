@@ -767,7 +767,8 @@ export async function fetchMicrosoftUserInfo(
 		const userId = data.id || "";
 
 		// Microsoft 头像：/me/photo/$value 需要鉴权头，无法直接当 <img src>，
-		// 因此登录时抓取头像二进制并上传到自有服务器，返回公开 URL。
+		// 因此登录时抓取头像二进制并上传到 GitHub 仓库 avatars/ 目录（独立分支），
+		// 通过 jsDelivr CDN 以公开 URL 展示。
 		let avatarUrl = "";
 		try {
 			const photoRes = await fetch(
@@ -782,35 +783,11 @@ export async function fetchMicrosoftUserInfo(
 				const photoBuf = new Uint8Array(await photoRes.arrayBuffer());
 				const contentType =
 					photoRes.headers.get("content-type") || "image/jpeg";
-				const ext = contentType.includes("png")
-					? "png"
-					: contentType.includes("webp")
-						? "webp"
-						: contentType.includes("gif")
-							? "gif"
-							: "jpg";
-				const serverUrl = String(
-					import.meta.env.LOG_HISTORY_SERVER_URL || "",
-				).trim().replace(/\/$/, "");
-				const serverToken = String(
-					import.meta.env.LOG_HISTORY_SERVER_TOKEN || "",
-				).trim();
-				if (serverUrl && serverToken) {
-					const uploadRes = await fetch(
-						`${serverUrl}/api/avatar/${encodeURIComponent(userId)}.${ext}`,
-						{
-							method: "POST",
-							headers: {
-								Authorization: `Bearer ${serverToken}`,
-								"Content-Type": contentType,
-							},
-							body: photoBuf,
-						},
-					);
-					if (uploadRes.ok) {
-						avatarUrl = `${serverUrl}/api/avatar/${encodeURIComponent(userId)}.${ext}`;
-					}
-				}
+				avatarUrl = await uploadAvatarToGitHub(
+					userId,
+					photoBuf,
+					contentType,
+				);
 			}
 		} catch (error) {
 			console.error("[Microsoft OAuth] Fetch/upload avatar failed:", error);
@@ -827,5 +804,108 @@ export async function fetchMicrosoftUserInfo(
 	} catch (error) {
 		console.error("[Microsoft OAuth] Fetch userinfo failed:", error);
 		return null;
+	}
+}
+
+/**
+ * 将头像图片上传到 GitHub 仓库的 avatars/ 目录（独立分支 avatars）。
+ * 返回可公开访问的 jsDelivr CDN URL；配置缺失或上传失败时返回空字符串。
+ * 环境变量：
+ *   GITHUB_TOKEN（必填，需要有 repo 写权限）
+ *   GITHUB_REPO（仓库名，默认 liteblog）
+ *   GITHUB_OWNER（仓库所属账号，默认 lumia-li）
+ */
+async function uploadAvatarToGitHub(
+	userId: string,
+	photoBuf: Uint8Array,
+	contentType: string,
+): Promise<string> {
+	const token = String(import.meta.env.GITHUB_TOKEN || "").trim();
+	const owner = String(import.meta.env.GITHUB_OWNER || "lumia-li").trim();
+	const repo = String(import.meta.env.GITHUB_REPO || "liteblog").trim();
+	if (!token) {
+		console.error("[Microsoft OAuth] 缺少 GITHUB_TOKEN，头像无法上传");
+		return "";
+	}
+
+	const ext = contentType.includes("png")
+		? "png"
+		: contentType.includes("webp")
+			? "webp"
+			: contentType.includes("gif")
+				? "gif"
+				: "jpg";
+	const filename = `${userId}.${ext}`;
+	const branch = "avatars";
+	const base64 = Buffer.from(photoBuf).toString("base64");
+
+	const apiBase = `https://api.github.com/repos/${owner}/${repo}`;
+	const headers: Record<string, string> = {
+		Authorization: `Bearer ${token}`,
+		Accept: "application/vnd.github+json",
+		"Content-Type": "application/json",
+		"User-Agent": "liteblog-avatar",
+	};
+
+	try {
+		// 1. 确保 avatars 分支存在（从 main 派生）
+		const refRes = await fetch(`${apiBase}/git/ref/heads/${branch}`, {
+			headers,
+		});
+		if (refRes.status === 404) {
+			const mainRes = await fetch(`${apiBase}/git/ref/heads/main`, {
+				headers,
+			});
+			if (mainRes.ok) {
+				const mainData = (await mainRes.json()) as { object: { sha: string } };
+				await fetch(`${apiBase}/git/refs`, {
+					method: "POST",
+					headers,
+					body: JSON.stringify({
+						ref: `refs/heads/${branch}`,
+						sha: mainData.object.sha,
+					}),
+				});
+			}
+		}
+
+		// 2. 若文件已存在，获取其 sha（更新必需）
+		let existingSha: string | undefined;
+		const fileRes = await fetch(
+			`${apiBase}/contents/avatars/${filename}?ref=${branch}`,
+			{ headers },
+		);
+		if (fileRes.ok) {
+			const fileData = (await fileRes.json()) as { sha?: string };
+			existingSha = fileData.sha;
+		}
+
+		// 3. 上传/更新文件
+		const putRes = await fetch(
+			`${apiBase}/contents/avatars/${filename}`,
+			{
+				method: "PUT",
+				headers,
+				body: JSON.stringify({
+					message: `Update avatar for ${userId}`,
+					content: base64,
+					branch,
+					...(existingSha ? { sha: existingSha } : {}),
+				}),
+			},
+		);
+		if (!putRes.ok) {
+			console.error(
+				"[Microsoft OAuth] GitHub 头像上传失败:",
+				putRes.status,
+				await putRes.text(),
+			);
+			return "";
+		}
+
+		return `https://cdn.jsdelivr.net/gh/${owner}/${repo}@${branch}/avatars/${filename}`;
+	} catch (error) {
+		console.error("[Microsoft OAuth] 上传头像到 GitHub 异常:", error);
+		return "";
 	}
 }

@@ -31,6 +31,11 @@ export default defineConfig({
   site: "https://li.liyueovo.top/",
   base: "/",
   trailingSlash: "ignore",
+  // Vercel 自定义域名下 Origin 检查会把 DELETE/POST 请求误判为跨站，
+  // 导致后台删除/清空登录记录返回 403。API 已有 DEV_EDITOR_CODE 鉴权兜底，故关闭。
+  security: {
+      checkOrigin: false,
+  },
 
   integrations: [
       tailwind({

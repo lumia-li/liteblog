@@ -12,10 +12,10 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "start": "node dist/server/entry.mjs",
+    "start": "astro dev",
     "check": "astro check",
     "build": "astro build",
-    "postbuild": "pagefind --site dist",
+    "postbuild": "pagefind --site dist && node scripts/sync-pagefind-to-vercel.js",
     "preview": "astro preview",
     "astro": "astro",
     "type-check": "tsc --noEmit --isolatedDeclarations",
@@ -28,7 +28,6 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.9.6",
-    "@astrojs/node": "^9.5.5",
     "@astrojs/rss": "^4.0.14",
     "@astrojs/sitemap": "^3.6.0",
     "@astrojs/svelte": "7.2.3",

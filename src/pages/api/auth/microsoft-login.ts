@@ -19,7 +19,7 @@ export const GET: APIRoute = async ({ request }) => {
 			response_type: "code",
 			response_mode: "query",
 			state,
-			scope: "openid email profile",
+			scope: "openid email profile User.Read",
 		});
 
 		withState.headers.set(

@@ -725,7 +725,7 @@ export async function fetchMicrosoftUserInfo(
 	accessToken: string,
 ): Promise<OAuthUser | null> {
 	try {
-		const response = await fetch("https://graph.microsoft.com/oidc/userinfo", {
+		const response = await fetch("https://graph.microsoft.com/v1.0/me", {
 			method: "GET",
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
@@ -740,30 +740,38 @@ export async function fetchMicrosoftUserInfo(
 		if (!response.ok) return null;
 
 		const data = JSON.parse(text) as {
-			sub: string;
-			name?: string;
-			given_name?: string;
-			family_name?: string;
-			email?: string;
-			preferred_username?: string;
-			picture?: string;
+			id?: string;
+			displayName?: string;
+			givenName?: string;
+			surname?: string;
+			mail?: string;
+			userPrincipalName?: string;
 		};
 
-		const email = data.email || data.preferred_username || "";
+		// Microsoft Graph /me 返回字段（不同账号类型字段略有差异）：
+		// - displayName / givenName / surname：真实姓名
+		// - mail：工作/学校账号邮箱；个人账号可能为空，此时用 userPrincipalName
+		// - userPrincipalName：登录名（形如 xxx@outlook.com 或 xxx@tenant.onmicrosoft.com）
+		const email = data.mail || data.userPrincipalName || "";
+		const fullName = [data.givenName, data.surname]
+			.filter(Boolean)
+			.join(" ");
 		const displayName =
-			data.name ||
-			data.given_name ||
+			data.displayName ||
+			fullName ||
 			email.split("@")[0] ||
 			"Microsoft用户";
 		const username =
-			email.split("@")[0] || data.preferred_username || displayName;
+			email.split("@")[0] || data.userPrincipalName || displayName;
 
 		return {
-			id: data.sub,
+			id: data.id || "",
 			username,
 			email,
 			display_name: displayName,
-			avatar_url: data.picture || "",
+			// Microsoft Graph 头像需要单独的 /me/photo/$value 请求且带鉴权头，
+			// 无法作为公开 <img src> 直接使用，因此留空（前端显示首字母头像）。
+			avatar_url: "",
 			role: "user",
 		};
 	} catch (error) {

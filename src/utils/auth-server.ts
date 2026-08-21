@@ -622,3 +622,152 @@ export async function fetchGitHubUserInfo(
 		return null;
 	}
 }
+
+/* ─── Microsoft OAuth ─── */
+
+export function getMicrosoftOAuthConfig(): {
+	clientId: string;
+	clientSecret: string;
+	callback: string;
+	tenant: string;
+} {
+	const clientId = String(import.meta.env.MICROSOFT_CLIENT_ID || "").trim();
+	const clientSecret = String(
+		import.meta.env.MICROSOFT_CLIENT_SECRET || "",
+	).trim();
+	const callback = String(import.meta.env.MICROSOFT_CALLBACK || "").trim();
+	const tenant = String(import.meta.env.MICROSOFT_TENANT || "common").trim();
+
+	if (!clientId || !clientSecret || !callback) {
+		throw new Error(
+			"缺少 Microsoft 登录配置：MICROSOFT_CLIENT_ID、MICROSOFT_CLIENT_SECRET、MICROSOFT_CALLBACK",
+		);
+	}
+
+	return { clientId, clientSecret, callback, tenant };
+}
+
+export async function exchangeMicrosoftCodeForToken(
+	code: string,
+	config: ReturnType<typeof getMicrosoftOAuthConfig>,
+): Promise<
+	| {
+			success: true;
+			data: {
+				access_token: string;
+				expires_in: number;
+				scope: string;
+				token_type: string;
+			};
+	  }
+	| { success: false; error: string }
+> {
+	try {
+		const response = await fetch(
+			`https://login.microsoftonline.com/${config.tenant}/oauth2/v2.0/token`,
+			{
+				method: "POST",
+				headers: { "Content-Type": "application/x-www-form-urlencoded" },
+				body: new URLSearchParams({
+					client_id: config.clientId,
+					client_secret: config.clientSecret,
+					code,
+					grant_type: "authorization_code",
+					redirect_uri: config.callback,
+				}).toString(),
+			},
+		);
+
+		console.log("[Microsoft OAuth] Token exchange status:", response.status);
+		const text = await response.text();
+		console.log("[Microsoft OAuth] Token exchange body:", text);
+
+		if (!response.ok) {
+			return { success: false, error: `HTTP ${response.status}: ${text}` };
+		}
+
+		const data = JSON.parse(text) as {
+			access_token?: string;
+			expires_in?: number;
+			scope?: string;
+			token_type?: string;
+			error?: string;
+			error_description?: string;
+		};
+
+		if (data.error) {
+			return {
+				success: false,
+				error: data.error_description || data.error,
+			};
+		}
+
+		if (!data.access_token) {
+			return { success: false, error: "No access_token in response" };
+		}
+
+		return {
+			success: true,
+			data: {
+				access_token: data.access_token,
+				expires_in: data.expires_in || 3600,
+				scope: data.scope || "",
+				token_type: data.token_type || "Bearer",
+			},
+		};
+	} catch (error) {
+		console.error("[Microsoft OAuth] Token exchange failed:", error);
+		return { success: false, error: `Fetch failed: ${error}` };
+	}
+}
+
+export async function fetchMicrosoftUserInfo(
+	accessToken: string,
+): Promise<OAuthUser | null> {
+	try {
+		const response = await fetch("https://graph.microsoft.com/oidc/userinfo", {
+			method: "GET",
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				Accept: "application/json",
+			},
+		});
+
+		console.log("[Microsoft OAuth] UserInfo status:", response.status);
+		const text = await response.text();
+		console.log("[Microsoft OAuth] UserInfo body:", text);
+
+		if (!response.ok) return null;
+
+		const data = JSON.parse(text) as {
+			sub: string;
+			name?: string;
+			given_name?: string;
+			family_name?: string;
+			email?: string;
+			preferred_username?: string;
+			picture?: string;
+		};
+
+		const email = data.email || data.preferred_username || "";
+		const displayName =
+			data.name ||
+			data.given_name ||
+			email.split("@")[0] ||
+			"Microsoft用户";
+		const username =
+			email.split("@")[0] || data.preferred_username || displayName;
+
+		return {
+			id: data.sub,
+			username,
+			email,
+			display_name: displayName,
+			avatar_url: data.picture || "",
+			role: "user",
+		};
+	} catch (error) {
+		console.error("[Microsoft OAuth] Fetch userinfo failed:", error);
+		return null;
+	}
+}

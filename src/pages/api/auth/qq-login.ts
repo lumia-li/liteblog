@@ -1,29 +1,38 @@
 import type { APIRoute } from "astro";
-import { getQQLoginConfig } from "../../../utils/auth-server";
+import { getQQLoginConfig, setState } from "../../../utils/auth-server";
 
 export const prerender = false;
 
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ request }) => {
 	try {
-		const { token } = getQQLoginConfig();
+		const config = getQQLoginConfig();
 
-		// 构建心月互联 QQ 登录 URL
-		// 文档：https://qq.wch666.com/api/qq.php?token=[token]&msg=[信息]&display['pc'|'mobile']
-		// 回调地址需要在心月互联后台预先配置
-		// msg 参数会在登录成功后传回，用于标识登录来源
-		const url = `https://qq.wch666.com/api/qq.php?token=${token}&msg=qq_login&display=pc`;
+		// 生成 state（存入 cookie，防止 CSRF）
+		const response = new Response(null, { status: 302 });
+		const { response: withState, state } = setState(
+			response,
+			request,
+			"/api/auth/qq-callback",
+		);
 
-		return new Response(null, {
-			status: 302,
-			headers: {
-				Location: url,
-			},
+		// 腾讯 QQ 互联授权 URL
+		const params = new URLSearchParams({
+			response_type: "code",
+			client_id: config.appId,
+			redirect_uri: config.callback,
+			state,
+			scope: "get_user_info",
 		});
+
+		withState.headers.set(
+			"Location",
+			`https://graph.qq.com/oauth2.0/authorize?${params.toString()}`,
+		);
+		return withState;
 	} catch (error) {
+		const message =
+			error instanceof Error ? error.message : "QQ 登录配置错误";
 		console.error("QQ 登录发起失败:", error);
-		return new Response(JSON.stringify({ error: "QQ 登录配置错误" }), {
-			status: 500,
-			headers: { "Content-Type": "application/json" },
-		});
+		return new Response(message, { status: 500 });
 	}
 };

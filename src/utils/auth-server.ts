@@ -115,20 +115,130 @@ export function getOAuthConfig(): {
 	return { clientId, clientSecret, callback, base };
 }
 
+/** 腾讯 QQ 互联 OAuth 配置 */
 export function getQQLoginConfig(): {
-	token: string;
+	appId: string;
+	appKey: string;
 	callback: string;
 } {
-	const token = String(import.meta.env.QQ_XYHULIAN_TOKEN || "").trim();
-	const callback = String(import.meta.env.QQ_XYHULIAN_CALLBACK || "").trim();
+	const appId = String(import.meta.env.QQ_APP_ID || "").trim();
+	const appKey = String(import.meta.env.QQ_APP_KEY || "").trim();
+	const callback = String(import.meta.env.QQ_CALLBACK || "").trim();
 
-	if (!token || !callback) {
-		throw new Error(
-			"缺少 QQ 登录配置：QQ_XYHULIAN_TOKEN、QQ_XYHULIAN_CALLBACK",
-		);
+	if (!appId || !appKey || !callback) {
+		throw new Error("缺少 QQ 登录配置：QQ_APP_ID、QQ_APP_KEY、QQ_CALLBACK");
 	}
 
-	return { token, callback };
+	return { appId, appKey, callback };
+}
+
+/** 用授权 code 换取 access_token（腾讯返回的是 URL 编码格式） */
+export async function exchangeQQCodeForToken(
+	code: string,
+	config: ReturnType<typeof getQQLoginConfig>,
+): Promise<
+	| { success: true; accessToken: string; expiresIn: number }
+	| { success: false; error: string }
+> {
+	try {
+		const params = new URLSearchParams({
+			grant_type: "authorization_code",
+			client_id: config.appId,
+			client_secret: config.appKey,
+			code,
+			redirect_uri: config.callback,
+		});
+		const response = await fetch(
+			`https://graph.qq.com/oauth2.0/token?${params.toString()}`,
+		);
+		const text = await response.text();
+		console.log("[QQ OAuth] Token response:", text);
+
+		// 腾讯返回形如：access_token=xxx&expires_in=7776000
+		const urlEncoded = new URLSearchParams(text);
+		const accessToken = urlEncoded.get("access_token");
+		if (!accessToken) {
+			return {
+				success: false,
+				error: urlEncoded.get("error_description") || urlEncoded.get("error") || text,
+			};
+		}
+		const expiresIn = Number(urlEncoded.get("expires_in")) || 7776000;
+		return { success: true, accessToken, expiresIn };
+	} catch (error) {
+		console.error("[QQ OAuth] Token exchange failed:", error);
+		return { success: false, error: `Fetch failed: ${error}` };
+	}
+}
+
+/** 用 access_token 获取 openid（腾讯返回 JSONP 格式 callback({...})） */
+export async function fetchQQOpenId(
+	accessToken: string,
+): Promise<{ openid: string; unionid?: string } | null> {
+	try {
+		const response = await fetch(
+			`https://graph.qq.com/oauth2.0/me?access_token=${encodeURIComponent(accessToken)}`,
+		);
+		const text = await response.text();
+		console.log("[QQ OAuth] OpenID response:", text);
+
+		// 解析 callback( {...} ) 格式
+		const match = text.match(/callback\(\s*(.*?)\s*\)/);
+		if (!match) return null;
+		const data = JSON.parse(match[1]) as {
+			openid?: string;
+			unionid?: string;
+			error?: string;
+		};
+		if (!data.openid) return null;
+		return { openid: data.openid, unionid: data.unionid };
+	} catch (error) {
+		console.error("[QQ OAuth] Fetch openid failed:", error);
+		return null;
+	}
+}
+
+/** 用 access_token + openid 获取 QQ 用户信息（get_user_info） */
+export async function fetchQQUserInfo(
+	accessToken: string,
+	appId: string,
+	openid: string,
+): Promise<{
+	nickname: string;
+	avatar: string;
+	gender?: string;
+} | null> {
+	try {
+		const params = new URLSearchParams({
+			access_token: accessToken,
+			oauth_consumer_key: appId,
+			openid,
+		});
+		const response = await fetch(
+			`https://graph.qq.com/user/get_user_info?${params.toString()}`,
+		);
+		const text = await response.text();
+		console.log("[QQ OAuth] UserInfo response:", text);
+
+		const data = JSON.parse(text) as {
+			ret: number;
+			msg?: string;
+			nickname?: string;
+			figureurl_qq_2?: string;
+			figureurl_qq_100?: string;
+			gender?: string;
+		};
+		if (data.ret !== 0) return null;
+		return {
+			nickname: data.nickname || "",
+			// figureurl_qq_100 是 100x100 头像，figureurl_qq_2 是 50x50，优先大图
+			avatar: data.figureurl_qq_100 || data.figureurl_qq_2 || "",
+			gender: data.gender,
+		};
+	} catch (error) {
+		console.error("[QQ OAuth] Fetch userinfo failed:", error);
+		return null;
+	}
 }
 
 export function getGoogleOAuthConfig(): {

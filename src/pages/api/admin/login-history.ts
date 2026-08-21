@@ -39,7 +39,7 @@ export const GET: APIRoute = async ({ request }) => {
 	if (!isAuthorized(request)) {
 		return json(403, { ok: false, message: "未授权：缺少或错误的开发者口令" });
 	}
-	const records = listLoginHistory();
+	const records = await listLoginHistory();
 	return json(200, { ok: true, records });
 };
 
@@ -50,13 +50,13 @@ export const DELETE: APIRoute = async ({ request }) => {
 	const url = new URL(request.url);
 	const id = url.searchParams.get("id");
 	if (id) {
-		const removed = removeLoginHistory(id);
+		const removed = await removeLoginHistory(id);
 		return json(removed ? 200 : 404, {
 			ok: removed,
 			message: removed ? "已删除该条登录记录" : "未找到该条记录",
 		});
 	}
-	const cleared = clearLoginHistory();
+	const cleared = await clearLoginHistory();
 	return json(cleared ? 200 : 500, {
 		ok: cleared,
 		message: cleared ? "已清空全部登录历史" : "清空失败（存储不可写）",

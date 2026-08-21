@@ -77,7 +77,7 @@ export const GET: APIRoute = async ({ request }) => {
 		// 设置会话 cookie
 		redirectResponse = setSession(redirectResponse, session, request);
 
-		recordLogin(user, "qq", {
+		await recordLogin(user, "qq", {
 			ip: (() => {
 				const forwarded = request.headers.get("x-forwarded-for");
 				if (forwarded) return forwarded.split(",")[0].trim();

@@ -24,7 +24,7 @@ import { remarkExcerpt } from "./src/plugins/remark-excerpt.js";
 import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 import { pluginCustomCopyButton } from "./src/plugins/expressive-code/custom-copy-button.js";
 
-import vercel from "@astrojs/vercel";
+import node from "@astrojs/node";
 
 // https://astro.build/config
 export default defineConfig({
@@ -189,7 +189,7 @@ export default defineConfig({
       },
 	},
 
-  adapter: vercel({
-      imageService: true,
+  adapter: node({
+      mode: "standalone",
   }),
 });

@@ -71,7 +71,7 @@ export const GET: APIRoute = async ({ request }) => {
 			},
 			request,
 		);
-		recordLogin(user, "microsoft", {
+		await recordLogin(user, "microsoft", {
 			ip: getClientIp(request),
 			ua: request.headers.get("user-agent") || "",
 		});

@@ -60,7 +60,7 @@ export const GET: APIRoute = async ({ request }) => {
 			accessToken: tokenResult.data.access_token,
 			expiresAt: Date.now() + tokenResult.data.expires_in * 1000,
 		}, request);
-		recordLogin(user, "airliny", {
+		await recordLogin(user, "airliny", {
 			ip: getClientIp(request),
 			ua: request.headers.get("user-agent") || "",
 		});

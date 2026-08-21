@@ -66,7 +66,7 @@ export const GET: APIRoute = async ({ request }) => {
 			},
 			request,
 		);
-		recordLogin(user, "github", {
+		await recordLogin(user, "github", {
 			ip: getClientIp(request),
 			ua: request.headers.get("user-agent") || "",
 		});

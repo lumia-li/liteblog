@@ -764,14 +764,64 @@ export async function fetchMicrosoftUserInfo(
 		const username =
 			email.split("@")[0] || data.userPrincipalName || displayName;
 
+		const userId = data.id || "";
+
+		// Microsoft 头像：/me/photo/$value 需要鉴权头，无法直接当 <img src>，
+		// 因此登录时抓取头像二进制并上传到自有服务器，返回公开 URL。
+		let avatarUrl = "";
+		try {
+			const photoRes = await fetch(
+				"https://graph.microsoft.com/v1.0/me/photo/$value",
+				{
+					headers: {
+						Authorization: `Bearer ${accessToken}`,
+					},
+				},
+			);
+			if (photoRes.ok && userId) {
+				const photoBuf = new Uint8Array(await photoRes.arrayBuffer());
+				const contentType =
+					photoRes.headers.get("content-type") || "image/jpeg";
+				const ext = contentType.includes("png")
+					? "png"
+					: contentType.includes("webp")
+						? "webp"
+						: contentType.includes("gif")
+							? "gif"
+							: "jpg";
+				const serverUrl = String(
+					import.meta.env.LOG_HISTORY_SERVER_URL || "",
+				).trim().replace(/\/$/, "");
+				const serverToken = String(
+					import.meta.env.LOG_HISTORY_SERVER_TOKEN || "",
+				).trim();
+				if (serverUrl && serverToken) {
+					const uploadRes = await fetch(
+						`${serverUrl}/api/avatar/${encodeURIComponent(userId)}.${ext}`,
+						{
+							method: "POST",
+							headers: {
+								Authorization: `Bearer ${serverToken}`,
+								"Content-Type": contentType,
+							},
+							body: photoBuf,
+						},
+					);
+					if (uploadRes.ok) {
+						avatarUrl = `${serverUrl}/api/avatar/${encodeURIComponent(userId)}.${ext}`;
+					}
+				}
+			}
+		} catch (error) {
+			console.error("[Microsoft OAuth] Fetch/upload avatar failed:", error);
+		}
+
 		return {
-			id: data.id || "",
+			id: userId,
 			username,
 			email,
 			display_name: displayName,
-			// Microsoft Graph 头像需要单独的 /me/photo/$value 请求且带鉴权头，
-			// 无法作为公开 <img src> 直接使用，因此留空（前端显示首字母头像）。
-			avatar_url: "",
+			avatar_url: avatarUrl,
 			role: "user",
 		};
 	} catch (error) {

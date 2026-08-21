@@ -1,0 +1,8 @@
+---
+import AdminLoginHistory from "@components/admin/AdminLoginHistory.svelte";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+---
+
+<MainGridLayout title="登录历史后台" description="查看账号登录记录，管理已登录账号">
+	<AdminLoginHistory client:only="svelte" />
+</MainGridLayout>

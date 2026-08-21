@@ -167,6 +167,12 @@ export default defineConfig({
 	},
 
   vite: {
+      // 禁止 dev server 直接服务私有数据目录（data/ 存放登录历史，含邮箱/IP 等敏感信息）
+      server: {
+          fs: {
+              deny: ["**/data/**"],
+          },
+      },
       build: {
           rollupOptions: {
               onwarn(warning, warn) {

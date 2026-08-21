@@ -44,5 +44,8 @@ yarn.lock
 *.iml
 
 # dev runtime logs
-dev.log
-dev.err
+dev*.log
+dev*.err
+
+# private runtime data (login history etc.)
+data/

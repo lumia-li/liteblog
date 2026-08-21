@@ -7,8 +7,15 @@ import {
 	readState,
 	setSession,
 } from "@utils/auth-server";
+import { recordLogin } from "@utils/login-history";
 
 export const prerender = false;
+
+function getClientIp(request: Request): string {
+	const forwarded = request.headers.get("x-forwarded-for");
+	if (forwarded) return forwarded.split(",")[0].trim();
+	return request.headers.get("x-real-ip")?.trim() || "";
+}
 
 function redirectResponse(url: string, status = 302): Response {
 	return new Response(null, { status, headers: { Location: url } });
@@ -53,6 +60,10 @@ export const GET: APIRoute = async ({ request }) => {
 			accessToken: tokenResult.data.access_token,
 			expiresAt: Date.now() + tokenResult.data.expires_in * 1000,
 		}, request);
+		recordLogin(user, "airliny", {
+			ip: getClientIp(request),
+			ua: request.headers.get("user-agent") || "",
+		});
 		return response;
 	} catch (error) {
 		const message = error instanceof Error ? error.message : "登录失败";

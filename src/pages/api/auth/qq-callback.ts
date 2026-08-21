@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
-import { getQQLoginConfig, setSession } from "../../../utils/auth-server";
+import { setSession } from "../../../utils/auth-server";
+import { recordLogin } from "@utils/login-history";
 
 // 心月互联 QQ 登录用户信息接口
 interface QQUserInfo {
@@ -75,6 +76,15 @@ export const GET: APIRoute = async ({ request }) => {
 
 		// 设置会话 cookie
 		redirectResponse = setSession(redirectResponse, session, request);
+
+		recordLogin(user, "qq", {
+			ip: (() => {
+				const forwarded = request.headers.get("x-forwarded-for");
+				if (forwarded) return forwarded.split(",")[0].trim();
+				return request.headers.get("x-real-ip")?.trim() || "";
+			})(),
+			ua: request.headers.get("user-agent") || "",
+		});
 
 		return redirectResponse;
 	} catch (error) {

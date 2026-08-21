@@ -7,6 +7,10 @@ dist/
 # dependencies
 node_modules/
 
+# local tool caches
+.npm-cache/
+.pnpm-store/
+
 # logs
 npm-debug.log*
 yarn-debug.log*
@@ -17,6 +21,7 @@ pnpm-debug.log*
 .env
 .env.*
 !.env.example
+!.env.enc
 .env.local
 .env.production
 

@@ -20,6 +20,8 @@
     "astro": "astro",
     "type-check": "tsc --noEmit --isolatedDeclarations",
     "new-post": "node scripts/new-post.js",
+    "env:encrypt": "node scripts/env-crypt.mjs encrypt",
+    "env:decrypt": "node scripts/env-crypt.mjs decrypt",
     "format": "biome format --write ./src",
     "lint": "biome check --write ./src",
     "preinstall": "npx only-allow pnpm"

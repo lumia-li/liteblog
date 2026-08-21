@@ -1,0 +1,659 @@
+﻿---
+import Footer from "@components/Footer.astro";
+import GlobalControlCapsule from "@components/home/GlobalControlCapsule.astro";
+import HeroHub from "@components/home/HeroHub.astro";
+import type { MarkdownHeading } from "astro";
+import { Icon } from "astro-icon/components";
+import Layout from "./Layout.astro";
+
+interface Props {
+	title?: string;
+	banner?: string;
+	description?: string;
+	lang?: string;
+	setOGTypeArticle?: boolean;
+	headings?: MarkdownHeading[];
+	pageType?: string;
+	showHero?: boolean;
+	homeCentered?: boolean;
+	shellMaxWidth?: string;
+	contentMaxWidth?: string;
+}
+
+const {
+	title,
+	banner,
+	description,
+	lang,
+	setOGTypeArticle,
+	pageType = "hub",
+	showHero = true,
+	homeCentered = false,
+	shellMaxWidth = "980px",
+	contentMaxWidth = "760px",
+} = Astro.props;
+---
+
+<Layout title={title} banner={banner} description={description} lang={lang} setOGTypeArticle={setOGTypeArticle} pageType={pageType}>
+	<slot slot="head" name="head"></slot>
+
+	<div id="banner-wrapper" class="hidden">
+		<div id="banner"></div>
+	</div>
+
+	<div class:list={["hub-shell", { "home-centered": homeCentered }]} style={`--hub-shell-max:${shellMaxWidth};--hub-content-max:${contentMaxWidth};`}>
+		<main id="swup-container" class:list={["hub-content", { "home-centered": homeCentered }]}>
+			{!showHero && <GlobalControlCapsule />}
+			{showHero && <HeroHub />}
+			<div id="content-wrapper">
+				<slot></slot>
+			</div>
+			<Footer />
+		</main>
+	</div>
+	<div id="floating-actions" aria-label="文章快捷操作">
+		<button id="comments-shortcut-btn" class="floating-action-btn comments-shortcut-btn hide" type="button" aria-label="跳到评论区" title="跳到评论区">
+			<Icon name="material-symbols:forum-outline-rounded" />
+		</button>
+		<button id="back-to-top-btn" class="floating-action-btn back-to-top-btn hide" type="button" aria-label="回到顶部" title="回到顶部">
+			<Icon name="material-symbols:keyboard-arrow-up-rounded" />
+		</button>
+	</div>
+	<script is:inline>
+		(() => {
+			const SHOW_OFFSET = 180;
+			const COMMENTS_SCROLL_OFFSET = 24;
+			const isPostsRoute = () => /^\/posts(?:\/|$)/.test(window.location.pathname);
+			const getScrollY = () => (
+				window.scrollY ||
+				document.documentElement.scrollTop ||
+				document.body.scrollTop ||
+				0
+			);
+			const easeInOutCubic = (t) => (
+				t < 0.5
+					? 4 * t * t * t
+					: 1 - ((-2 * t + 2) ** 3) / 2
+			);
+			const animateScrollTo = (targetY, duration) => {
+				const startY = getScrollY();
+				const nextTargetY = Math.max(0, Math.floor(Number(targetY) || 0));
+				const distance = nextTargetY - startY;
+				if (Math.abs(distance) <= 4 || duration <= 0) {
+					window.scrollTo(0, nextTargetY);
+					return;
+				}
+
+				const startTime = performance.now();
+				const tick = (now) => {
+					const progress = Math.min(1, (now - startTime) / duration);
+					const nextY = Math.round(startY + distance * easeInOutCubic(progress));
+					window.scrollTo(0, nextY);
+
+					if (progress < 1) {
+						requestAnimationFrame(tick);
+						return;
+					}
+
+					window.scrollTo(0, nextTargetY);
+				};
+
+				requestAnimationFrame(tick);
+			};
+			const getCommentsTarget = () => document.querySelector(".article-comments, #comment");
+			const syncFloatingActionButtons = () => {
+				const backButton = document.getElementById("back-to-top-btn");
+				const commentsButton = document.getElementById("comments-shortcut-btn");
+				const commentsTarget = getCommentsTarget();
+				const shouldShowBack = isPostsRoute() && getScrollY() > SHOW_OFFSET;
+				const shouldShowComments = isPostsRoute() && Boolean(commentsTarget);
+
+				backButton?.classList.toggle("hide", !shouldShowBack);
+				commentsButton?.classList.toggle("hide", !shouldShowComments);
+				commentsButton?.classList.toggle("stacked", shouldShowBack);
+			};
+			const scrollToTop = () => {
+				const currentY = getScrollY();
+				const duration = Math.min(680, Math.max(280, currentY * 0.2));
+				animateScrollTo(0, duration);
+			};
+			const scrollToComments = () => {
+				const target = getCommentsTarget();
+				if (!(target instanceof HTMLElement)) return;
+				const top = Math.max(0, target.getBoundingClientRect().top + getScrollY() - COMMENTS_SCROLL_OFFSET);
+				const distance = Math.abs(top - getScrollY());
+				const duration = Math.min(720, Math.max(300, distance * 0.22));
+				animateScrollTo(top, duration);
+			};
+			const bindSwupHooks = () => {
+				if (window.__floatingActionButtonsSwupReady || !window.swup?.hooks) return;
+				window.__floatingActionButtonsSwupReady = true;
+				window.swup.hooks.on("content:replace", () => {
+					window.requestAnimationFrame(syncFloatingActionButtons);
+				});
+				window.swup.hooks.on("page:view", () => {
+					window.requestAnimationFrame(syncFloatingActionButtons);
+				});
+			};
+
+			if (!window.__floatingActionButtonsReady) {
+				window.__floatingActionButtonsReady = true;
+				window.addEventListener("scroll", syncFloatingActionButtons, { passive: true });
+				document.addEventListener("scroll", syncFloatingActionButtons, { passive: true, capture: true });
+				document.addEventListener("click", (event) => {
+					const target = event.target;
+					if (!(target instanceof Element)) return;
+					if (target.closest("#back-to-top-btn")) {
+						event.preventDefault();
+						event.stopImmediatePropagation();
+						scrollToTop();
+						return;
+					}
+					if (target.closest("#comments-shortcut-btn")) {
+						event.preventDefault();
+						event.stopImmediatePropagation();
+						scrollToComments();
+					}
+				});
+				document.addEventListener("swup:enable", bindSwupHooks);
+			}
+
+			bindSwupHooks();
+			syncFloatingActionButtons();
+			window.requestAnimationFrame(syncFloatingActionButtons);
+		})();
+	</script>
+</Layout>
+
+<style is:global>
+	:root {
+		--page-bg: #ffffff;
+		--page-bg-article: #ffffff;
+		--card-bg: #f5f5f5;
+		--surface-bg: #f4f4f4;
+		--surface-border: #dddddd;
+		--primary: #111111;
+		--text-color: #111111;
+		--btn-content: #222222;
+		--line-divider: rgba(0, 0, 0, 0.12);
+		--btn-regular-bg: #f7f7f7;
+		--btn-regular-bg-hover: #f2f2f2;
+		--btn-regular-bg-active: #ebebeb;
+		--btn-card-bg-hover: #f4f4f4;
+		--btn-card-bg-active: #eeeeee;
+		--btn-plain-bg-hover: #f4f4f4;
+		--btn-plain-bg-active: #efefef;
+		--btn-border: #d7d7d7;
+		--codeblock-bg: #f6f8fa;
+		--codeblock-topbar-bg: #eef2f7;
+		--codeblock-border: #d8dee8;
+		--codeblock-shadow: 0 8px 22px rgba(15, 23, 42, 0.12);
+		--codeblock-badge-bg: #e2e8f0;
+		--codeblock-badge-text: #334155;
+		--license-block-bg: #e8ebef;
+		--radius-large: 1rem;
+		--meta-divider: rgba(17, 17, 17, 0.28);
+	}
+
+	:root.dark {
+		--page-bg: #0f1218;
+		--page-bg-article: #0d1016;
+		--card-bg: #151a22;
+		--surface-bg: #171d27;
+		--surface-border: #263040;
+		--primary: #f5f7fb;
+		--text-color: #eef2ff;
+		--btn-content: #e5eaf5;
+		--line-divider: rgba(255, 255, 255, 0.16);
+		--btn-regular-bg: #1a212c;
+		--btn-regular-bg-hover: #212a37;
+		--btn-regular-bg-active: #273346;
+		--btn-card-bg-hover: #1e2734;
+		--btn-card-bg-active: #253042;
+		--btn-plain-bg-hover: #202938;
+		--btn-plain-bg-active: #263245;
+		--btn-border: #2a3444;
+		--codeblock-bg: #090d14;
+		--codeblock-topbar-bg: #101827;
+		--codeblock-border: #263244;
+		--codeblock-shadow: 0 10px 28px rgba(0, 0, 0, 0.42);
+		--codeblock-badge-bg: #253246;
+		--codeblock-badge-text: #bfdbfe;
+		--license-block-bg: #151c26;
+		--meta-divider: rgba(236, 242, 255, 0.35);
+	}
+
+	html,
+	body {
+		background: var(--page-bg) !important;
+		color: var(--text-color) !important;
+	}
+	body[data-page-type="article"] {
+		background: var(--page-bg-article) !important;
+	}
+
+	/* Freeze banner/layout vars on hub homepage to prevent refresh reflow jitter */
+	html,
+	:root {
+		--banner-height-extend: 0px !important;
+		--home-banner-height-custom: 0px !important;
+	}
+
+	body.enable-banner #banner-wrapper,
+	body.enable-banner #banner,
+	body.enable-banner #top-row,
+	body.enable-banner #main-grid,
+	body.enable-banner #sidebar-sticky {
+		transform: none !important;
+		translate: none !important;
+		height: 0 !important;
+		min-height: 0 !important;
+		max-height: 0 !important;
+		top: auto !important;
+		margin: 0 !important;
+		padding: 0 !important;
+	}
+
+	:root::before,
+	:root::after,
+	#banner-wrapper {
+		opacity: 0 !important;
+	}
+
+	body {
+		font-family: "KeinannMaruPOP", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Noto Sans SC", "Source Han Sans SC", sans-serif;
+	}
+
+	#top-row,
+	#toc-wrapper {
+		display: none !important;
+	}
+
+	#floating-actions {
+		--floating-action-size: 3.15rem;
+		--floating-action-bottom: max(1.4rem, env(safe-area-inset-bottom));
+		--floating-action-gap: 0.85rem;
+		position: fixed;
+		right: max(1.25rem, env(safe-area-inset-right));
+		bottom: var(--floating-action-bottom);
+		z-index: 90;
+		width: var(--floating-action-size);
+		height: calc(var(--floating-action-size) * 2 + var(--floating-action-gap));
+		pointer-events: none;
+	}
+
+	.floating-action-btn {
+		--floating-action-stack-y: 0px;
+		--floating-action-hide-y: 0px;
+		--floating-action-hover-y: 0px;
+		--floating-action-scale: 1;
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		width: var(--floating-action-size);
+		height: var(--floating-action-size);
+		border: 0;
+		border-radius: 9999px;
+		display: inline-flex !important;
+		align-items: center;
+		justify-content: center;
+		color: #ffffff;
+		background: #111111;
+		box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
+		cursor: pointer;
+		opacity: 1;
+		pointer-events: auto;
+		visibility: visible;
+		transform: translateY(calc(var(--floating-action-stack-y) + var(--floating-action-hide-y) + var(--floating-action-hover-y))) scale(var(--floating-action-scale));
+		transition:
+			opacity 0.2s ease,
+			visibility 0.2s ease,
+			transform 0.2s ease,
+			background-color 0.2s ease,
+			box-shadow 0.2s ease;
+	}
+
+	#comments-shortcut-btn.floating-action-btn.stacked {
+		--floating-action-stack-y: calc(-1 * (var(--floating-action-size) + var(--floating-action-gap)));
+	}
+
+	.floating-action-btn:hover {
+		--floating-action-hover-y: -1px;
+		background: #1d1d1d;
+		box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
+	}
+
+	.floating-action-btn:active {
+		--floating-action-scale: 0.92;
+	}
+
+	.floating-action-btn.hide {
+		pointer-events: none;
+		opacity: 0;
+		visibility: hidden;
+		--floating-action-hide-y: 0.8rem;
+		--floating-action-scale: 0.86;
+	}
+
+	.floating-action-btn svg {
+		width: 1.65rem;
+		height: 1.65rem;
+	}
+
+	:root.dark .floating-action-btn {
+		background: #f4f6fb;
+		color: #111827;
+		box-shadow: 0 12px 28px rgba(0, 0, 0, 0.42);
+	}
+
+	:root.dark .floating-action-btn:hover {
+		background: #ffffff;
+	}
+
+	@media (max-width: 768px) {
+		#floating-actions {
+			--floating-action-size: 2.85rem;
+			--floating-action-bottom: max(1rem, env(safe-area-inset-bottom));
+			--floating-action-gap: 0.72rem;
+			right: max(1rem, env(safe-area-inset-right));
+		}
+	}
+
+	.hub-shell {
+		width: min(100%, var(--hub-shell-max, 980px));
+		margin: 0 auto;
+		min-height: 100vh;
+		padding: 24px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		box-sizing: border-box;
+	}
+
+	.hub-content {
+		width: min(100%, var(--hub-content-max, 760px));
+		margin: 0 auto;
+	}
+
+	/* Explicit homepage mode: avoid relying on global body classes */
+	.hub-shell.home-centered {
+		min-height: 100dvh;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+	.hub-content.home-centered {
+		width: min(100%, var(--hub-content-max, 760px));
+		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+	.hub-content.home-centered #content-wrapper {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+	.hub-shell.home-centered .hero-hub {
+		text-align: center;
+		min-height: 72vh;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
+	.hub-shell.home-centered .hero-class-card {
+		text-align: center;
+	}
+
+	.card-base:not(.simple-post-card) {
+		background: var(--surface-bg) !important;
+		border: 1px solid var(--surface-border);
+		border-radius: 16px !important;
+		box-shadow: none !important;
+	}
+	.hub-content-article .card-base:not(.simple-post-card) {
+		background: var(--card-bg) !important;
+		border-color: var(--surface-border);
+	}
+
+	/* Typography plugin tokens: align prose with light background */
+	.hub-content .custom-md {
+		--tw-prose-body: rgba(17, 17, 17, 0.76);
+		--tw-prose-headings: rgba(17, 17, 17, 0.94);
+		--tw-prose-lead: rgba(17, 17, 17, 0.68);
+		--tw-prose-links: #111111;
+		--tw-prose-bold: #111111;
+		--tw-prose-counters: rgba(17, 17, 17, 0.5);
+		--tw-prose-bullets: rgba(17, 17, 17, 0.35);
+		--tw-prose-hr: rgba(0, 0, 0, 0.14);
+		--tw-prose-quotes: rgba(17, 17, 17, 0.86);
+		--tw-prose-quote-borders: rgba(0, 0, 0, 0.24);
+		--tw-prose-captions: rgba(17, 17, 17, 0.62);
+		--tw-prose-code: #111111;
+		--tw-prose-th-borders: rgba(0, 0, 0, 0.2);
+		--tw-prose-td-borders: rgba(0, 0, 0, 0.12);
+
+		--tw-prose-invert-body: rgba(229, 234, 241, 0.84);
+		--tw-prose-invert-headings: rgba(245, 248, 255, 0.98);
+		--tw-prose-invert-lead: rgba(217, 224, 235, 0.78);
+		--tw-prose-invert-links: #f8fafc;
+		--tw-prose-invert-bold: #f8fafc;
+		--tw-prose-invert-counters: rgba(219, 228, 241, 0.58);
+		--tw-prose-invert-bullets: rgba(219, 228, 241, 0.45);
+		--tw-prose-invert-hr: rgba(203, 213, 225, 0.22);
+		--tw-prose-invert-quotes: rgba(241, 245, 249, 0.92);
+		--tw-prose-invert-quote-borders: rgba(203, 213, 225, 0.35);
+		--tw-prose-invert-captions: rgba(203, 213, 225, 0.72);
+		--tw-prose-invert-code: #f8fafc;
+		--tw-prose-invert-th-borders: rgba(203, 213, 225, 0.35);
+		--tw-prose-invert-td-borders: rgba(203, 213, 225, 0.2);
+	}
+
+	/* Keep markdown readable in dark mode even when local token overrides are loaded later. */
+	:root.dark .hub-content .custom-md {
+		--tw-prose-body: var(--tw-prose-invert-body);
+		--tw-prose-headings: var(--tw-prose-invert-headings);
+		--tw-prose-lead: var(--tw-prose-invert-lead);
+		--tw-prose-links: var(--tw-prose-invert-links);
+		--tw-prose-bold: var(--tw-prose-invert-bold);
+		--tw-prose-counters: var(--tw-prose-invert-counters);
+		--tw-prose-bullets: var(--tw-prose-invert-bullets);
+		--tw-prose-hr: var(--tw-prose-invert-hr);
+		--tw-prose-quotes: var(--tw-prose-invert-quotes);
+		--tw-prose-quote-borders: var(--tw-prose-invert-quote-borders);
+		--tw-prose-captions: var(--tw-prose-invert-captions);
+		--tw-prose-code: var(--tw-prose-invert-code);
+		--tw-prose-th-borders: var(--tw-prose-invert-th-borders);
+		--tw-prose-td-borders: var(--tw-prose-invert-td-borders);
+	}
+
+	.hub-content .custom-md :is(h1, h2, h3, h4, h5, h6) .anchor {
+		margin-left: 0.28em;
+		text-decoration: none !important;
+		opacity: 0;
+		transition: opacity 0.16s ease;
+	}
+
+	.hub-content .custom-md :is(h1, h2, h3, h4, h5, h6):hover .anchor,
+	.hub-content .custom-md :is(h1, h2, h3, h4, h5, h6) .anchor:focus-visible {
+		opacity: 0.55;
+	}
+
+	.hub-content .custom-md .anchor-icon {
+		font-size: 0.72em;
+		line-height: 1;
+		text-decoration: none !important;
+		vertical-align: 0.08em;
+	}
+
+	.hub-content .custom-md .expressive-code {
+		margin: 1.35em 0 1.7em;
+	}
+
+	.hub-content .custom-md .expressive-code .frame {
+		border-radius: 14px;
+		box-shadow: var(--codeblock-shadow);
+	}
+
+	.hub-content .custom-md .expressive-code pre {
+		position: relative;
+		border-color: var(--codeblock-border) !important;
+		border-radius: 14px;
+		background: var(--codeblock-bg) !important;
+		overflow-x: auto;
+		overflow-y: hidden;
+		scrollbar-width: none;
+		-ms-overflow-style: none;
+	}
+
+	.hub-content .custom-md .expressive-code .gutter .ln {
+		color: color-mix(in srgb, var(--text-color) 34%, transparent) !important;
+	}
+
+	.hub-content .custom-md .expressive-code .ec-line .gutter ~ .code {
+		--ecLineBrdCol: color-mix(in srgb, var(--text-color) 12%, transparent);
+	}
+
+	.hub-content .custom-md .expressive-code [data-language]::before {
+		top: 0.7rem;
+		right: 3.15rem;
+		margin-right: 0;
+		border-radius: 999px;
+		background: var(--codeblock-badge-bg);
+		color: var(--codeblock-badge-text);
+		opacity: 1;
+	}
+
+	.hub-content .custom-md .expressive-code .copy-btn {
+		all: unset;
+		position: absolute;
+		top: 0.62rem;
+		right: 0.62rem;
+		z-index: 4;
+		box-sizing: border-box;
+		display: inline-flex;
+		width: 2rem;
+		height: 2rem;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid color-mix(in srgb, var(--codeblock-badge-text) 18%, transparent);
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--codeblock-badge-bg) 88%, var(--codeblock-bg));
+		color: var(--codeblock-badge-text);
+		box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+		cursor: pointer;
+		opacity: 0.86;
+		transition:
+			opacity 0.16s ease,
+			background-color 0.16s ease,
+			border-color 0.16s ease,
+			transform 0.16s ease;
+	}
+
+	.hub-content .custom-md .expressive-code .copy-btn:hover,
+	.hub-content .custom-md .expressive-code .copy-btn:focus-visible,
+	.hub-content .custom-md .expressive-code .copy-btn.success {
+		border-color: color-mix(in srgb, var(--codeblock-badge-text) 32%, transparent);
+		background: color-mix(in srgb, var(--codeblock-badge-bg) 72%, var(--codeblock-badge-text));
+		opacity: 1;
+		transform: translateY(-1px);
+	}
+
+	.hub-content .custom-md .expressive-code .copy-btn:focus-visible {
+		outline: 2px solid color-mix(in srgb, var(--codeblock-badge-text) 42%, transparent);
+		outline-offset: 2px;
+	}
+
+	.hub-content .custom-md .expressive-code .copy-btn > .copy-btn-icon {
+		display: grid;
+		width: 1rem;
+		height: 1rem;
+		place-items: center;
+		pointer-events: none;
+	}
+
+	.hub-content .custom-md .expressive-code .copy-btn svg {
+		grid-area: 1 / 1;
+		display: block;
+		width: 1rem;
+		height: 1rem;
+		fill: currentColor;
+		pointer-events: none;
+	}
+
+	.hub-content .custom-md .expressive-code .copy-btn .success-icon,
+	.hub-content .custom-md .expressive-code .copy-btn.success .copy-icon {
+		display: none;
+	}
+
+	.hub-content .custom-md .expressive-code .copy-btn.success .success-icon {
+		display: block;
+	}
+
+	.hub-content .custom-md .expressive-code pre::-webkit-scrollbar {
+		display: none;
+		width: 0;
+		height: 0;
+	}
+
+	.hub-content .custom-md .expressive-code .os-scrollbar {
+		display: none !important;
+	}
+
+	/* Twikoo: keep comment area in light palette inside this layout */
+	.hub-content #comment,
+	.hub-content .twikoo {
+		--tk-text: #111827;
+		--tk-muted: #6b7280;
+		--tk-line: rgba(107, 114, 128, 0.28);
+		--tk-line-soft: rgba(107, 114, 128, 0.18);
+		--tk-card-bg: rgba(255, 255, 255, 0.78);
+		--tk-card-bg-soft: rgba(255, 255, 255, 0.58);
+		--tk-input-bg: rgba(255, 255, 255, 0.8);
+		--tk-input-label-bg: rgba(245, 247, 250, 0.95);
+		--tk-chip-bg: rgba(255, 255, 255, 0.72);
+		--tk-expand-text: rgba(248, 250, 252, 0.96);
+		--tk-shadow: 0 10px 28px rgba(15, 23, 42, 0.1);
+		--tk-shadow-hover: 0 14px 36px rgba(15, 23, 42, 0.16);
+	}
+
+	:root.dark .hub-content #comment,
+	:root.dark .hub-content .twikoo {
+		--tk-text: #e2e8f0;
+		--tk-muted: #9aa7bb;
+		--tk-line: rgba(148, 163, 184, 0.36);
+		--tk-line-soft: rgba(148, 163, 184, 0.24);
+		--tk-card-bg: rgba(22, 29, 40, 0.9);
+		--tk-card-bg-soft: rgba(22, 29, 40, 0.74);
+		--tk-input-bg: rgba(18, 24, 34, 0.95);
+		--tk-input-label-bg: rgba(20, 28, 40, 0.95);
+		--tk-chip-bg: rgba(30, 39, 55, 0.9);
+		--tk-expand-text: rgba(226, 232, 240, 0.96);
+		--tk-shadow: 0 14px 34px rgba(2, 6, 23, 0.42);
+		--tk-shadow-hover: 0 18px 42px rgba(2, 6, 23, 0.5);
+	}
+
+	.btn-card,
+	.btn-regular,
+	.btn-plain {
+		border: 1px solid var(--btn-border);
+		border-radius: 9999px !important;
+	}
+
+	.footer {
+		display: none;
+	}
+	@media (max-width: 768px) {
+		.hub-shell.home-centered .hero-hub {
+			min-height: auto;
+		}
+
+		.hub-shell {
+			padding: 16px 14px;
+		}
+	}
+</style>

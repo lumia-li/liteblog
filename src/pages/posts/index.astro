@@ -1,0 +1,15 @@
+---
+import PostPage from "@components/PostPage.astro";
+import { PAGE_SIZE } from "@constants/constants";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { getSortedPosts } from "@utils/content-utils";
+
+const allBlogPosts = await getSortedPosts();
+const pageLike = {
+	data: allBlogPosts,
+} as any;
+---
+
+<MainGridLayout title="文章" description="文章列表">
+	<PostPage page={pageLike} clientPagination={true} pageSize={PAGE_SIZE} />
+</MainGridLayout>

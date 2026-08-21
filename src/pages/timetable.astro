@@ -1,0 +1,28 @@
+﻿---
+import TimetableEditor from "@components/timetable/TimetableEditor.svelte";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+
+const timetableApiUrl = "/api/timetable";
+const remoteModeEnabled =
+	Boolean(String(import.meta.env.TIMETABLE_REMOTE_LOGIN_URL || "").trim()) &&
+	Boolean(String(import.meta.env.TIMETABLE_REMOTE_SCHEDULE_URL || "").trim()) &&
+	Boolean(String(import.meta.env.TIMETABLE_REMOTE_TENANT_NAME || "").trim()) &&
+	Boolean(String(import.meta.env.TIMETABLE_REMOTE_USERNAME || "").trim()) &&
+	Boolean(String(import.meta.env.TIMETABLE_REMOTE_PASSWORD || "").trim());
+---
+
+<MainGridLayout
+	title="课程表"
+	description="导入 Excel 并编辑你的课程表"
+	showHero={false}
+	shellMaxWidth="1380px"
+	contentMaxWidth="1280px"
+>
+	<TimetableEditor
+		client:load
+		apiUrl={timetableApiUrl}
+		autoSyncWeekToServer={!remoteModeEnabled}
+		autoDetectWeekOnLoad={!remoteModeEnabled}
+		keepLocalWeekControl={remoteModeEnabled}
+	/>
+</MainGridLayout>

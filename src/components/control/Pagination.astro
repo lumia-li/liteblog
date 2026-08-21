@@ -1,0 +1,181 @@
+---
+import type { Page } from "astro";
+import { Icon } from "astro-icon/components";
+import { url } from "../../utils/url-utils";
+
+interface Props {
+	page: Page;
+	class?: string;
+	style?: string;
+	basePath?: string;
+}
+
+const { page, style, basePath = "/" } = Astro.props;
+
+const HIDDEN = -1;
+
+const className = Astro.props.class;
+
+const ADJ_DIST = 2;
+const VISIBLE = ADJ_DIST * 2 + 1;
+
+// for test
+let count = 1;
+let l = page.currentPage;
+let r = page.currentPage;
+while (0 < l - 1 && r + 1 <= page.lastPage && count + 2 <= VISIBLE) {
+	count += 2;
+	l--;
+	r++;
+}
+while (0 < l - 1 && count < VISIBLE) {
+	count++;
+	l--;
+}
+while (r + 1 <= page.lastPage && count < VISIBLE) {
+	count++;
+	r++;
+}
+
+let pages: number[] = [];
+if (l > 1) pages.push(1);
+if (l === 3) pages.push(2);
+if (l > 3) pages.push(HIDDEN);
+for (let i = l; i <= r; i++) pages.push(i);
+if (r < page.lastPage - 2) pages.push(HIDDEN);
+if (r === page.lastPage - 2) pages.push(page.lastPage - 1);
+if (r < page.lastPage) pages.push(page.lastPage);
+
+const normalizeBasePath = (path: string) => {
+	const withLeadingSlash = path.startsWith("/") ? path : `/${path}`;
+	return withLeadingSlash.endsWith("/")
+		? withLeadingSlash
+		: `${withLeadingSlash}/`;
+};
+
+const resolvedBasePath = normalizeBasePath(basePath);
+const getPageUrl = (p: number) => {
+	if (p === 1) return resolvedBasePath;
+	return `${resolvedBasePath}${p}/`;
+};
+---
+
+<div class:list={[className, "flex flex-row gap-3 justify-center flex-wrap"]} style={style}>
+    <a
+        href={page.url.prev || ""}
+        aria-label={page.url.prev ? "Previous Page" : null}
+        class:list={["pager-link pager-side", { "pager-disabled": page.url.prev == undefined }]}
+    >
+        <Icon name="material-symbols:chevron-left-rounded" class="pager-chevron" />
+        <span>上一页</span>
+    </a>
+
+    <div class="pager-pages">
+        {pages.map((p) => {
+            if (p == HIDDEN) {
+                return <span class="pager-ellipsis">...</span>;
+            }
+            if (p == page.currentPage) {
+                return <span class="pager-current">{p}</span>;
+            }
+            return (
+                <a href={url(getPageUrl(p))} aria-label={`Page ${p}`} class="pager-link pager-page">
+                    {p}
+                </a>
+            );
+        })}
+    </div>
+
+    <a
+        href={page.url.next || ""}
+        aria-label={page.url.next ? "Next Page" : null}
+        class:list={["pager-link pager-side", { "pager-disabled": page.url.next == undefined }]}
+    >
+        <span>下一页</span>
+        <Icon name="material-symbols:chevron-right-rounded" class="pager-chevron" />
+    </a>
+</div>
+
+<style>
+    .pager-link {
+        color: #1f1f1f;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        user-select: none;
+    }
+
+    .pager-side {
+        gap: 2px;
+        font-size: 1.0625rem;
+        min-height: 2.5rem;
+        padding: 0 0.25rem;
+    }
+
+    .pager-pages {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .pager-page,
+    .pager-current {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 9999px;
+        font-size: 1.125rem;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .pager-page:hover {
+        background: rgba(0, 0, 0, 0.04);
+    }
+
+    .pager-current {
+        background: #ececec;
+        color: #111;
+        border: 1px solid #dbdbdb;
+        font-weight: 500;
+    }
+
+    .pager-ellipsis {
+        width: 2.5rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #444;
+        font-size: 1.125rem;
+        height: 2.5rem;
+        line-height: 1;
+    }
+
+    .pager-chevron {
+        font-size: 1.25rem;
+    }
+
+    .pager-disabled {
+        color: #b3b3b3;
+        pointer-events: none;
+    }
+
+    @media (max-width: 640px) {
+        .pager-side {
+            font-size: 0.95rem;
+        }
+        .pager-page,
+        .pager-current,
+        .pager-ellipsis {
+            width: 2.15rem;
+            height: 2.15rem;
+            font-size: 1rem;
+            line-height: 1;
+        }
+    }
+</style>

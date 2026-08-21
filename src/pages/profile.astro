@@ -1,0 +1,368 @@
+---
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { readSession } from "@utils/auth-server";
+
+export const prerender = false;
+
+const session = readSession(Astro.request);
+const user = session?.user ?? null;
+---
+
+<MainGridLayout title="个人资料" description="用户个人资料页" showHero={false}>
+	<div class="profile-card">
+		{user ? (
+			<>
+				<div class="profile-header">
+					{user.avatar_url ? (
+						<img src={user.avatar_url} alt={user.display_name || user.username} class="profile-avatar" />
+					) : (
+						<div class="profile-avatar profile-avatar-fallback">
+							{(user.display_name || user.username).charAt(0).toUpperCase()}
+						</div>
+					)}
+				<div class="profile-titles">
+					<div class="profile-name-row">
+						<h1 class="profile-name">{user.display_name || user.username}</h1>
+						{(["1", "4"] as string[]).includes(user.id) ? (
+							<span class="profile-role profile-role-rainbow">
+								{user.id === "1" ? "猫猫管理员" : "璃猫猫"}
+							</span>
+						) : (
+							<span class="profile-role">{user.role === "admin" ? "管理员" : "普通用户"}</span>
+						)}
+					</div>
+					<p class="profile-username">@{user.username}</p>
+				</div>
+				</div>
+				<div class="profile-section">
+					<h2 class="profile-section-title">基本信息</h2>
+					<div class="profile-body">
+						<div class="profile-field">
+							<span class="profile-label">用户 ID</span>
+							<span class="profile-value">{user.id}</span>
+						</div>
+						<div class="profile-field">
+							<span class="profile-label">邮箱</span>
+							<span class="profile-value">{user.email || "未设置"}</span>
+						</div>
+						<div class="profile-field">
+							<span class="profile-label">用户名</span>
+							<span class="profile-value">{user.username}</span>
+						</div>
+					</div>
+				</div>
+				<div class="profile-actions">
+					<a href="/" class="profile-btn profile-btn-default">返回首页</a>
+					<a href="/api/auth/logout" class="profile-btn profile-btn-danger">退出登录</a>
+				</div>
+			</>
+		) : (
+			<div class="profile-guest">
+				<div class="profile-avatar profile-avatar-fallback">?</div>
+				<h1 class="profile-name">未登录</h1>
+				<p class="profile-hint">登录后查看你的个人资料</p>
+				<div class="profile-guest-actions">
+					<a href="/" class="profile-btn profile-btn-default">返回首页</a>
+					<a href="/api/auth/login" class="profile-btn profile-btn-primary">使用 Airliny 登录</a>
+					<a href="/api/auth/google-login" class="profile-btn profile-btn-primary">使用 Google 登录</a>
+					<a href="/api/auth/microsoft-login" class="profile-btn profile-btn-primary">使用 Microsoft 登录</a>
+				</div>
+			</div>
+		)}
+	</div>
+</MainGridLayout>
+
+
+
+<style>
+	:root {
+		--rc1: #00ff87;
+		--rc2: #60efff;
+		--rc3: #0061ff;
+		--rc4: #ea00ff;
+		--rc5: #ff1b6b;
+	}
+
+	@keyframes rainbow-move {
+		0% { background-position: 0% 0%; }
+		100% { background-position: 200% 0%; }
+	}
+
+	.profile-card {
+		width: min(100%, 520px);
+		margin: 2rem auto 0;
+		padding: 1.5rem;
+		border-radius: 1.25rem;
+		background: var(--surface-bg, #f4f4f4);
+		border: 1px solid var(--surface-border, #dddddd);
+	}
+
+	.profile-header {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.profile-avatar {
+		width: 80px;
+		height: 80px;
+		border-radius: 999px;
+		object-fit: cover;
+		background: var(--btn-regular-bg, #f7f7f7);
+		border: 1px solid var(--surface-border, #dddddd);
+		-webkit-user-drag: none;
+		user-drag: none;
+		user-select: none;
+	}
+
+	.profile-avatar-fallback {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 2rem;
+		font-weight: 700;
+		color: var(--text-color, #111111);
+	}
+
+	.profile-titles {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+	}
+
+	.profile-name {
+		margin: 0;
+		font-size: 1.5rem;
+		font-weight: 800;
+		color: var(--text-color, #111111);
+		user-select: none;
+	}
+
+	.profile-username {
+		margin: 0;
+		font-size: 0.9rem;
+		color: color-mix(in oklab, var(--text-color, #111111) 68%, transparent);
+		user-select: none;
+	}
+
+	.profile-role {
+		display: inline-flex;
+		width: fit-content;
+		padding: 0.2rem 0.7rem;
+		border-radius: 999px;
+		font-size: 0.75rem;
+		font-weight: 700;
+		background: var(--btn-regular-bg, #f7f7f7);
+		color: var(--text-color, #111111);
+		border: 1px solid var(--surface-border, #dddddd);
+		user-select: none;
+	}
+
+	.profile-role-cat {
+		background: #dbeafe;
+		color: #1e40af;
+		border-color: #93c5fd;
+		transition: background-color 0.15s ease, transform 0.15s ease;
+	}
+
+	:root.dark .profile-role-cat {
+		background: rgba(59, 130, 246, 0.2);
+		color: #bfdbfe;
+		border-color: rgba(96, 165, 250, 0.5);
+	}
+
+	.profile-role-cat:active {
+		transform: scale(0.95);
+	}
+
+	.profile-role-rainbow {
+		position: relative;
+		background: #dbeafe;
+		color: #1e40af;
+		z-index: 0;
+	}
+
+	.profile-role-rainbow::before {
+		content: '';
+		position: absolute;
+		inset: -2px;
+		z-index: -1;
+		border-radius: inherit;
+		padding: 2px;
+		background: linear-gradient(90deg, var(--rc1), var(--rc5), var(--rc3), var(--rc4), var(--rc2), var(--rc1));
+		background-size: 200% 100%;
+		animation: rainbow-move 4s linear infinite;
+		-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+		-webkit-mask-composite: xor;
+		mask-composite: exclude;
+		pointer-events: none;
+	}
+
+	.profile-role-rainbow::after {
+		content: '';
+		position: absolute;
+		bottom: -35%;
+		left: 5%;
+		width: 90%;
+		height: 35%;
+		z-index: -1;
+		background: linear-gradient(90deg, var(--rc1), var(--rc5), var(--rc3), var(--rc4), var(--rc2), var(--rc1));
+		background-size: 200% 100%;
+		filter: blur(10px);
+		opacity: 0.7;
+		border-radius: 999px;
+		animation: rainbow-move 4s linear infinite;
+		pointer-events: none;
+	}
+
+	:root.dark .profile-role-rainbow {
+		background: rgba(59, 130, 246, 0.2);
+		color: #bfdbfe;
+	}
+
+	.profile-body {
+		margin-top: 1.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.85rem;
+	}
+
+	.profile-field {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0.75rem 1rem;
+		border-radius: 0.85rem;
+		background: var(--card-bg, #f5f5f5);
+		border: 1px solid var(--surface-border, #dddddd);
+	}
+
+	.profile-label {
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: color-mix(in oklab, var(--text-color, #111111) 72%, transparent);
+	}
+
+	.profile-value {
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--text-color, #111111);
+		word-break: break-all;
+	}
+
+	.profile-actions {
+		margin-top: 1.5rem;
+		display: flex;
+		justify-content: flex-end;
+		gap: 0.5rem;
+	}
+
+	.profile-guest-actions {
+		display: flex;
+		gap: 0.5rem;
+		justify-content: center;
+	}
+
+	.profile-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		height: 2.6rem;
+		padding: 0 1.25rem;
+		border-radius: 999px;
+		font-size: 0.9rem;
+		font-weight: 700;
+		text-decoration: none;
+		transition: background-color 0.15s ease, transform 0.15s ease;
+	}
+
+	.profile-btn:hover {
+		transform: translateY(-1px);
+	}
+
+	.profile-btn:active {
+		transform: scale(0.97);
+	}
+
+	.profile-btn-primary {
+		background: var(--text-color, #111111);
+		color: var(--page-bg, #ffffff);
+	}
+
+	.profile-btn-primary:active {
+		background: color-mix(in oklab, var(--text-color, #111111) 88%, transparent);
+	}
+
+	.profile-btn-default {
+		background: var(--btn-regular-bg, #f7f7f7);
+		color: var(--text-color, #111111);
+		border: 1px solid var(--surface-border, #dddddd);
+	}
+
+	.profile-btn-default:active {
+		background: var(--btn-regular-bg-active, #ebebeb);
+	}
+
+	.profile-btn-danger {
+		background: rgba(220, 38, 38, 0.1);
+		color: #dc2626;
+		border: 1px solid rgba(220, 38, 38, 0.25);
+	}
+
+	.profile-btn-danger:active {
+		background: rgba(220, 38, 38, 0.2);
+	}
+
+	.profile-guest {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.75rem;
+		text-align: center;
+	}
+
+	.profile-hint {
+		margin: 0 0 0.5rem;
+		font-size: 0.9rem;
+		color: color-mix(in oklab, var(--text-color, #111111) 68%, transparent);
+	}
+
+	.profile-name-row {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.profile-section {
+		margin-top: 1.5rem;
+	}
+
+	.profile-section-title {
+		margin: 0 0 0.75rem;
+		font-size: 0.95rem;
+		font-weight: 800;
+		color: var(--text-color, #111111);
+	}
+
+	:root.dark .profile-btn-primary {
+		background: var(--text-color, #f5f7fb);
+		color: var(--page-bg, #0f1218);
+	}
+
+	@media (max-width: 640px) {
+		.profile-card {
+			padding: 1.15rem;
+			margin-top: 1rem;
+		}
+
+		.profile-avatar {
+			width: 64px;
+			height: 64px;
+		}
+
+		.profile-name {
+			font-size: 1.25rem;
+		}
+	}
+</style>

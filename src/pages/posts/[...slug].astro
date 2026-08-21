@@ -1,0 +1,680 @@
+﻿---
+import path from "node:path";
+import Twikoo from "@components/comment/Twikoo.astro";
+import DevDeletePostButton from "@components/editor/DevDeletePostButton.svelte";
+import DevEditPostButton from "@components/editor/DevEditPostButton.svelte";
+import LinkOpenConfirmGuard from "@components/misc/LinkOpenConfirmGuard.svelte";
+import Markdown from "@components/misc/Markdown.astro";
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { getSortedPosts } from "@utils/content-utils";
+import { getDir, getPostUrlBySlug, url } from "@utils/url-utils";
+import { Icon } from "astro-icon/components";
+import ImageWrapper from "../../components/misc/ImageWrapper.astro";
+import PostMetadata from "../../components/PostMeta.astro";
+import { profileConfig, siteConfig } from "../../config";
+import { formatDateToYYYYMMDD } from "../../utils/date-utils";
+
+export async function getStaticPaths() {
+	const blogEntries = await getSortedPosts();
+	return blogEntries.map((entry) => ({
+		params: { slug: entry.slug },
+		props: { entry },
+	}));
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await entry.render();
+const backToPostsHref = `${url("/posts/")}?return=1&slug=${encodeURIComponent(entry.slug)}`;
+
+const { remarkPluginFrontmatter } = await entry.render();
+const publishedDate = entry.data.published;
+const lastUpdatedDate = entry.data.updated ?? entry.data.published;
+const publishedText = formatDateToYYYYMMDD(publishedDate);
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
+const ageDays = Math.max(
+	0,
+	Math.floor((Date.now() - lastUpdatedDate.getTime()) / MS_PER_DAY),
+);
+
+type FreshnessTone = "fresh" | "notice" | "warn";
+let freshnessTone: FreshnessTone;
+let freshnessMessage: string;
+
+if (ageDays <= 3) {
+	freshnessTone = "fresh";
+	freshnessMessage = `发布于 ${publishedText}，这篇文章刚出炉，内容还热乎。`;
+} else if (ageDays <= 45) {
+	freshnessTone = "notice";
+	freshnessMessage = `发布于 ${publishedText}，最近更新于 ${ageDays} 天前，整体内容仍然可参考。`;
+} else {
+	freshnessTone = "warn";
+	freshnessMessage = `发布于 ${publishedText}，最近更新于 ${ageDays} 天前，部分信息可能已经发生变化。`;
+}
+
+const jsonLd = {
+	"@context": "https://schema.org",
+	"@type": "BlogPosting",
+	headline: entry.data.title,
+	description: entry.data.description || entry.data.title,
+	keywords: entry.data.tags,
+	author: {
+		"@type": "Person",
+		name: profileConfig.name,
+		url: Astro.site,
+	},
+	datePublished: formatDateToYYYYMMDD(entry.data.published),
+	inLanguage: entry.data.lang
+		? entry.data.lang.replace("_", "-")
+		: siteConfig.lang.replace("_", "-"),
+	// TODO include cover image here
+};
+---
+<MainGridLayout banner={entry.data.image} title={entry.data.title} description={entry.data.description} lang={entry.data.lang} setOGTypeArticle={true} headings={headings} showHero={false} pageType="article">
+	<script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+	<LinkOpenConfirmGuard client:load containerSelector=".markdown-content" />
+
+	<article id="post-container" class="article-flow">
+		<div class="article-back-row onload-animation">
+			<a class="article-back-btn" href={backToPostsHref} data-no-swup>← 返回文章列表</a>
+		</div>
+		<div
+			class:list={["article-freshness-bar onload-animation", `is-${freshnessTone}`]}
+			role="status"
+			aria-live="polite"
+		>
+			<div class="article-freshness-icon">
+				<Icon name="material-symbols:info-rounded"></Icon>
+			</div>
+			<p class="article-freshness-text">{freshnessMessage}</p>
+		</div>
+		<header class="article-header onload-animation">
+			<div class="article-reading-meta transition">
+				<div class="article-reading-item">
+					<div class="article-reading-icon">
+						<Icon name="material-symbols:notes-rounded"></Icon>
+					</div>
+					<div class="text-sm">{remarkPluginFrontmatter.words} {" " + i18n(I18nKey.wordsCount)}</div>
+				</div>
+				<div class="article-reading-item">
+					<div class="article-reading-icon">
+						<Icon name="material-symbols:schedule-outline-rounded"></Icon>
+					</div>
+					<div class="text-sm">
+						{remarkPluginFrontmatter.minutes} {" " + i18n(remarkPluginFrontmatter.minutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}
+					</div>
+				</div>
+			</div>
+
+			<h1
+				data-pagefind-body
+				data-pagefind-weight="10"
+				data-pagefind-meta="title"
+				class="article-title transition"
+			>
+				{entry.data.title}
+			</h1>
+
+			<PostMetadata
+				class="article-meta"
+				published={entry.data.published}
+				updated={entry.data.updated}
+				tags={entry.data.tags}
+				category={entry.data.category}
+			></PostMetadata>
+
+			<div class="article-editor-actions">
+				<DevEditPostButton
+					client:only="svelte"
+					title={entry.data.title}
+					slug={entry.slug}
+					content={entry.body}
+					description={entry.data.description || ""}
+					tags={entry.data.tags || []}
+					category={entry.data.category || ""}
+					image={entry.data.image || ""}
+					draft={Boolean(entry.data.draft)}
+					published={formatDateToYYYYMMDD(entry.data.published)}
+				/>
+				<DevDeletePostButton
+					client:only="svelte"
+					title={entry.data.title}
+					postId={entry.id}
+					afterSuccess="home"
+				/>
+			</div>
+		</header>
+
+		{entry.data.image && (
+			<div class="article-cover onload-animation">
+				<ImageWrapper id="post-cover" src={entry.data.image} basePath={path.join("content/posts/", getDir(entry.id))} class="rounded-2xl banner-container" />
+			</div>
+		)}
+
+		<div class="article-body onload-animation">
+			<Markdown class="markdown-content article-markdown">
+				<Content />
+			</Markdown>
+		</div>
+
+	</article>
+
+	<section class="article-comments card-base p-6 mb-4">
+		<div class="flex items-center mb-4">
+			<div class="w-1 h-5 rounded-md bg-[var(--primary)] mr-3"></div>
+			<h2 class="text-xl font-bold text-black/90 dark:text-white/90">评论区</h2>
+		</div>
+		<Twikoo path={`/posts/${entry.slug}`} />
+	</section>
+
+	<nav class="article-nav-wrap flex flex-col md:flex-row justify-between mb-4 gap-4 overflow-hidden w-full">
+		<a href={entry.data.nextSlug ? getPostUrlBySlug(entry.data.nextSlug) : "#"}
+		   rel={entry.data.nextSlug ? "next" : null}
+		   data-post-nav-link={entry.data.nextSlug ? "true" : null}
+		   class:list={["post-nav-item w-full font-bold overflow-hidden active:scale-95", {"pointer-events-none": !entry.data.nextSlug}]}
+		>
+			{entry.data.nextSlug && <div class="btn-card rounded-2xl w-full h-[3.75rem] max-w-full px-4 flex items-center !justify-start gap-4" >
+				<Icon name="material-symbols:chevron-left-rounded" class="text-[2rem] text-[var(--primary)]" />
+				<div class="overflow-hidden transition overflow-ellipsis whitespace-nowrap max-w-[calc(100%_-_3rem)] text-black/75 dark:text-white/75">
+					{entry.data.nextTitle}
+				</div>
+			</div>}
+		</a>
+
+		<a href={entry.data.prevSlug ? getPostUrlBySlug(entry.data.prevSlug) : "#"}
+		   rel={entry.data.prevSlug ? "prev" : null}
+		   data-post-nav-link={entry.data.prevSlug ? "true" : null}
+		   class:list={["post-nav-item w-full font-bold overflow-hidden active:scale-95", {"pointer-events-none": !entry.data.prevSlug}]}
+		>
+			{entry.data.prevSlug && <div class="btn-card rounded-2xl w-full h-[3.75rem] max-w-full px-4 flex items-center !justify-end gap-4">
+				<div class="overflow-hidden transition overflow-ellipsis whitespace-nowrap max-w-[calc(100%_-_3rem)] text-black/75 dark:text-white/75">
+					{entry.data.prevTitle}
+				</div>
+				<Icon name="material-symbols:chevron-right-rounded" class="text-[2rem] text-[var(--primary)]" />
+			</div>}
+		</a>
+	</nav>
+
+</MainGridLayout>
+
+<style>
+	:root {
+		--article-back-text: rgba(17, 17, 17, 0.86);
+		--article-back-text-hover: rgba(17, 17, 17, 0.92);
+		--article-back-hover-bg: rgba(0, 0, 0, 0.06);
+		--article-back-active-bg: rgba(0, 0, 0, 0.1);
+		--article-reading-text: rgba(17, 17, 17, 0.5);
+		--article-reading-icon: rgba(17, 17, 17, 0.58);
+		--article-reading-icon-bg: rgba(0, 0, 0, 0.04);
+		--article-title-text: rgba(17, 17, 17, 0.95);
+		--article-body-text: rgba(17, 17, 17, 0.86);
+		--article-comment-bg: #ffffff;
+		--article-comment-border: #e8e8e8;
+		--article-tk-text: #111827;
+		--article-tk-muted: #9ca3af;
+		--article-tk-line: #d1d5db;
+		--article-tk-line-soft: #e5e7eb;
+		--article-tk-bg: #ffffff;
+		--article-tk-hover: rgba(17, 24, 39, 0.06);
+		--article-fresh-bg: #e8f8ee;
+		--article-fresh-border: #b7e5c8;
+		--article-fresh-text: #185b34;
+		--article-fresh-icon: #1f7a43;
+		--article-notice-bg: #fff6e7;
+		--article-notice-border: #f6dcad;
+		--article-notice-text: #7a5116;
+		--article-notice-icon: #a96913;
+		--article-warn-bg: #fff0f2;
+		--article-warn-border: #f7c2cb;
+		--article-warn-text: #8f2337;
+		--article-warn-icon: #c13957;
+	}
+
+	:root.dark {
+		--article-back-text: rgba(229, 237, 248, 0.88);
+		--article-back-text-hover: rgba(246, 250, 255, 0.96);
+		--article-back-hover-bg: rgba(148, 163, 184, 0.16);
+		--article-back-active-bg: rgba(148, 163, 184, 0.24);
+		--article-reading-text: rgba(191, 203, 220, 0.74);
+		--article-reading-icon: rgba(216, 226, 242, 0.84);
+		--article-reading-icon-bg: rgba(100, 116, 139, 0.22);
+		--article-title-text: rgba(244, 248, 255, 0.96);
+		--article-body-text: rgba(224, 233, 245, 0.88);
+		--article-comment-bg: #141b26;
+		--article-comment-border: #2d384a;
+		--article-tk-text: #e6edf7;
+		--article-tk-muted: #9ba9bd;
+		--article-tk-line: #3a4a60;
+		--article-tk-line-soft: #2c394d;
+		--article-tk-bg: #101826;
+		--article-tk-hover: rgba(226, 232, 240, 0.08);
+		--article-fresh-bg: rgba(22, 101, 52, 0.2);
+		--article-fresh-border: rgba(74, 222, 128, 0.38);
+		--article-fresh-text: #c8f5d8;
+		--article-fresh-icon: #7be7a7;
+		--article-notice-bg: rgba(120, 53, 15, 0.24);
+		--article-notice-border: rgba(251, 191, 36, 0.4);
+		--article-notice-text: #ffe6b0;
+		--article-notice-icon: #ffd277;
+		--article-warn-bg: rgba(127, 29, 29, 0.24);
+		--article-warn-border: rgba(251, 113, 133, 0.44);
+		--article-warn-text: #ffd4dc;
+		--article-warn-icon: #ff97a9;
+	}
+
+	.article-flow {
+		width: min(100%, 1140px);
+		margin: 0 auto 2rem;
+		padding: 2.35rem 0.75rem 0;
+	}
+
+	.article-back-row {
+		display: flex;
+		justify-content: flex-start;
+		margin-bottom: 1.4rem;
+	}
+
+	.article-freshness-bar {
+		display: flex;
+		align-items: center;
+		gap: 0.65rem;
+		margin-bottom: 1rem;
+		padding: 0.75rem 0.9rem;
+		border-radius: 0.8rem;
+		border: 1px solid;
+		line-height: 1.55;
+	}
+
+	.article-freshness-bar.is-fresh {
+		background: var(--article-fresh-bg);
+		border-color: var(--article-fresh-border);
+		color: var(--article-fresh-text);
+	}
+
+	.article-freshness-bar.is-notice {
+		background: var(--article-notice-bg);
+		border-color: var(--article-notice-border);
+		color: var(--article-notice-text);
+	}
+
+	.article-freshness-bar.is-warn {
+		background: var(--article-warn-bg);
+		border-color: var(--article-warn-border);
+		color: var(--article-warn-text);
+	}
+
+	.article-freshness-icon {
+		flex: 0 0 auto;
+		width: 1.1rem;
+		height: 1.1rem;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.article-freshness-bar.is-fresh .article-freshness-icon {
+		color: var(--article-fresh-icon);
+	}
+
+	.article-freshness-bar.is-notice .article-freshness-icon {
+		color: var(--article-notice-icon);
+	}
+
+	.article-freshness-bar.is-warn .article-freshness-icon {
+		color: var(--article-warn-icon);
+	}
+
+	.article-freshness-text {
+		margin: 0;
+		font-size: 0.97rem;
+		font-weight: 600;
+	}
+
+	.article-back-btn {
+		display: inline-flex;
+		align-items: center;
+		height: 2.35rem;
+		padding: 0 1.05rem;
+		border-radius: 9999px;
+		text-decoration: none;
+		font-size: 1rem;
+		font-weight: 600;
+		color: var(--article-back-text);
+		background: transparent;
+		border: none;
+		transition: background-color 0.2s ease, color 0.2s ease;
+	}
+
+	.article-back-btn:hover {
+		background: var(--article-back-hover-bg);
+		color: var(--article-back-text-hover);
+	}
+
+	.article-back-btn:active {
+		background: var(--article-back-active-bg);
+	}
+
+	.article-header {
+		margin-bottom: 1.5rem;
+		padding-bottom: 1.1rem;
+		border-bottom: 1px dashed var(--line-divider);
+	}
+
+	.article-reading-meta {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 1.1rem;
+		margin-bottom: 0.8rem;
+		color: var(--article-reading-text);
+	}
+
+	.article-reading-item {
+		display: inline-flex;
+		align-items: center;
+	}
+
+	.article-reading-icon {
+		height: 1.5rem;
+		width: 1.5rem;
+		border-radius: 0.5rem;
+		margin-right: 0.5rem;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--article-reading-icon);
+		background: var(--article-reading-icon-bg);
+	}
+
+	.article-title {
+		display: block;
+		width: 100%;
+		margin-bottom: 0.9rem;
+		font-weight: 800;
+		font-size: clamp(2rem, 3vw, 2.95rem);
+		line-height: 1.22;
+		letter-spacing: 0.01em;
+		color: var(--article-title-text);
+	}
+
+	.article-meta {
+		margin-bottom: 0.9rem;
+	}
+
+	.article-editor-actions {
+		display: flex;
+		justify-content: flex-end;
+		gap: 0.5rem;
+		margin-bottom: 0.25rem;
+	}
+
+	.article-cover {
+		width: 100%;
+		margin-bottom: 1.6rem;
+	}
+
+	.article-cover :global(#post-cover) {
+		width: 100%;
+		max-height: 72vh;
+		object-fit: cover;
+		overflow: hidden;
+	}
+
+	.article-body {
+		width: 100%;
+	}
+
+	.article-markdown {
+		max-width: none;
+		font-size: clamp(1.22rem, 1.35vw, 1.38rem) !important;
+		line-height: 1.95;
+		color: var(--article-body-text);
+	}
+
+	.article-markdown :global(p) {
+		font-size: 1.12em !important;
+		max-width: 100ch;
+	}
+
+	.article-markdown :global(li),
+	.article-markdown :global(blockquote),
+	.article-markdown :global(td) {
+		font-size: 1.08em !important;
+	}
+
+	.article-markdown :global(h2),
+	.article-markdown :global(h3),
+	.article-markdown :global(h4) {
+		max-width: 36ch;
+	}
+
+	.article-comments {
+		background: var(--article-comment-bg) !important;
+		border-color: var(--article-comment-border) !important;
+		--tk-text: var(--article-tk-text);
+		--tk-muted: var(--article-tk-muted);
+		--tk-line: var(--article-tk-line);
+		--tk-line-soft: var(--article-tk-line-soft);
+		--tk-card-bg: var(--article-tk-bg);
+		--tk-card-bg-soft: var(--article-tk-bg);
+		--tk-input-bg: var(--article-tk-bg);
+		--tk-input-label-bg: var(--article-tk-bg);
+		--tk-chip-bg: var(--article-tk-bg);
+		--tk-expand-text: var(--article-tk-text);
+		--tk-shadow: none;
+		--tk-shadow-hover: none;
+	}
+
+	.article-comments :global(.twikoo) {
+		color: var(--article-tk-text);
+	}
+
+	.article-comments :global(.twikoo .tk-submit) {
+		border-radius: 18px;
+		background: var(--article-tk-bg);
+		border: none !important;
+		padding: 0;
+	}
+
+	.article-comments :global(.twikoo .tk-submit .tk-avatar) {
+		display: none !important;
+	}
+
+	.article-comments :global(.twikoo .tk-submit .tk-main) {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.article-comments :global(.twikoo .tk-submit .tk-col) {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.article-comments :global(.twikoo .tk-submit .tk-input),
+	.article-comments :global(.twikoo .tk-submit .tk-col > .tk-input) {
+		order: 1;
+		width: 100%;
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	.article-comments :global(.twikoo .tk-submit .tk-meta-input),
+	.article-comments :global(.twikoo .tk-submit .tk-col > .tk-meta-input) {
+		order: 2;
+		margin-top: 12px;
+		margin-bottom: 0 !important;
+	}
+
+	.article-comments :global(.twikoo .tk-submit .tk-row.actions) {
+		margin-left: 0 !important;
+		margin-top: 12px;
+	}
+
+	.article-comments :global(.twikoo .tk-submit-action-icon.__markdown) {
+		display: none !important;
+	}
+
+	.article-comments :global(.twikoo .el-textarea__inner) {
+		min-height: 176px !important;
+		border-radius: 16px !important;
+		background: var(--article-tk-bg) !important;
+		border: 1px solid var(--article-tk-line) !important;
+		color: var(--article-tk-text) !important;
+		box-shadow: none !important;
+		line-height: 1.6 !important;
+		padding-top: 22px !important;
+		padding-bottom: 14px !important;
+	}
+
+	.article-comments :global(.twikoo .el-textarea__inner::placeholder) {
+		color: var(--article-tk-muted) !important;
+	}
+
+	.article-comments :global(.twikoo .el-textarea .el-input__count) {
+		background: transparent !important;
+		color: var(--article-tk-text) !important;
+		font-weight: 700;
+	}
+
+	.article-comments :global(.twikoo .tk-meta-input) {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 16px;
+	}
+
+	.article-comments :global(.twikoo .tk-meta-input .el-input) {
+		width: 100%;
+		margin: 0 !important;
+	}
+
+	.article-comments :global(.twikoo .tk-meta-input .el-input-group) {
+		border: 1px solid var(--article-tk-line);
+		border-radius: 14px;
+		overflow: hidden;
+		background: var(--article-tk-bg);
+	}
+
+	.article-comments :global(.twikoo .tk-meta-input .el-input-group__prepend) {
+		min-width: 84px;
+		background: var(--article-tk-bg) !important;
+		border: none !important;
+		border-right: 1px solid var(--article-tk-line) !important;
+		color: var(--article-tk-text) !important;
+		font-weight: 700;
+		border-radius: 0 !important;
+	}
+
+	.article-comments :global(.twikoo .tk-meta-input .el-input__inner) {
+		background: var(--article-tk-bg) !important;
+		border: none !important;
+		color: var(--article-tk-text) !important;
+		border-radius: 0 !important;
+	}
+
+	.article-comments :global(.twikoo .tk-row.actions .el-button) {
+		border-radius: 12px !important;
+	}
+
+	.article-comments :global(.twikoo .tk-meta-input .el-input__inner::placeholder) {
+		color: var(--article-tk-muted) !important;
+	}
+
+	.article-comments :global(.twikoo .el-input__inner:hover),
+	.article-comments :global(.twikoo .el-textarea__inner:hover),
+	.article-comments :global(.twikoo .el-input__inner:focus),
+	.article-comments :global(.twikoo .el-textarea__inner:focus) {
+		border-color: var(--article-tk-muted) !important;
+	}
+
+	.article-comments :global(.twikoo .tk-expand:hover) {
+		background-color: var(--article-tk-hover);
+	}
+
+	.article-comments :global(.twikoo .tk-content img) {
+		border-radius: 10px;
+	}
+
+	/* OwO emotion panel: sync with light/dark theme tokens */
+	.article-comments :global(.twikoo .OwO),
+	.article-comments :global(.twikoo .OwO .OwO-body),
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-items),
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-bar) {
+		background: var(--article-tk-bg) !important;
+		color: var(--article-tk-text) !important;
+		border-color: var(--article-tk-line) !important;
+	}
+
+	.article-comments :global(.twikoo .OwO) {
+		border: 1px solid var(--article-tk-line) !important;
+		border-radius: 10px !important;
+		overflow: hidden;
+	}
+
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-items .OwO-item),
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-items span),
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-items li) {
+		color: var(--article-tk-text) !important;
+	}
+
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-items .OwO-item:hover),
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-items span:hover),
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-items li:hover) {
+		background: var(--article-tk-hover) !important;
+	}
+
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-bar .OwO-packages li),
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-bar .OwO-packages span) {
+		color: var(--article-tk-muted) !important;
+		background: transparent !important;
+		border-color: var(--article-tk-line-soft) !important;
+	}
+
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-bar .OwO-packages li:hover),
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-bar .OwO-packages span:hover),
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-bar .OwO-packages .OwO-package-active),
+	.article-comments :global(.twikoo .OwO .OwO-body .OwO-bar .OwO-packages .active) {
+		color: var(--article-tk-text) !important;
+		background: var(--article-tk-hover) !important;
+	}
+
+	@media (max-width: 900px) {
+		.article-comments :global(.twikoo .tk-meta-input) {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.article-comments,
+	.article-nav-wrap {
+		width: min(100%, 1140px);
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	@media (max-width: 768px) {
+		.article-flow {
+			padding: 1.45rem 0 0;
+		}
+
+		.article-reading-meta {
+			gap: 0.8rem;
+		}
+
+		.article-title {
+			margin-bottom: 0.75rem;
+			font-size: clamp(1.7rem, 7vw, 2.2rem);
+			line-height: 1.28;
+		}
+
+		.article-markdown {
+			font-size: 1.2rem !important;
+			line-height: 1.85;
+		}
+
+		.article-markdown :global(p) {
+			font-size: 1.08em !important;
+		}
+	}
+</style>

@@ -1,0 +1,9 @@
+﻿---
+import TrashManager from "@components/editor/TrashManager.svelte";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+---
+
+<MainGridLayout title="垃圾桶" description="开发者模式删除文章管理">
+	<TrashManager client:only="svelte" />
+</MainGridLayout>
+

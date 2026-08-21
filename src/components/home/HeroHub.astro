@@ -1,0 +1,1791 @@
+---
+import UserMenu from "@components/auth/UserMenu.svelte";
+import { navBarConfig, profileConfig, siteConfig } from "@/config";
+import { Icon } from "astro-icon/components";
+import ImageWrapper from "@components/misc/ImageWrapper.astro";
+import { pathsEqual, url } from "@utils/url-utils";
+
+const socialLinks = [...profileConfig.links];
+
+const statsExternalLink =
+	navBarConfig.links.find(
+		(item) => typeof item === "object" && item.external === true,
+	) ?? null;
+const statsHref =
+	statsExternalLink && typeof statsExternalLink === "object"
+		? statsExternalLink.url
+		: "#";
+const timetableApiUrl = "/api/timetable";
+
+const functionLinks = [
+	{ name: "博客", icon: "material-symbols:article-outline-rounded", href: url("/posts/?scrollTo=posts"), active: true, scrollToPosts: true },
+	{ name: "论坛", icon: "material-symbols:forum-outline-rounded", href: "#", active: true, badge: "NEW" },
+	{ name: "课程表", icon: "material-symbols:calendar-month-outline-rounded", href: url("/timetable"), noSwup: true },
+	{ name: "画廊", icon: "material-symbols:photo-library-outline-rounded", href: "#" },
+	{ name: "统计", icon: "material-symbols:monitoring-rounded", href: statsHref, external: true },
+];
+
+const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
+---
+
+<section class="hero-hub" data-timetable-api-url={timetableApiUrl}>
+	<div class="hero-control-capsule" data-home-capsule data-mode="light">
+		<button
+			type="button"
+			class="hero-control-btn hero-theme-toggle"
+			aria-label="切换深色与浅色模式"
+			aria-pressed="false"
+			data-theme-toggle
+		>
+			<svg
+				class="hero-theme-icon hero-theme-icon-sun icon"
+				viewBox="0 0 1024 1024"
+				version="1.1"
+				xmlns="http://www.w3.org/2000/svg"
+				width="200"
+				height="200"
+				aria-hidden="true"
+			>
+				<path
+					d="M512 224c159.058 0 288 128.942 288 288S671.058 800 512 800 224 671.058 224 512s128.942-288 288-288z m0 640c17.673 0 32 14.327 32 32v64c0 17.673-14.327 32-32 32-17.673 0-32-14.327-32-32v-64c0-17.673 14.327-32 32-32zM263.098 760.902c12.497 12.496 12.497 32.758 0 45.254l-45.254 45.255c-12.497 12.497-32.758 12.497-45.255 0s-12.497-32.758 0-45.255l45.255-45.254c12.496-12.497 32.758-12.497 45.254 0z m543.058 0l45.255 45.254c12.497 12.497 12.497 32.758 0 45.255s-32.758 12.497-45.255 0l-45.254-45.255c-12.497-12.496-12.497-32.758 0-45.254 12.496-12.497 32.758-12.497 45.254 0zM128 480c17.673 0 32 14.327 32 32 0 17.673-14.327 32-32 32H64c-17.673 0-32-14.327-32-32 0-17.673 14.327-32 32-32h64z m832 0c17.673 0 32 14.327 32 32 0 17.673-14.327 32-32 32h-64c-17.673 0-32-14.327-32-32 0-17.673 14.327-32 32-32h64zM217.844 172.589l45.254 45.255c12.497 12.496 12.497 32.758 0 45.254-12.496 12.497-32.758 12.497-45.254 0l-45.255-45.254c-12.497-12.497-12.497-32.758 0-45.255s32.758-12.497 45.255 0z m633.567 0c12.497 12.497 12.497 32.758 0 45.255l-45.255 45.254c-12.496 12.497-32.758 12.497-45.254 0-12.497-12.496-12.497-32.758 0-45.254l45.254-45.255c12.497-12.497 32.758-12.497 45.255 0zM512 32c17.673 0 32 14.327 32 32v64c0 17.673-14.327 32-32 32-17.673 0-32-14.327-32-32V64c0-17.673 14.327-32 32-32z"
+					fill="#000000"
+				></path>
+			</svg>
+			<svg class="hero-theme-icon hero-theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+				<path d="M14.9 3.32a.9.9 0 0 1 .58 1.08 7.54 7.54 0 0 0 9.37 9.38.9.9 0 0 1 .79 1.58A10.55 10.55 0 1 1 12.34 2.53a.9.9 0 0 1 1.08.8.9.9 0 0 1-.6.99 8.75 8.75 0 1 0 8.86 8.86.9.9 0 0 1 .98-.6.9.9 0 0 1 .81 1.08 10.57 10.57 0 1 1-8.57-10.34Z" />
+			</svg>
+		</button>
+		<div class="hero-control-divider" aria-hidden="true"></div>
+		<button
+			type="button"
+			class="hero-control-btn hero-menu-toggle"
+			aria-label="打开开发者模式解锁菜单"
+			aria-expanded="false"
+			data-menu-toggle
+		>
+			<svg class="hero-menu-icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+				<path d="M62 505.96630859c0-0.63544922 0.63544922-1.90546875 0.63544922-2.54003906 3.17548828-16.51464844 11.43193359-29.21748047 26.04023437-37.47392578 6.35185547-3.8109375 13.33828125-5.08183594 20.32470703-5.71640625H906.74316406c17.78378906 0 31.12207031 7.621875 41.28486328 21.59472656 7.62099609 10.79736328 10.79736328 22.23017578 9.52734375 35.56845703-2.54091797 20.32382813-16.51464844 38.10849609-37.47392578 43.18945313-5.71640625 1.27001953-11.4328125 1.90546875-17.78378906 1.90546875H113.44677734c-20.96015625 0-34.93300781-10.16279297-45.09492187-27.31113281-3.17636719-5.08095703-4.44638672-10.79736328-5.71640625-16.51464844 0-0.63457031-0.63544922-1.90458984-0.63544922-2.54003906v-10.16191407zM62 242.38144531c0-0.63544922 0.63544922-1.90546875 0.63544922-2.54091797 3.17548828-16.51376953 11.43193359-29.21660156 26.04023437-37.47392578 6.35185547-3.81005859 13.33828125-5.08007813 20.32470703-5.71552734H906.74316406c17.78378906 0 31.12207031 7.62099609 41.28486328 21.59472656 7.62099609 10.79736328 10.79736328 22.23017578 9.52734375 35.56757813-2.54091797 20.32470703-16.51464844 38.109375-37.47392578 43.18945312-5.71640625 1.27089844-11.4328125 1.90634766-17.78378906 1.90634766H113.44677734c-20.96015625 0-34.93300781-10.16279297-45.09492187-27.31113281-3.17636719-5.08183594-4.44638672-10.79736328-5.71640625-16.51464844 0-1.27001953-0.63544922-2.54003906-0.63544922-3.17548828v-9.52734375zM107.09492188 820.3625c-1.27001953 0-1.90546875-0.63457031-3.17548829-0.63457031-14.60742188-3.17636719-24.77021484-11.4328125-32.39208984-24.13564453-5.71640625-9.52734375-8.25732422-19.68925781-7.621875-30.4875 1.90546875-21.59472656 17.14921875-40.64941406 39.37851562-45.72949219 4.44726563-1.27089844 9.52734375-1.27089844 14.60917969-1.27089844h790.75458985c17.14921875 0 30.48662109 7.621875 40.64941406 20.96015625 6.35097656 8.89189453 10.16191406 19.68925781 10.16191406 30.48662109 0 12.70283203-4.44550781 24.13476563-12.70283203 33.66210938-8.25644531 9.52734375-19.0546875 15.24375-31.75664063 16.51464844-0.63544922 0-1.27089844 0-1.90546875 0.63457031H107.09492188zM962 228.40771484c-0.63544922-1.90546875-0.63544922-4.44550781-1.27001953-6.35097656l1.27001953 6.35097656z" />
+			</svg>
+		</button>
+		<div class="hero-control-menu" data-control-menu hidden>
+			<div class="hero-dev-header">
+				<span class="hero-dev-dot" aria-hidden="true"></span>
+				<p class="hero-control-menu-title">开发者模式</p>
+			</div>
+			<input
+				type="password"
+				class="hero-decrypt-input"
+				placeholder="输入开发口令，按回车解锁"
+				data-decrypt-input
+				autocomplete="off"
+				spellcheck="false"
+			/>
+			<div class="hero-decrypt-output" data-decrypt-output>等待输入</div>
+		</div>
+		<div class="hero-control-divider" aria-hidden="true"></div>
+		<div class="hero-control-user-menu">
+			<UserMenu client:only="svelte" />
+		</div>
+	</div>
+
+	{isHomePage ? (
+		<div class="hero-avatar" aria-label={profileConfig.name} draggable="false">
+			<ImageWrapper src={profileConfig.avatar || ""} alt={profileConfig.name} />
+		</div>
+	) : (
+		<a class="hero-avatar hero-avatar-link" href={url("/")} aria-label="返回主页" draggable="false">
+			<ImageWrapper src={profileConfig.avatar || ""} alt={profileConfig.name} />
+		</a>
+	)}
+	<h1 class="hero-name">{profileConfig.name}</h1>
+	<p class="hero-subtitle">{siteConfig.subtitle || "Protect What You Love."}</p>
+	<p class="hero-stats">
+		全站浏览量:
+		<span id="hero-busuanzi-site-pv">--</span>
+		次浏览
+	</p>
+
+		<a href={url("/timetable")} class="hero-class-card hero-class-card-link" aria-label="打开课程表" draggable="false" data-no-swup>
+			<div class="hero-class-toprow">
+				<p id="hero-class-title" class="hero-class-title">今日课程</p>
+				<span id="hero-class-weekline" class="hero-class-weekline">第--周 · --</span>
+			</div>
+		<div class="hero-class-headline-row">
+			<span id="hero-class-status" class="hero-class-status" data-state="idle">暂无课程</span>
+		</div>
+		<div id="hero-class-main" class="hero-class-main" data-has-course="false">
+			<span id="hero-class-color" class="hero-class-color" aria-hidden="true"></span>
+			<span class="hero-class-copy">
+				<strong id="hero-class-course" class="hero-class-course">未设置课程</strong>
+				<small id="hero-class-detail" class="hero-class-detail"></small>
+			</span>
+		</div>
+		<div class="hero-class-meta-row">
+			<p id="hero-class-countdown-row" class="hero-class-countdown">
+				<span id="hero-class-countdown-label">距上课还有:</span>
+				<span id="hero-class-countdown-value">--</span>
+			</p>
+		</div>
+	</a>
+
+	<div class="hero-social-row">
+		{socialLinks.map((item) => (
+			<a href={item.url} target={item.url.startsWith("http") ? "_blank" : null} rel="noopener noreferrer" class="hero-pill" aria-label={item.name} draggable="false">
+				<Icon name={item.icon} class="hero-pill-icon" />
+				<span>{item.name}</span>
+			</a>
+		))}
+	</div>
+
+	<div class="hero-divider"></div>
+
+	<div class="hero-menu-grid">
+		{functionLinks.map((item) => (
+			<a
+				href={item.href}
+				target={item.external ? "_blank" : null}
+				rel={item.external ? "noopener noreferrer" : null}
+				class:list={["hero-chip", { "hero-chip-active": item.active }]}
+				data-scroll-to-posts={item.scrollToPosts ? "true" : null}
+				data-no-swup={item.noSwup ? "" : null}
+				draggable="false"
+			>
+				<Icon name={item.icon} class="hero-chip-icon" />
+				<span>{item.name}</span>
+				{item.badge && <span class="hero-chip-badge">{item.badge}</span>}
+			</a>
+		))}
+	</div>
+</section>
+
+<script is:inline>
+		(() => {
+		const pvTarget = document.getElementById("hero-busuanzi-site-pv");
+		const classTitleTarget = document.getElementById("hero-class-title");
+		const statusTarget = document.getElementById("hero-class-status");
+		const weekLineTarget = document.getElementById("hero-class-weekline");
+		const classMainTarget = document.getElementById("hero-class-main");
+		const classCourseTarget = document.getElementById("hero-class-course");
+		const classDetailTarget = document.getElementById("hero-class-detail");
+		const countdownRowTarget = document.getElementById("hero-class-countdown-row");
+		const countdownLabelTarget = document.getElementById("hero-class-countdown-label");
+		const countdownTarget = document.getElementById("hero-class-countdown-value");
+		const tempId = "hero-busuanzi-temp";
+		const scriptId = "hero-busuanzi-script";
+		const src = "https://cdn.busuanzi.cc/busuanzi/3.6.9/busuanzi.min.js";
+		const heroRoot = document.querySelector(".hero-hub");
+		const TIMETABLE_API_URL = heroRoot?.getAttribute("data-timetable-api-url") || "/api/timetable";
+		const TIMETABLE_REFRESH_MS = 30_000;
+		const TIMETABLE_RETRY_MS = 120_000;
+		let cachedTimetable = null;
+		let timetableLastAttemptAt = 0;
+		let timetableFetchPromise = null;
+		const dayByIndex = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+		const dayLabelMap = {
+			sun: "周日",
+			mon: "周一",
+			tue: "周二",
+			wed: "周三",
+			thu: "周四",
+			fri: "周五",
+			sat: "周六",
+		};
+
+		const syncPv = () => {
+			const rawNode = document.getElementById("busuanzi_value_site_pv") || document.getElementById("busuanzi_site_pv");
+			if (!pvTarget || !rawNode) return;
+			const value = rawNode.textContent?.trim();
+			if (value) pvTarget.textContent = value;
+		};
+
+		const ensureTempNode = () => {
+			if (document.getElementById(tempId)) return;
+			const holder = document.createElement("span");
+			holder.id = tempId;
+			holder.style.display = "none";
+			holder.innerHTML = '<span id="busuanzi_site_pv">--</span>';
+			document.body.appendChild(holder);
+		};
+
+		const loadBusuanzi = () => {
+			ensureTempNode();
+			const old = document.getElementById(scriptId);
+			if (old) old.remove();
+			const script = document.createElement("script");
+			script.id = scriptId;
+			script.src = src;
+			script.defer = true;
+			script.onload = () => window.setTimeout(syncPv, 120);
+			document.head.appendChild(script);
+		};
+
+		const format = (v) => String(v).padStart(2, "0");
+		const formatDuration = (seconds) => {
+			const safe = Math.max(0, Math.floor(seconds));
+			const hour = Math.floor(safe / 3600);
+			const minute = Math.floor((safe % 3600) / 60);
+			const second = safe % 60;
+			if (hour >= 24) {
+				const day = Math.floor(hour / 24);
+				const restHour = hour % 24;
+				return `${day}天 ${restHour}时 ${format(minute)}分 ${format(second)}秒`;
+			}
+			if (hour >= 1) {
+				return `${hour}时 ${format(minute)}分 ${format(second)}秒`;
+			}
+			return `${minute}分 ${format(second)}秒`;
+		};
+		const formatMinute = (minute) => {
+			const normalized = ((minute % (24 * 60)) + 24 * 60) % (24 * 60);
+			const h = Math.floor(normalized / 60);
+			const m = normalized % 60;
+			return `${format(h)}:${format(m)}`;
+		};
+		const parseWeekInRange = (weeksText, week) => {
+			const source = typeof weeksText === "string" ? weeksText.trim() : "";
+			if (!source) return true;
+			const normalized = source.replace(/\s+/g, "");
+			const oddOnly = /单/.test(normalized);
+			const evenOnly = /双/.test(normalized);
+			let matched = false;
+			const rangePattern = /(\d{1,2})(?:[-~](\d{1,2}))?/g;
+			let match = rangePattern.exec(normalized);
+			while (match) {
+				const start = Number(match[1]);
+				const end = Number(match[2] || match[1]);
+				if (week >= start && week <= end) {
+					matched = true;
+					break;
+				}
+				match = rangePattern.exec(normalized);
+			}
+			if (!matched && /周/.test(normalized)) return false;
+			if (oddOnly && week % 2 === 0) return false;
+			if (evenOnly && week % 2 === 1) return false;
+			return matched || !/\d/.test(normalized);
+		};
+		const groupedSlotWindowMap = {
+			"1-2": [8 * 60 + 30, 10 * 60],
+			"3-4": [10 * 60 + 20, 11 * 60 + 50],
+			"5-6": [13 * 60, 14 * 60 + 25],
+			"6-8": [14 * 60 + 45, 16 * 60 + 10],
+			"9-10": [18 * 60 + 30, 20 * 60],
+		};
+		const groupedIndexWindowMap = [
+			[8 * 60 + 30, 10 * 60],
+			[10 * 60 + 20, 11 * 60 + 50],
+			[13 * 60, 14 * 60 + 25],
+			[14 * 60 + 45, 16 * 60 + 10],
+			[18 * 60 + 30, 20 * 60],
+		];
+		const normalizePeriodLabelKey = (label) => {
+			const source = (label || "").toString().replace(/\s+/g, "");
+			const range = source.match(/(\d{1,2})[-~—–](\d{1,2})/);
+			if (range?.[1] && range?.[2]) return `${range[1]}-${range[2]}`;
+			const single = source.match(/(?:第)?(\d{1,2})节?/);
+			if (single?.[1]) return single[1];
+			return source;
+		};
+		const slotStartMap = {
+			1: 8 * 60 + 30,
+			2: 9 * 60 + 15,
+			3: 10 * 60 + 20,
+			4: 11 * 60 + 5,
+			5: 13 * 60,
+			6: 13 * 60 + 45,
+			7: 14 * 60 + 45,
+			8: 15 * 60 + 30,
+			9: 18 * 60 + 30,
+			10: 19 * 60 + 15,
+		};
+		const slotEndMap = {
+			1: 9 * 60 + 15,
+			2: 10 * 60,
+			3: 11 * 60 + 5,
+			4: 11 * 60 + 50,
+			5: 13 * 60 + 45,
+			6: 14 * 60 + 25,
+			7: 15 * 60 + 30,
+			8: 16 * 60 + 10,
+			9: 19 * 60 + 15,
+			10: 20 * 60,
+		};
+		const parsePeriodWindow = (period, index, totalPeriods) => {
+			const source = (period?.time || "").toString();
+			const fullRange = source.match(/(\d{1,2})[:：](\d{2})\s*[-~—–到至]+\s*(\d{1,2})[:：](\d{2})/);
+			if (fullRange?.[1] && fullRange?.[2] && fullRange?.[3] && fullRange?.[4]) {
+				const start = Number(fullRange[1]) * 60 + Number(fullRange[2]);
+				const end = Number(fullRange[3]) * 60 + Number(fullRange[4]);
+				return [start, Math.max(end, start + 1)];
+			}
+			const timeMatches = Array.from(source.matchAll(/(\d{1,2})[:：](\d{2})/g));
+			if (timeMatches.length >= 2) {
+				const start = Number(timeMatches[0][1]) * 60 + Number(timeMatches[0][2]);
+				const end = Number(timeMatches[1][1]) * 60 + Number(timeMatches[1][2]);
+				return [start, Math.max(end, start + 1)];
+			}
+			if (timeMatches.length === 1) {
+				const start = Number(timeMatches[0][1]) * 60 + Number(timeMatches[0][2]);
+				return [start, start + 90];
+			}
+			const normalizedLabel = normalizePeriodLabelKey(period?.label || "");
+			if (Object.prototype.hasOwnProperty.call(groupedSlotWindowMap, normalizedLabel)) {
+				return groupedSlotWindowMap[normalizedLabel];
+			}
+			if (period?.id && /^p_group_(\d+)$/.test(String(period.id))) {
+				const groupIndex = Number(String(period.id).replace("p_group_", "")) - 1;
+				if (groupedIndexWindowMap[groupIndex]) return groupedIndexWindowMap[groupIndex];
+			}
+			const slotMatch = normalizedLabel.match(/^(\d{1,2})(?:[-~](\d{1,2}))?$/);
+			if (slotMatch?.[1]) {
+				const startSlot = Number(slotMatch[1]);
+				const endSlot = Number(slotMatch[2] || slotMatch[1]);
+				const start = slotStartMap[startSlot] ?? 8 * 60 + index * 120;
+				const end = slotEndMap[endSlot] ?? start + 90;
+				return [start, Math.max(end, start + 1)];
+			}
+			if (totalPeriods === 5 && groupedIndexWindowMap[index]) {
+				return groupedIndexWindowMap[index];
+			}
+			if (totalPeriods === 10) {
+				const slot = index + 1;
+				const start = slotStartMap[slot] ?? 8 * 60 + index * 120;
+				const end = slotEndMap[slot] ?? start + 90;
+				return [start, Math.max(end, start + 1)];
+			}
+			const fallbackStart = 8 * 60 + index * 120;
+			return [fallbackStart, fallbackStart + 90];
+		};
+		const detectCurrentWeekByDate = (termStartDate, totalWeeks) => {
+			if (!termStartDate) return null;
+			const start = new Date(`${termStartDate}T00:00:00`);
+			if (Number.isNaN(start.getTime())) return null;
+			const now = new Date();
+			const dayDiff = Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+			const week = Math.floor(dayDiff / 7) + 1;
+			return Math.max(1, Math.min(totalWeeks, week));
+		};
+		const normalizeWeeklySheet = (sheet) => {
+			if (!sheet || typeof sheet !== "object") return null;
+			const periods = Array.isArray(sheet?.periods) ? sheet.periods : [];
+			const courses = sheet?.courses && typeof sheet.courses === "object" ? sheet.courses : {};
+			if (!periods.length) return null;
+			return { periods, courses };
+		};
+		const resolveWeeklySnapshot = (parsed, currentWeek) => {
+			if (parsed?.weeklyMode !== true) return null;
+			const weeklySheets = parsed?.weeklySheets;
+			if (!weeklySheets || typeof weeklySheets !== "object") return null;
+			const active = normalizeWeeklySheet(weeklySheets?.[String(currentWeek)]);
+			if (active) return active;
+			const firstKey = Object.keys(weeklySheets).sort((a, b) => Number(a) - Number(b))[0];
+			if (!firstKey) return null;
+			return normalizeWeeklySheet(weeklySheets[firstKey]);
+		};
+		const normalizeCurrentWeek = (parsed, totalWeeks) => {
+			const byStored = Math.max(1, Math.min(totalWeeks, Number(parsed?.currentWeek || 1)));
+			const byDate = detectCurrentWeekByDate(parsed?.termStartDate || "", totalWeeks);
+			return byDate || byStored;
+		};
+		const normalizeTimetableFromState = (parsed) => {
+			if (!parsed || typeof parsed !== "object") return null;
+			const totalWeeks = Math.max(1, Number(parsed?.totalWeeks || 18));
+			const currentWeek = normalizeCurrentWeek(parsed, totalWeeks);
+			const weeklySnapshot = resolveWeeklySnapshot(parsed, currentWeek);
+			if (weeklySnapshot) {
+				return {
+					periods: weeklySnapshot.periods,
+					courses: weeklySnapshot.courses,
+					totalWeeks,
+					currentWeek,
+				};
+			}
+			const periods = Array.isArray(parsed?.periods) ? parsed.periods : [];
+			const courses = parsed?.courses && typeof parsed.courses === "object" ? parsed.courses : {};
+			return { periods, courses, totalWeeks, currentWeek };
+		};
+		const refreshTimetable = (force = false) => {
+			const now = Date.now();
+			const hasData = Boolean(cachedTimetable);
+			const waitMs = hasData ? TIMETABLE_REFRESH_MS : TIMETABLE_RETRY_MS;
+			const expired = now - timetableLastAttemptAt > waitMs;
+			if (!force && !expired) return Promise.resolve(cachedTimetable);
+			if (timetableFetchPromise) return timetableFetchPromise;
+			timetableLastAttemptAt = now;
+			timetableFetchPromise = fetch(TIMETABLE_API_URL, {
+				method: "GET",
+				cache: "no-store",
+			})
+				.then(async (response) => {
+					const payload = await response.json().catch(() => ({}));
+					if (!response.ok) {
+						throw new Error(
+							typeof payload?.message === "string" ? payload.message : "读取课程表失败",
+						);
+					}
+					cachedTimetable = normalizeTimetableFromState(payload?.state);
+					return cachedTimetable;
+				})
+				.catch(() => cachedTimetable)
+				.finally(() => {
+					timetableFetchPromise = null;
+				});
+			return timetableFetchPromise;
+		};
+		const pickCourseFromCell = (rawCell, currentWeek) => {
+			const list = Array.isArray(rawCell) ? rawCell : rawCell ? [rawCell] : [];
+			if (!list.length) return null;
+			return (
+				list.find((item) => item?.course && parseWeekInRange(item?.weeks || "", currentWeek)) ||
+				list.find((item) => item?.course) ||
+				null
+			);
+		};
+		const buildDayEntries = (table, dayKey) => {
+			const entries = [];
+			for (let i = 0; i < table.periods.length; i += 1) {
+				const period = table.periods[i];
+				const course = pickCourseFromCell(table.courses?.[`${period.id}__${dayKey}`], table.currentWeek);
+				if (!course) continue;
+					const [startMinutes, endMinutes] = parsePeriodWindow(period, i, table.periods.length);
+				entries.push({
+					periodLabel: (period?.label || `第${i + 1}节`).toString(),
+					timeText:
+						(period?.time || "").toString().trim() ||
+						`${formatMinute(startMinutes)} - ${formatMinute(endMinutes)}`,
+					course,
+					startMinutes,
+					endMinutes,
+				});
+			}
+			entries.sort((a, b) => a.startMinutes - b.startMinutes);
+			return entries;
+		};
+		const findNextEntry = (table, now, nowMinute) => {
+			const todayIndex = now.getDay();
+			for (let offset = 0; offset < 14; offset += 1) {
+				const dayIndex = (todayIndex + offset) % 7;
+				const dayKey = dayByIndex[dayIndex];
+				const dayEntries = buildDayEntries(table, dayKey);
+				if (!dayEntries.length) continue;
+				const minThreshold = offset === 0 ? nowMinute : -1;
+				const entry = dayEntries.find((item) => item.startMinutes >= minThreshold);
+				if (!entry) continue;
+				const nextAt = new Date(now);
+				nextAt.setDate(now.getDate() + offset);
+				nextAt.setHours(Math.floor(entry.startMinutes / 60), entry.startMinutes % 60, 0, 0);
+				return { offset, dayKey, entry, nextAt };
+			}
+			return null;
+		};
+		const toggleVisible = (el, visible) => {
+			if (!el) return;
+			el.classList.toggle("is-hidden", !visible);
+		};
+		const normalizeCourseColor = (course) => {
+			const raw = typeof course?.color === "string" ? course.color.trim() : "";
+			if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(raw)) return raw;
+			return "#ff9500";
+		};
+		const renderClassCourse = (entry, fallbackText) => {
+			if (!classMainTarget || !classCourseTarget || !classDetailTarget) return;
+			const fallback = String(fallbackText || "点击设置课程表").trim();
+			if (!entry?.course?.course) {
+				classMainTarget.dataset.hasCourse = "false";
+				classMainTarget.style.removeProperty("--course-color");
+				classCourseTarget.textContent = fallback;
+				classDetailTarget.textContent = "";
+				return;
+			}
+			const course = entry.course;
+			const location = course.location?.trim();
+			const detail = [entry.periodLabel, entry.timeText, location].filter(Boolean).join(" · ");
+			classMainTarget.dataset.hasCourse = "true";
+			classMainTarget.style.setProperty("--course-color", normalizeCourseColor(course));
+			classCourseTarget.textContent = course.course;
+			classDetailTarget.textContent = detail;
+		};
+		const applyStateBadge = (state, text) => {
+			if (!statusTarget) return;
+			statusTarget.dataset.state = state;
+			statusTarget.textContent = text;
+		};
+		const updateCourseCard = () => {
+			if (!countdownTarget || !classCourseTarget) return;
+			if (classTitleTarget) classTitleTarget.textContent = "今日课程";
+			const table = cachedTimetable;
+			const now = new Date();
+			const nowMinute = now.getHours() * 60 + now.getMinutes();
+			const todayKey = dayByIndex[now.getDay()];
+			if (weekLineTarget) {
+				weekLineTarget.textContent = table
+					? `第${table.currentWeek}周 · ${dayLabelMap[todayKey] || "--"}`
+					: "第--周 · --";
+			}
+			if (!table || table.periods.length === 0) {
+				applyStateBadge("idle", "未设置");
+				renderClassCourse(null, "点击设置课程表");
+				if (countdownLabelTarget) countdownLabelTarget.textContent = "距上课还有:";
+				countdownTarget.textContent = "--";
+				toggleVisible(countdownRowTarget, false);
+				return;
+			}
+
+			const todayEntries = buildDayEntries(table, todayKey);
+			const currentEntry = todayEntries.find(
+				(item) => nowMinute >= item.startMinutes && nowMinute < item.endMinutes,
+			);
+			const nextTodayEntry = todayEntries.find((item) => item.startMinutes > nowMinute) || null;
+			const doneTodayEntries = todayEntries.filter((item) => item.endMinutes <= nowMinute);
+			const isTodayFinished =
+				todayEntries.length > 0 && todayEntries.every((item) => item.endMinutes <= nowMinute);
+			let statusState = "idle";
+			let highlightText = "点击设置课程表";
+			let highlightEntry = null;
+			let countdownLabel = "距上课还有:";
+			let countdownValue = "--";
+			let showCountdown = true;
+
+			if (currentEntry) {
+				statusState = "active";
+				countdownLabel = "距下课还有:";
+				highlightEntry = currentEntry;
+				highlightText = currentEntry.course.location?.trim()
+					? `${currentEntry.course.course} - ${currentEntry.course.location.trim()}`
+					: currentEntry.course.course;
+				const endAt = new Date(now);
+				endAt.setHours(Math.floor(currentEntry.endMinutes / 60), currentEntry.endMinutes % 60, 0, 0);
+				countdownValue = formatDuration((endAt.getTime() - Date.now()) / 1000);
+			} else if (nextTodayEntry) {
+				statusState = doneTodayEntries.length > 0 ? "break" : "pending";
+				countdownLabel = "距上课还有:";
+				highlightEntry = nextTodayEntry;
+				highlightText = nextTodayEntry.course.location?.trim()
+					? `${nextTodayEntry.course.course} - ${nextTodayEntry.course.location.trim()}`
+					: nextTodayEntry.course.course;
+				const nextAt = new Date(now);
+				nextAt.setHours(Math.floor(nextTodayEntry.startMinutes / 60), nextTodayEntry.startMinutes % 60, 0, 0);
+				countdownValue = formatDuration((nextAt.getTime() - Date.now()) / 1000);
+			} else {
+				const nextAny = findNextEntry(table, now, nowMinute);
+				if (nextAny) {
+					const crossWeek = now.getDay() + nextAny.offset >= 7;
+					if (crossWeek) {
+						statusState = "nextweek";
+					} else if (nextAny.offset === 1) {
+						statusState = "tomorrow";
+					} else {
+						statusState = "upcoming";
+					}
+					highlightText = nextAny.entry.course.location?.trim()
+						? `${nextAny.entry.course.course} - ${nextAny.entry.course.location.trim()}`
+						: nextAny.entry.course.course;
+					highlightEntry = nextAny.entry;
+					countdownLabel = "距上课还有:";
+					countdownValue = formatDuration((nextAny.nextAt.getTime() - Date.now()) / 1000);
+				} else {
+					statusState = "idle";
+					highlightText = "本周暂无可识别课程";
+					highlightEntry = null;
+					countdownLabel = "距上课还有:";
+					countdownValue = "";
+					showCountdown = false;
+				}
+			}
+
+			const stateTextMap = {
+				active: "上课中",
+				break: "课间休息",
+				pending: "待上课",
+				tomorrow: "翌日课程",
+				nextweek: "下周课程",
+				upcoming: "近期课程",
+				idle: "暂无课程",
+			};
+			applyStateBadge(statusState, stateTextMap[statusState] || "课程状态");
+			if (classTitleTarget) {
+				classTitleTarget.textContent = isTodayFinished
+					? "今日课毕"
+					: statusState === "nextweek"
+						? "本周课毕"
+						: "今日课程";
+			}
+			renderClassCourse(highlightEntry, highlightText);
+			if (countdownLabelTarget) countdownLabelTarget.textContent = countdownLabel;
+			countdownTarget.textContent = countdownValue;
+			toggleVisible(countdownRowTarget, showCountdown);
+		};
+
+		loadBusuanzi();
+		window.setTimeout(syncPv, 400);
+		const host = window;
+		if (host.__heroPvInterval) {
+			window.clearInterval(host.__heroPvInterval);
+		}
+		host.__heroPvInterval = window.setInterval(syncPv, 3000);
+
+		void refreshTimetable(true).finally(() => {
+			updateCourseCard();
+		});
+		if (host.__heroCourseInterval) {
+			window.clearInterval(host.__heroCourseInterval);
+		}
+		host.__heroCourseInterval = window.setInterval(() => {
+			updateCourseCard();
+			void refreshTimetable();
+		}, 1000);
+		window.addEventListener("focus", () => {
+			void refreshTimetable(true).finally(() => {
+				updateCourseCard();
+			});
+		});
+		window.addEventListener("timetable-updated", () => {
+			void refreshTimetable(true).finally(() => {
+				updateCourseCard();
+			});
+		});
+
+		const dragBlockSelector = ".hero-avatar, .hero-pill, .hero-chip, .simple-post-title, .simple-post-enter";
+		const blogChip = document.querySelector('a.hero-chip[data-scroll-to-posts="true"]');
+
+		const resolvePostsAnchor = () => {
+			const firstPostItem = document.querySelector("#content-wrapper [data-post-item]");
+			if (firstPostItem instanceof HTMLElement) {
+				return firstPostItem;
+			}
+			const firstCard = document.querySelector("#content-wrapper .card-base");
+			if (firstCard instanceof HTMLElement) {
+				return firstCard;
+			}
+			return (
+				document.getElementById("content-wrapper") ||
+				document.getElementById("swup-container")
+			);
+		};
+		const getPostsTop = () => {
+			const postSection = resolvePostsAnchor();
+			if (!(postSection instanceof HTMLElement)) return 0;
+			return Math.max(
+				0,
+				window.scrollY + postSection.getBoundingClientRect().top - 8,
+			);
+		};
+		const smoothScrollToPosts = () => {
+			window.scrollTo({
+				top: getPostsTop(),
+				behavior: "smooth",
+			});
+		};
+		const scheduleAutoScrollToPosts = () => {
+			window.setTimeout(() => {
+				smoothScrollToPosts();
+			}, 360);
+			// Some navigation hooks may reset scroll after first paint; correct once more.
+			window.setTimeout(() => {
+				const targetTop = getPostsTop();
+				if (Math.abs(window.scrollY - targetTop) > 24) {
+					smoothScrollToPosts();
+				}
+			}, 920);
+		};
+
+		if (blogChip instanceof HTMLAnchorElement) {
+			blogChip.addEventListener("click", (event) => {
+				const targetUrl = new URL(blogChip.href, window.location.origin);
+				const normalizePath = (path) => path.replace(/^\/|\/$/g, "");
+				const samePath =
+					normalizePath(targetUrl.pathname) ===
+					normalizePath(window.location.pathname);
+				if (!samePath) return;
+				event.preventDefault();
+				event.stopImmediatePropagation?.();
+				event.stopPropagation();
+				smoothScrollToPosts();
+			}, { capture: true });
+		}
+
+		const currentUrl = new URL(window.location.href);
+		const hasScrollToPosts = currentUrl.searchParams.get("scrollTo") === "posts";
+		const isReturnVisit = currentUrl.searchParams.get("return") === "1";
+		if (hasScrollToPosts && !isReturnVisit) {
+			scheduleAutoScrollToPosts();
+		}
+		if (currentUrl.searchParams.has("scrollTo")) {
+			currentUrl.searchParams.delete("scrollTo");
+			const nextSearch = currentUrl.searchParams.toString();
+			const nextUrl = `${currentUrl.pathname}${nextSearch ? `?${nextSearch}` : ""}${currentUrl.hash}`;
+			window.history.replaceState(window.history.state, "", nextUrl);
+		}
+
+		document.addEventListener(
+			"dragstart",
+			(event) => {
+				const target = event.target;
+				if (!(target instanceof Element)) return;
+				if (target.closest(dragBlockSelector)) {
+					event.preventDefault();
+				}
+			},
+			true,
+		);
+	})();
+</script>
+
+<script is:inline>
+	(() => {
+		const LIGHT_MODE = "light";
+		const DARK_MODE = "dark";
+		const root = document.documentElement;
+		const host = window;
+		const CAPSULE_SELECTOR = "[data-home-capsule]";
+		const DEV_EDITOR_ENABLED_KEY = "devEditorEnabled";
+		const DEV_EDITOR_CREDENTIAL_STORAGE_KEY = "devEditorCredential";
+		const DEV_EDITOR_LEGACY_CODE_STORAGE_KEY = "devEditorCode";
+		const DEV_EDITOR_AUTO_LOCK_AT_KEY = "devEditorAutoLockAt";
+		const DEV_EDITOR_SESSION_KEY = "devEditorSessionActive";
+		const DEV_EDITOR_SESSION_GRACE_UNTIL_KEY = "devEditorSessionGraceUntil";
+		const DEV_EDITOR_SESSION_RECOVERY_GRACE_MS = 30 * 1000;
+
+		const hashDevCodeClient = async (code) => {
+			if (typeof crypto === "undefined" || typeof crypto.subtle === "undefined") {
+				throw new Error("当前环境不支持口令加密");
+			}
+			const input = new TextEncoder().encode(code);
+			const digest = await crypto.subtle.digest("SHA-256", input);
+			return Array.from(new Uint8Array(digest), (byte) =>
+				byte.toString(16).padStart(2, "0"),
+			).join("");
+		};
+
+		const enableDeveloperMode = (devCodeHash) => {
+			localStorage.setItem(DEV_EDITOR_CREDENTIAL_STORAGE_KEY, devCodeHash);
+			localStorage.removeItem(DEV_EDITOR_LEGACY_CODE_STORAGE_KEY);
+			localStorage.setItem(DEV_EDITOR_ENABLED_KEY, "true");
+			localStorage.removeItem(DEV_EDITOR_AUTO_LOCK_AT_KEY);
+			localStorage.setItem(
+				DEV_EDITOR_SESSION_GRACE_UNTIL_KEY,
+				String(Date.now() + DEV_EDITOR_SESSION_RECOVERY_GRACE_MS),
+			);
+			try {
+				sessionStorage.setItem(DEV_EDITOR_SESSION_KEY, "true");
+			} catch (_error) {
+				// Ignore storage exceptions and fail open for this UX action.
+			}
+			window.dispatchEvent(
+				new CustomEvent("developer-mode-change", { detail: true }),
+			);
+		};
+
+		const unlockDeveloperMode = async (rawCode) => {
+			const source = String(rawCode || "").trim();
+			if (!source) {
+				return "请输入开发者口令";
+			}
+
+			let devCodeHash = "";
+			try {
+				devCodeHash = await hashDevCodeClient(source);
+			} catch (error) {
+				const message =
+					error instanceof Error ? error.message : "口令加密失败，请稍后再试";
+				return message;
+			}
+
+			try {
+				const response = await fetch("/api/dev/verify", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ devCodeHash }),
+					cache: "no-store",
+				});
+				if (!response.ok) {
+					return response.status === 403
+						? "口令错误，开发者模式解锁失败"
+						: "校验失败，请稍后重试";
+				}
+				enableDeveloperMode(devCodeHash);
+				return "开发者模式已解锁，可使用编辑器/草稿箱/垃圾桶";
+			} catch {
+				return "网络异常，暂时无法验证口令";
+			}
+		};
+
+		const reflectThemeState = (capsule) => {
+			if (!(capsule instanceof HTMLElement)) return;
+			const isDark = root.classList.contains("dark");
+			capsule.dataset.mode = isDark ? DARK_MODE : LIGHT_MODE;
+			const toggle = capsule.querySelector("[data-theme-toggle]");
+			if (toggle instanceof HTMLButtonElement) {
+				toggle.setAttribute("aria-pressed", String(isDark));
+			}
+		};
+
+		const setThemeFromCapsule = (mode) => {
+			const nextMode = mode === DARK_MODE ? DARK_MODE : LIGHT_MODE;
+			const apply = () => {
+				root.classList.toggle("dark", nextMode === DARK_MODE);
+				root.setAttribute("data-theme", nextMode === DARK_MODE ? "github-dark" : "github-light");
+				localStorage.setItem("theme", nextMode);
+				const capsule = document.querySelector(CAPSULE_SELECTOR);
+				reflectThemeState(capsule);
+			};
+
+			const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+			const doc = document;
+			if (!prefersReducedMotion && typeof doc.startViewTransition === "function") {
+				try {
+					const transition = doc.startViewTransition(apply);
+					transition.finished?.catch(() => {});
+				} catch {
+					apply();
+				}
+				return;
+			}
+
+			root.classList.add("theme-switching-soft");
+			apply();
+			window.setTimeout(() => {
+				root.classList.remove("theme-switching-soft");
+			}, 360);
+		};
+
+		const closeMenu = (capsule) => {
+			if (!(capsule instanceof HTMLElement)) return;
+			const menu = capsule.querySelector("[data-control-menu]");
+			const toggle = capsule.querySelector("[data-menu-toggle]");
+			if (menu instanceof HTMLElement) {
+				menu.hidden = true;
+			}
+			if (toggle instanceof HTMLButtonElement) {
+				toggle.setAttribute("aria-expanded", "false");
+			}
+			capsule.classList.remove("menu-open");
+		};
+
+		const toggleMenu = (capsule) => {
+			if (!(capsule instanceof HTMLElement)) return;
+			const menu = capsule.querySelector("[data-control-menu]");
+			const toggle = capsule.querySelector("[data-menu-toggle]");
+			if (!(menu instanceof HTMLElement) || !(toggle instanceof HTMLButtonElement)) return;
+			const nextOpen = menu.hidden;
+			menu.hidden = !nextOpen;
+			toggle.setAttribute("aria-expanded", String(nextOpen));
+			capsule.classList.toggle("menu-open", nextOpen);
+		};
+
+		const setupCapsule = () => {
+			const capsule = document.querySelector(CAPSULE_SELECTOR);
+			if (!(capsule instanceof HTMLElement) || capsule.dataset.bound === "true") return;
+			capsule.dataset.bound = "true";
+			reflectThemeState(capsule);
+
+			const themeToggle = capsule.querySelector("[data-theme-toggle]");
+			const menuToggle = capsule.querySelector("[data-menu-toggle]");
+			const decryptInput = capsule.querySelector("[data-decrypt-input]");
+			const decryptOutput = capsule.querySelector("[data-decrypt-output]");
+			let decrypting = false;
+
+			if (themeToggle instanceof HTMLButtonElement) {
+				themeToggle.addEventListener("click", () => {
+					const nextMode = root.classList.contains("dark") ? LIGHT_MODE : DARK_MODE;
+					setThemeFromCapsule(nextMode);
+				});
+			}
+
+			if (menuToggle instanceof HTMLButtonElement) {
+				menuToggle.addEventListener("click", (event) => {
+					event.preventDefault();
+					toggleMenu(capsule);
+					if (
+						menuToggle.getAttribute("aria-expanded") === "true" &&
+						decryptInput instanceof HTMLInputElement
+					) {
+						window.setTimeout(() => decryptInput.focus(), 0);
+					}
+				});
+			}
+
+			const runDecrypt = async () => {
+				if (
+					decrypting ||
+					!(decryptOutput instanceof HTMLElement) ||
+					!(decryptInput instanceof HTMLInputElement)
+				) {
+					return;
+				}
+				const value = decryptInput.value;
+				decrypting = true;
+				decryptOutput.dataset.state = "loading";
+				decryptOutput.textContent = "正在验证口令...";
+				try {
+					const message = await unlockDeveloperMode(value);
+					const unlocked = message.includes("已解锁");
+					decryptOutput.dataset.state = unlocked ? "success" : "error";
+					decryptOutput.textContent = message;
+					if (unlocked) {
+						decryptInput.value = "";
+					}
+				} catch (_error) {
+					decryptOutput.dataset.state = "error";
+					decryptOutput.textContent = "校验异常，请稍后重试";
+				} finally {
+					decrypting = false;
+				}
+			};
+
+			if (decryptInput instanceof HTMLInputElement) {
+				decryptInput.addEventListener("keydown", (event) => {
+					if (event.key === "Enter" && !event.isComposing) {
+						event.preventDefault();
+						runDecrypt();
+					}
+				});
+				decryptInput.addEventListener("input", () => {
+					if (!(decryptOutput instanceof HTMLElement)) return;
+					if (decryptOutput.dataset.state === "loading") return;
+					decryptOutput.dataset.state = "idle";
+					decryptOutput.textContent = "回车验证开发口令";
+				});
+			}
+		};
+
+		if (!host.__homeCapsuleOutsideBound) {
+			host.__homeCapsuleOutsideBound = true;
+			document.addEventListener("pointerdown", (event) => {
+				const capsule = document.querySelector(CAPSULE_SELECTOR);
+				if (!(capsule instanceof HTMLElement)) return;
+				if (event.target instanceof Node && capsule.contains(event.target)) return;
+				closeMenu(capsule);
+			});
+			document.addEventListener("keydown", (event) => {
+				if (event.key !== "Escape") return;
+				const capsule = document.querySelector(CAPSULE_SELECTOR);
+				closeMenu(capsule);
+			});
+		}
+
+		setupCapsule();
+
+		if (window.swup?.hooks && !host.__homeCapsuleSwupHooked) {
+			host.__homeCapsuleSwupHooked = true;
+			window.swup.hooks.on("page:view", () => {
+				setupCapsule();
+			});
+		} else if (!window.swup?.hooks && !host.__homeCapsuleSwupEnableBound) {
+			host.__homeCapsuleSwupEnableBound = true;
+			document.addEventListener(
+				"swup:enable",
+				() => {
+					if (!window.swup?.hooks || host.__homeCapsuleSwupHooked) return;
+					host.__homeCapsuleSwupHooked = true;
+					window.swup.hooks.on("page:view", () => {
+						setupCapsule();
+					});
+				},
+				{ once: true },
+			);
+		}
+	})();
+</script>
+
+<style>
+	.hero-hub {
+		--hero-avatar-bg: #ffffff;
+		--hero-avatar-border: #e9e9e9;
+		--hero-text-main: #111111;
+		--hero-text-sub: #505050;
+		--hero-text-muted: #666666;
+		--hero-card-bg: #ffffff;
+		--hero-card-border: #d7dde5;
+		--hero-card-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+		--hero-card-hover-border: #c8cfd8;
+		--hero-card-hover-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+		--hero-card-title: #1f2937;
+		--hero-card-week: #6b7280;
+		--hero-card-main-bg: #f8fafc;
+		--hero-card-main-border: #e2e8f0;
+		--hero-card-highlight: #1f2937;
+		--hero-card-count-bg: #f7f9fb;
+		--hero-card-count-border: #dde3eb;
+		--hero-card-count-text: #5b6778;
+		--hero-card-count-value: #374151;
+		--hero-pill-bg: #f8f8f8;
+		--hero-pill-border: #e4e4e4;
+		--hero-pill-text: #111111;
+		--hero-divider: #d2d2d2;
+		--hero-chip-bg: #f8f8f8;
+		--hero-chip-border: #e4e4e4;
+		--hero-chip-text: #111111;
+		--hero-chip-active-bg: #101010;
+		--hero-chip-active-border: #101010;
+		--hero-chip-active-text: #ffffff;
+		--hero-chip-badge-bg: #ffffff;
+		--hero-chip-badge-text: #111111;
+		--capsule-bg: rgba(255, 255, 255, 0.76);
+		--capsule-border: rgba(205, 213, 224, 0.95);
+		--capsule-shadow: 0 12px 32px rgba(18, 25, 39, 0.12);
+		--capsule-text: #1d2838;
+		--capsule-btn-hover: rgba(28, 39, 56, 0.08);
+		--capsule-menu-bg: rgba(255, 255, 255, 0.96);
+		--capsule-menu-border: rgba(214, 222, 233, 0.95);
+		--capsule-input-bg: #f8fafc;
+		--capsule-input-border: #d6deea;
+		--capsule-input-text: #1f2937;
+		--capsule-output-bg: #f2f5fa;
+		--capsule-output-text: #2f3d4d;
+		--capsule-accent: #2f9d5b;
+		--capsule-accent-soft: rgba(47, 157, 91, 0.12);
+		--capsule-marker: #111111;
+		--capsule-marker-soft: rgba(17, 17, 17, 0.12);
+		--capsule-status-loading-bg: #eef4ff;
+		--capsule-status-loading-text: #3b4f76;
+		--capsule-status-success-bg: #edf9f1;
+		--capsule-status-success-text: #166534;
+		--capsule-status-error-bg: #fff1f1;
+		--capsule-status-error-text: #b42318;
+		width: min(100%, 760px);
+		margin: 0 auto 24px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+	}
+
+	:global(html.dark) .hero-hub {
+		--hero-avatar-bg: #131a24;
+		--hero-avatar-border: #2a3445;
+		--hero-text-main: #f3f6ff;
+		--hero-text-sub: #b8c1d3;
+		--hero-text-muted: #95a2b6;
+		--hero-card-bg: #141b26;
+		--hero-card-border: #2a3447;
+		--hero-card-shadow: 0 14px 30px rgba(2, 6, 23, 0.42);
+		--hero-card-hover-border: #3c4a62;
+		--hero-card-hover-shadow: 0 16px 34px rgba(2, 6, 23, 0.5);
+		--hero-card-title: #e9effb;
+		--hero-card-week: #9aa7bb;
+		--hero-card-main-bg: #1a2331;
+		--hero-card-main-border: #2f3b4f;
+		--hero-card-highlight: #e8eef9;
+		--hero-card-count-bg: #182231;
+		--hero-card-count-border: #2d394d;
+		--hero-card-count-text: #afbbc9;
+		--hero-card-count-value: #eff4ff;
+		--hero-pill-bg: #1a2331;
+		--hero-pill-border: #2b3649;
+		--hero-pill-text: #ecf1fb;
+		--hero-divider: rgba(148, 163, 184, 0.35);
+		--hero-chip-bg: #1a2331;
+		--hero-chip-border: #2b3649;
+		--hero-chip-text: #ecf1fb;
+		--hero-chip-active-bg: #243247;
+		--hero-chip-active-border: #32445f;
+		--hero-chip-active-text: #eff4ff;
+		--hero-chip-badge-bg: rgba(239, 244, 255, 0.16);
+		--hero-chip-badge-text: #f6f9ff;
+		--capsule-bg: rgba(15, 20, 29, 0.74);
+		--capsule-border: rgba(58, 72, 94, 0.9);
+		--capsule-shadow: 0 14px 36px rgba(1, 5, 16, 0.55);
+		--capsule-text: #edf2ff;
+		--capsule-btn-hover: rgba(237, 242, 255, 0.12);
+		--capsule-menu-bg: rgba(15, 21, 32, 0.95);
+		--capsule-menu-border: rgba(57, 73, 97, 0.95);
+		--capsule-input-bg: #121c2b;
+		--capsule-input-border: #30405a;
+		--capsule-input-text: #e5ecf8;
+		--capsule-output-bg: #101a28;
+		--capsule-output-text: #d9e2f2;
+		--capsule-accent: #6ad59b;
+		--capsule-accent-soft: rgba(106, 213, 155, 0.16);
+		--capsule-marker: #edf2ff;
+		--capsule-marker-soft: rgba(237, 242, 255, 0.16);
+		--capsule-status-loading-bg: rgba(80, 120, 205, 0.24);
+		--capsule-status-loading-text: #d4e3ff;
+		--capsule-status-success-bg: rgba(34, 197, 94, 0.22);
+		--capsule-status-success-text: #bbf7d0;
+		--capsule-status-error-bg: rgba(248, 113, 113, 0.2);
+		--capsule-status-error-text: #fecaca;
+	}
+
+	.hero-control-capsule {
+		position: fixed;
+		top: max(14px, calc(env(safe-area-inset-top) + 8px));
+		right: max(16px, calc(env(safe-area-inset-right) + 8px));
+		z-index: 80;
+		display: inline-flex;
+		align-items: center;
+		gap: 2px;
+		padding: 4px;
+		border-radius: 999px;
+		border: 1px solid var(--capsule-border);
+		background: var(--capsule-bg);
+		box-shadow: var(--capsule-shadow);
+		backdrop-filter: blur(14px) saturate(140%);
+	}
+
+	.hero-control-btn {
+		position: relative;
+		width: 40px;
+		height: 40px;
+		border: 0;
+		border-radius: 999px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background: transparent;
+		color: var(--capsule-text);
+		cursor: pointer;
+		transition: background-color 0.2s ease, transform 0.2s ease;
+	}
+
+	.hero-control-btn:hover {
+		background: var(--capsule-btn-hover);
+	}
+
+	.hero-control-btn:active {
+		transform: scale(0.95);
+	}
+
+	.hero-control-divider {
+		width: 1px;
+		height: 20px;
+		background: color-mix(in oklab, var(--capsule-text) 25%, transparent);
+	}
+
+	.hero-theme-toggle {
+		overflow: hidden;
+	}
+
+	.hero-theme-icon {
+		position: absolute;
+		width: 19px;
+		height: 19px;
+		fill: currentColor;
+		transition: opacity 0.24s ease, transform 0.24s ease;
+	}
+
+	.hero-control-capsule[data-mode="light"] .hero-theme-icon-sun {
+		opacity: 1;
+		transform: rotate(0deg) scale(1);
+	}
+
+	.hero-control-capsule[data-mode="light"] .hero-theme-icon-moon {
+		opacity: 0;
+		transform: rotate(35deg) scale(0.72);
+	}
+
+	.hero-control-capsule[data-mode="dark"] .hero-theme-icon-sun {
+		opacity: 0;
+		transform: rotate(-35deg) scale(0.72);
+	}
+
+	.hero-control-capsule[data-mode="dark"] .hero-theme-icon-moon {
+		opacity: 1;
+		transform: rotate(0deg) scale(1);
+	}
+
+	.hero-menu-icon {
+		width: 20px;
+		height: 20px;
+		fill: currentColor;
+	}
+
+	.hero-control-menu {
+		position: absolute;
+		top: calc(100% + 10px);
+		right: 0;
+		width: min(92vw, 286px);
+		padding: 12px 12px 10px;
+		border-radius: 14px;
+		border: 1px solid var(--capsule-menu-border);
+		background: var(--capsule-menu-bg);
+		box-shadow: 0 14px 28px rgba(2, 6, 23, 0.28);
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		text-align: left;
+	}
+
+	.hero-control-menu[hidden] {
+		display: none;
+	}
+
+	.hero-control-user-menu {
+		display: inline-flex;
+		align-items: center;
+	}
+
+	.hero-dev-header {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.hero-dev-dot {
+		width: 5px;
+		height: 18px;
+		border-radius: 9999px;
+		background: var(--capsule-marker);
+		box-shadow: none;
+	}
+
+	.hero-control-menu-title {
+		margin: 0;
+		font-size: 0.88rem;
+		font-weight: 700;
+		letter-spacing: 0.02em;
+		color: var(--capsule-text);
+	}
+
+	.hero-decrypt-input {
+		width: 100%;
+		height: 40px;
+		padding: 0 12px;
+		border-radius: 10px;
+		border: 1px solid var(--capsule-input-border);
+		background: var(--capsule-input-bg);
+		color: var(--capsule-input-text);
+		font-size: 0.84rem;
+		line-height: 40px;
+		outline: none;
+		caret-color: var(--capsule-accent);
+	}
+
+	.hero-decrypt-input::placeholder {
+		color: color-mix(in oklab, var(--capsule-input-text) 64%, transparent);
+	}
+
+	.hero-decrypt-input:focus {
+		border-color: color-mix(in oklab, var(--capsule-accent) 70%, var(--capsule-input-border));
+		box-shadow: 0 0 0 3px color-mix(in oklab, var(--capsule-accent) 20%, transparent);
+	}
+
+	.hero-decrypt-output {
+		min-height: 30px;
+		padding: 6px 9px;
+		border-radius: 10px;
+		background: var(--capsule-output-bg);
+		border: 1px solid color-mix(in oklab, var(--capsule-input-border) 72%, transparent);
+		color: var(--capsule-output-text);
+		font-size: 0.77rem;
+		line-height: 1.45;
+		white-space: pre-wrap;
+		word-break: break-word;
+	}
+
+	.hero-decrypt-output[data-state="loading"] {
+		background: var(--capsule-status-loading-bg);
+		color: var(--capsule-status-loading-text);
+		border-color: color-mix(in oklab, var(--capsule-status-loading-text) 35%, transparent);
+	}
+
+	.hero-decrypt-output[data-state="success"] {
+		background: var(--capsule-status-success-bg);
+		color: var(--capsule-status-success-text);
+		border-color: color-mix(in oklab, var(--capsule-status-success-text) 32%, transparent);
+	}
+
+	.hero-decrypt-output[data-state="error"] {
+		background: var(--capsule-status-error-bg);
+		color: var(--capsule-status-error-text);
+		border-color: color-mix(in oklab, var(--capsule-status-error-text) 30%, transparent);
+	}
+
+	.hero-avatar {
+		display: block;
+		width: 156px;
+		height: 156px;
+		border-radius: 9999px;
+		overflow: hidden;
+		border: none;
+		margin-bottom: 14px;
+		background: var(--hero-avatar-bg);
+		text-decoration: none;
+		-webkit-user-drag: none;
+		user-select: none;
+	}
+
+	.hero-avatar-link {
+		cursor: pointer;
+		transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+	}
+
+	.hero-avatar-link:hover,
+	.hero-avatar-link:focus-visible {
+		transform: translateY(-2px);
+		box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+		outline: none;
+	}
+
+	.hero-avatar-link:active {
+		transform: scale(0.97);
+	}
+
+	.hero-avatar :global(img) {
+		-webkit-user-drag: none;
+		user-drag: none;
+		user-select: none;
+		pointer-events: none;
+	}
+
+	.hero-name {
+		font-size: clamp(2.1rem, 4.3vw, 3.1rem);
+		font-weight: 800;
+		line-height: 1.1;
+		color: var(--hero-text-main);
+	}
+
+	.hero-subtitle {
+		margin-top: 4px;
+		font-size: clamp(1.15rem, 2.5vw, 2rem);
+		font-family: Georgia, "Times New Roman", serif;
+		color: var(--hero-text-sub);
+	}
+
+	.hero-stats {
+		margin-top: 12px;
+		font-size: 1.08rem;
+		color: var(--hero-text-muted);
+	}
+
+	.hero-class-card {
+		width: min(100%, 480px);
+		margin-top: 24px;
+		padding: 16px 16px 14px;
+		background: var(--hero-card-bg);
+		border: 1px solid var(--hero-card-border);
+		border-radius: 14px;
+		box-shadow: var(--hero-card-shadow);
+		text-align: left;
+		font-family: "KeinannMaruPOP", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+		--hero-class-title-size: clamp(1rem, 0.94rem + 0.3vw, 1.12rem);
+		--hero-class-week-size: clamp(0.78rem, 0.75rem + 0.18vw, 0.86rem);
+		--hero-class-status-size: clamp(0.74rem, 0.71rem + 0.12vw, 0.8rem);
+		--hero-class-highlight-size: clamp(0.96rem, 0.9rem + 0.35vw, 1.08rem);
+		--hero-class-count-size: clamp(0.78rem, 0.75rem + 0.12vw, 0.84rem);
+		--hero-class-count-value-size: clamp(0.84rem, 0.8rem + 0.16vw, 0.92rem);
+	}
+
+	.hero-class-card-link {
+		display: block;
+		color: inherit;
+		text-decoration: none;
+		transition: transform 100ms ease, border-color 160ms ease, box-shadow 160ms ease;
+	}
+
+	.hero-class-card-link:hover {
+		border-color: var(--hero-card-hover-border);
+		box-shadow: var(--hero-card-hover-shadow);
+	}
+
+	.hero-class-card-link:active {
+		transform: translateY(1px);
+	}
+
+	.hero-class-toprow {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 10px;
+		flex-wrap: wrap;
+	}
+
+	.hero-class-title {
+		margin: 0;
+		font-size: var(--hero-class-title-size);
+		font-weight: 700;
+		line-height: 1.35;
+		color: var(--hero-card-title);
+		letter-spacing: 0;
+	}
+
+	.hero-class-headline-row {
+		margin-top: 10px;
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		gap: 10px;
+		flex-wrap: wrap;
+	}
+
+	.hero-class-status {
+		display: inline-flex;
+		align-items: center;
+		height: 26px;
+		padding: 0 10px;
+		border-radius: 999px;
+		font-size: var(--hero-class-status-size);
+		font-weight: 600;
+		border: 1px solid #d6dce4;
+		background: #f5f7fa;
+		color: #455468;
+	}
+
+	.hero-class-status[data-state="active"] {
+		background: #e8f2ff;
+		color: #1d4f91;
+		border-color: #a6c8f0;
+	}
+
+	.hero-class-status[data-state="break"] {
+		background: #eaf8f1;
+		color: #0f766e;
+		border-color: #9fd7c0;
+	}
+
+	.hero-class-status[data-state="pending"] {
+		background: #fff7e8;
+		color: #b45309;
+		border-color: #f4c27a;
+	}
+
+	.hero-class-status[data-state="tomorrow"] {
+		background: #eef4ff;
+		color: #3730a3;
+		border-color: #b9c4ff;
+	}
+
+	.hero-class-status[data-state="nextweek"] {
+		background: #fff4e6;
+		color: #b45309;
+		border-color: #f4c27a;
+	}
+
+	.hero-class-status[data-state="upcoming"] {
+		background: #ecfdf3;
+		color: #166534;
+		border-color: #9fd7ae;
+	}
+
+	.hero-class-status[data-state="idle"] {
+		background: #f3f4f6;
+		color: #6b7280;
+		border-color: #d1d5db;
+	}
+
+	:global(html.dark) .hero-class-status[data-state="active"] {
+		background: rgba(59, 130, 246, 0.2);
+		color: #bfdbfe;
+		border-color: rgba(96, 165, 250, 0.5);
+	}
+
+	:global(html.dark) .hero-class-status[data-state="break"] {
+		background: rgba(20, 184, 166, 0.2);
+		color: #99f6e4;
+		border-color: rgba(45, 212, 191, 0.48);
+	}
+
+	:global(html.dark) .hero-class-status[data-state="pending"],
+	:global(html.dark) .hero-class-status[data-state="nextweek"] {
+		background: rgba(245, 158, 11, 0.2);
+		color: #fde68a;
+		border-color: rgba(251, 191, 36, 0.45);
+	}
+
+	:global(html.dark) .hero-class-status[data-state="tomorrow"] {
+		background: rgba(99, 102, 241, 0.23);
+		color: #c7d2fe;
+		border-color: rgba(129, 140, 248, 0.5);
+	}
+
+	:global(html.dark) .hero-class-status[data-state="upcoming"] {
+		background: rgba(34, 197, 94, 0.2);
+		color: #bbf7d0;
+		border-color: rgba(74, 222, 128, 0.45);
+	}
+
+	:global(html.dark) .hero-class-status[data-state="idle"] {
+		background: rgba(100, 116, 139, 0.22);
+		color: #cbd5e1;
+		border-color: rgba(148, 163, 184, 0.42);
+	}
+
+	.hero-class-weekline {
+		font-size: var(--hero-class-week-size);
+		font-weight: 500;
+		line-height: 1.35;
+		color: var(--hero-card-week);
+		white-space: nowrap;
+	}
+
+	.hero-class-main {
+		margin-top: 10px;
+		min-height: 70px;
+		padding: 12px 14px;
+		border-radius: 10px;
+		background: var(--hero-card-main-bg);
+		border: 1px solid var(--hero-card-main-border);
+		display: grid;
+		grid-template-columns: 8px minmax(0, 1fr);
+		gap: 12px;
+		align-items: center;
+		text-align: left;
+		line-height: 1.45;
+	}
+
+	.hero-class-main[data-has-course="false"] {
+		grid-template-columns: 1fr;
+		text-align: center;
+	}
+
+	.hero-class-color {
+		width: 8px;
+		height: 100%;
+		min-height: 42px;
+		border-radius: 999px;
+		background: var(--course-color, #ff9500);
+		box-shadow: 0 0 0 1px color-mix(in srgb, var(--course-color, #ff9500) 42%, transparent);
+	}
+
+	.hero-class-main[data-has-course="false"] .hero-class-color {
+		display: none;
+	}
+
+	.hero-class-copy {
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.hero-class-main[data-has-course="true"] .hero-class-copy {
+		align-items: flex-start;
+	}
+
+	.hero-class-course {
+		color: var(--hero-card-highlight);
+		font-size: var(--hero-class-highlight-size);
+		font-weight: 700;
+		line-height: 1.45;
+		word-break: break-word;
+		text-wrap: pretty;
+	}
+
+	.hero-class-main[data-has-course="true"] .hero-class-course {
+		color: var(--course-color, #ff9500) !important;
+		font-weight: 900;
+	}
+
+	.hero-class-detail {
+		max-width: 100%;
+		color: var(--hero-card-week);
+		font-size: 0.78rem;
+		font-weight: 600;
+		line-height: 1.35;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.hero-class-meta-row {
+		margin-top: 10px;
+		display: flex;
+		gap: 6px;
+	}
+
+	.hero-class-countdown {
+		margin: 0;
+		padding: 5px 10px;
+		border-radius: 999px;
+		background: var(--hero-card-count-bg);
+		border: 1px solid var(--hero-card-count-border);
+		font-size: var(--hero-class-count-size);
+		font-weight: 600;
+		color: var(--hero-card-count-text);
+	}
+
+	.hero-class-countdown-label {
+		display: none;
+	}
+
+	.hero-class-countdown-value {
+		font-size: var(--hero-class-count-value-size);
+		font-weight: 700;
+		color: var(--hero-card-count-value);
+	}
+
+	.is-hidden {
+		display: none !important;
+	}
+
+	.hero-social-row {
+		margin-top: 22px;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		justify-content: center;
+	}
+
+	.hero-pill {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		height: 42px;
+		padding: 0 16px;
+		border-radius: 9999px;
+		background: var(--hero-pill-bg);
+		border: 1px solid var(--hero-pill-border);
+		font-size: 1rem;
+		color: var(--hero-pill-text);
+		-webkit-user-drag: none;
+		user-select: none;
+	}
+	.hero-pill:active {
+		transform: scale(0.97);
+		background: color-mix(in oklab, var(--hero-pill-bg) 94%, black);
+	}
+
+	.hero-pill-icon {
+		font-size: 1.1rem;
+	}
+
+	.hero-divider {
+		width: min(100%, 480px);
+		height: 1px;
+		background: var(--hero-divider);
+		margin: 24px 0 18px;
+	}
+
+	.hero-menu-grid {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		justify-content: center;
+	}
+
+	.hero-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		height: 42px;
+		padding: 0 18px;
+		border-radius: 9999px;
+		border: 1px solid var(--hero-chip-border);
+		background: var(--hero-chip-bg);
+		color: var(--hero-chip-text);
+		font-weight: 600;
+		-webkit-user-drag: none;
+		user-select: none;
+	}
+
+	.hero-chip:active:not(.hero-chip-active) {
+		transform: scale(0.97);
+		background: color-mix(in oklab, var(--hero-chip-bg) 94%, black);
+	}
+
+	.hero-chip-active {
+		background: var(--hero-chip-active-bg);
+		border-color: var(--hero-chip-active-border);
+		color: var(--hero-chip-active-text);
+	}
+
+	.hero-chip-active:active {
+		transform: scale(0.97);
+	}
+
+	.hero-chip-badge {
+		display: inline-flex;
+		align-items: center;
+		height: 22px;
+		padding: 0 8px;
+		border-radius: 9999px;
+		font-size: 0.78rem;
+		background: var(--hero-chip-badge-bg);
+		color: var(--hero-chip-badge-text);
+		border: 1px solid color-mix(in oklab, currentColor 24%, transparent);
+	}
+
+	.hero-chip-active .hero-chip-badge {
+		color: var(--hero-chip-active-text);
+		background: color-mix(in oklab, var(--hero-chip-active-text) 18%, transparent);
+		border-color: color-mix(in oklab, var(--hero-chip-active-text) 36%, transparent);
+	}
+
+	.hero-chip-icon {
+		font-size: 1rem;
+	}
+
+	@media (max-width: 768px) {
+		.hero-hub {
+			margin-bottom: 16px;
+		}
+
+		.hero-control-capsule {
+			top: max(10px, calc(env(safe-area-inset-top) + 4px));
+			right: max(10px, calc(env(safe-area-inset-right) + 4px));
+			padding: 3px;
+		}
+
+		.hero-control-btn {
+			width: 36px;
+			height: 36px;
+		}
+
+		.hero-control-menu {
+			width: min(92vw, 280px);
+			padding: 11px 11px 9px;
+		}
+
+		.hero-avatar {
+			width: 112px;
+			height: 112px;
+		}
+
+		.hero-class-card {
+			width: 100%;
+			padding: 16px 14px 14px;
+			border-radius: 16px;
+			--hero-class-title-size: clamp(0.98rem, 0.92rem + 0.65vw, 1.08rem);
+			--hero-class-week-size: clamp(0.76rem, 0.73rem + 0.45vw, 0.82rem);
+			--hero-class-highlight-size: clamp(0.92rem, 0.86rem + 0.6vw, 1rem);
+		}
+
+		.hero-class-main {
+			padding: 10px;
+		}
+
+		.hero-chip,
+		.hero-pill {
+			height: 38px;
+			padding: 0 14px;
+			font-size: 0.92rem;
+		}
+	}
+
+	@media (max-width: 420px) {
+		.hero-class-card {
+			padding: 14px 12px 12px;
+		}
+
+		.hero-class-status {
+			height: 24px;
+			padding: 0 9px;
+		}
+
+		.hero-class-main {
+			margin-top: 8px;
+			padding: 9px 10px;
+		}
+
+		.hero-class-countdown {
+			padding: 4px 9px;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.hero-class-card,
+		.hero-class-card-link {
+			animation: none;
+			transition: none;
+		}
+
+		.hero-control-btn,
+		.hero-theme-icon {
+			transition: none;
+		}
+	}
+</style>
+

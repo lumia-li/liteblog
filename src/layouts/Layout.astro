@@ -1,0 +1,1276 @@
+﻿---
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/700.css";
+
+import ConfigCarrier from "@components/ConfigCarrier.astro";
+import Lantern from "@components/widget/Lantern.svelte";
+import RainEffect from "@components/widget/RainEffect.svelte";
+import { getBannerOffset } from "@utils/banner-utils";
+import { profileConfig, siteConfig } from "@/config";
+import {
+	AUTO_MODE,
+	BANNER_HEIGHT,
+	BANNER_HEIGHT_EXTEND,
+	BANNER_HEIGHT_HOME,
+	DARK_MODE,
+	DEFAULT_THEME,
+	LIGHT_MODE,
+	PAGE_WIDTH,
+} from "../constants/constants";
+import { defaultFavicons } from "../constants/icon";
+import type { Favicon } from "../types/config";
+import { pathsEqual, url } from "../utils/url-utils";
+import "katex/dist/katex.css";
+import "../styles/transition.css";
+
+interface Props {
+	title?: string;
+	banner?: string;
+	description?: string;
+	lang?: string;
+	setOGTypeArticle?: boolean;
+	pageType?: string;
+}
+
+let { title, banner, description, lang, setOGTypeArticle, pageType } =
+	Astro.props;
+
+// apply a class to the body element to decide the height of the banner, only used for initial page load
+// Swup can update the body for each page visit, but it's after the page transition, causing a delay for banner height change
+// so use Swup hooks instead to change the height immediately when a link is clicked
+const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
+
+// defines global css variables
+// why doing this in Layout instead of GlobalStyles: https://github.com/withastro/astro/issues/6728#issuecomment-1502203757
+const configHue = siteConfig.themeColor.hue;
+if (!banner || typeof banner !== "string" || banner.trim() === "") {
+	banner = siteConfig.banner.src;
+}
+
+// TODO don't use post cover as banner for now
+banner = siteConfig.banner.src;
+
+const enableBanner = siteConfig.banner.enable;
+
+let pageTitle: string;
+if (title) {
+	pageTitle = `${title} - ${siteConfig.title}`;
+} else {
+	pageTitle = `${siteConfig.title} - ${siteConfig.subtitle}`;
+}
+
+const favicons: Favicon[] =
+	siteConfig.favicon.length > 0 ? siteConfig.favicon : defaultFavicons;
+const isHubPageType = pageType === "hub";
+
+// const siteLang = siteConfig.lang.replace('_', '-')
+if (!lang) {
+	lang = `${siteConfig.lang}`;
+}
+const siteLang = lang.replace("_", "-");
+
+const bannerOffset = getBannerOffset(siteConfig.banner.position);
+const homeBannerHeight = "52vh";
+const customFontHref = url("/fonts/KeinannMaruPOP_CN-EN.ttf");
+---
+
+<!DOCTYPE html>
+<html lang={siteLang} class="bg-[var(--page-bg)] text-[14px] md:text-[16px]"
+	  data-overlayscrollbars-initialize
+>
+	<head>
+
+		<title>{pageTitle}</title>
+
+		<meta charset="UTF-8" />
+		<meta name="description" content={description || pageTitle}>
+		<meta name="author" content={profileConfig.name}>
+
+		<meta property="og:site_name" content={siteConfig.title}>
+		<meta property="og:url" content={Astro.url}>
+		<meta property="og:title" content={pageTitle}>
+		<meta property="og:description" content={description || pageTitle}>
+		{setOGTypeArticle ? (
+        <meta property="og:type" content="article" />
+        ) : (
+        <meta property="og:type" content="website" />
+        )}
+
+		<meta name="twitter:card" content="summary_large_image">
+		<meta property="twitter:url" content={Astro.url}>
+		<meta name="twitter:title" content={pageTitle}>
+		<meta name="twitter:description" content={description || pageTitle}>
+
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<link
+			rel="preload"
+			as="font"
+			href={customFontHref}
+			type="font/ttf"
+			crossorigin
+		/>
+		{favicons.map(favicon => (
+			<link rel="icon"
+				  href={favicon.src.startsWith('/') ? url(favicon.src) : favicon.src}
+				  sizes={favicon.sizes}
+				  media={favicon.theme && `(prefers-color-scheme: ${favicon.theme})`}
+			/>
+		))}
+
+		<!-- Set the theme before the page is rendered to avoid a flash -->
+		<script
+			is:inline
+			define:vars={{ DEFAULT_THEME, LIGHT_MODE, DARK_MODE, AUTO_MODE, BANNER_HEIGHT_EXTEND, configHue }}
+		>
+			const root = document.documentElement;
+			const theme = localStorage.getItem("theme") || DEFAULT_THEME;
+			switch (theme) {
+				case LIGHT_MODE:
+					root.classList.remove("dark");
+					break;
+				case DARK_MODE:
+					root.classList.add("dark");
+					break;
+				case AUTO_MODE:
+					if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+						root.classList.add("dark");
+					} else {
+						root.classList.remove("dark");
+					}
+					break;
+			}
+
+			const hue = localStorage.getItem("hue") || configHue;
+			root.style.setProperty("--hue", hue);
+
+			let offset = Math.floor(window.innerHeight * (BANNER_HEIGHT_EXTEND / 100));
+			offset = offset - (offset % 4);
+			root.style.setProperty("--banner-height-extend", `${offset}px`);
+		</script>
+		<script is:inline>
+			try {
+				if ("scrollRestoration" in history) history.scrollRestoration = "auto";
+			} catch {}
+		</script>
+		<script is:inline>
+			try {
+				const RETURN_STATE_KEY = "posts-list-return-state-v1";
+				const currentUrl = new URL(window.location.href);
+				const queryReturn = currentUrl.searchParams.get("return") === "1";
+				let stateReturn = false;
+				try {
+					const raw = sessionStorage.getItem(RETURN_STATE_KEY);
+					if (raw) {
+						const parsed = JSON.parse(raw);
+						if (parsed && typeof parsed === "object" && typeof parsed.listUrl === "string") {
+							const stateUrl = new URL(parsed.listUrl, window.location.origin);
+							stateReturn =
+								stateUrl.pathname.replace(/\/+$/, "") === currentUrl.pathname.replace(/\/+$/, "");
+						}
+					}
+				} catch {}
+				if (queryReturn || stateReturn) {
+					document.documentElement.classList.add("post-return-pending");
+				}
+			} catch {}
+		</script>
+		<style define:vars={{
+			configHue,
+			'page-width': `${PAGE_WIDTH}rem`,
+		}}></style>  <!-- defines global css variables. This will be applied to <html> <body> and some other elements idk why -->
+
+
+		<slot name="head"></slot>
+		<script is:inline defer src="https://u.liyueovo.top/script.js" data-website-id="df0ebd60-a90e-4ba1-9d16-70efe535ae3c"></script>
+
+		<link rel="alternate" type="application/rss+xml" title={profileConfig.name} href={`${Astro.site}rss.xml`}/>
+
+	</head>
+	<body class=" min-h-screen " class:list={[{"lg:is-home": isHomePage, "enable-banner": enableBanner}]}
+		data-page-type={pageType}
+		data-overlayscrollbars-initialize
+	>
+
+		<ConfigCarrier></ConfigCarrier>
+		{!isHubPageType && <Lantern client:only="svelte" />}
+		{!isHubPageType && <RainEffect client:only="svelte" />}
+		<slot />
+
+		<!-- increase the page height during page transition to prevent the scrolling animation from jumping -->
+		<div id="page-height-extend" class="hidden h-[300vh]"></div>
+
+		
+	</body>
+</html>
+
+<style is:global define:vars={{
+	bannerOffset,
+	'banner-height-home': `${BANNER_HEIGHT_HOME}vh`,
+	'banner-height': `${BANNER_HEIGHT}vh`,
+	'home-banner-height-custom': homeBannerHeight,
+}}>
+@font-face {
+	font-family: "KeinannMaruPOP";
+	src: url("/fonts/KeinannMaruPOP_CN-EN.ttf") format("truetype");
+	font-display: swap;
+}
+
+html.post-return-pending #swup-container {
+	visibility: hidden !important;
+}
+
+@tailwind components;
+@layer components {
+	.enable-banner {
+		--main-panel-top: calc(var(--banner-height) - 3.5rem);
+	}
+	.enable-banner.is-home #banner-wrapper {
+		@apply h-[var(--home-banner-height-custom)] translate-y-[var(--banner-height-extend)]
+	}
+	.enable-banner #banner-wrapper {
+		@apply h-[var(--banner-height-home)]
+	}
+
+	.enable-banner.is-home #banner {
+		@apply h-[var(--home-banner-height-custom)] translate-y-0
+	}
+	.enable-banner #banner {
+		@apply h-[var(--banner-height-home)] translate-y-[var(--bannerOffset)]
+	}
+	.enable-banner.is-home #main-grid {
+		transform: translateY(calc(var(--banner-height-extend) - 5.5rem));
+		position: relative;
+		isolation: isolate;
+	}
+	/* 绉婚櫎 main-grid 閬僵灞?*/
+	.enable-banner.is-home #main-grid::before {
+		content: none;
+	}
+	.enable-banner.is-home #main-grid > * {
+		position: relative;
+		z-index: 1;
+	}
+	/* 绉婚櫎 banner 閬僵灞傦紝淇濇寔鍥剧墖瀹屽叏娓呮櫚鍙 */
+	.enable-banner.is-home #banner-wrapper::after {
+		content: none;
+	}
+	.enable-banner.is-home #top-row {
+		height: calc(var(--home-banner-height-custom) - 4.5rem);
+	}
+	.enable-banner #top-row {
+		@apply h-[calc(var(--banner-height-home)_-_4.5rem)] transition-all duration-300
+	}
+	.enable-banner.is-home #sidebar-sticky {
+		@apply top-[calc(1rem_-_var(--banner-height-extend))]
+	}
+	.enable-banner.is-home #content-wrapper {
+		padding-bottom: 1.5rem;
+	}
+	.enable-banner.is-home #main-grid.home-main-grid #sidebar {
+		margin-top: -1.9rem;
+	}
+	.enable-banner.is-home #main-grid.home-main-grid #profile-card {
+		box-shadow:
+			0 28px 56px -34px rgba(0, 0, 0, 0.72),
+			0 0 0 1px rgba(255, 255, 255, 0.04);
+	}
+	.navbar-hidden {
+		@apply opacity-0 -translate-y-16
+	}
+}
+
+</style>
+
+<script>
+// @ts-nocheck
+import 'overlayscrollbars/overlayscrollbars.css';
+import {
+	OverlayScrollbars,
+	// ScrollbarsHidingPlugin,
+	// SizeObserverPlugin,
+	// ClickScrollPlugin
+} from 'overlayscrollbars';
+import {getHue, getStoredTheme, setHue, setTheme} from "../utils/setting-utils";
+import {pathsEqual, url} from "../utils/url-utils";
+import {
+	BANNER_HEIGHT,
+	BANNER_HEIGHT_HOME,
+	BANNER_HEIGHT_EXTEND,
+	MAIN_PANEL_OVERLAPS_BANNER_HEIGHT
+} from "../constants/constants";
+import { siteConfig } from '../config';
+
+/* Preload fonts */
+// (async function() {
+// 	try {
+// 		await Promise.all([
+// 			document.fonts.load("400 1em Roboto"),
+// 			document.fonts.load("700 1em Roboto"),
+// 		]);
+// 		document.body.classList.remove("hidden");
+// 	} catch (error) {
+// 		console.log("Failed to load fonts:", error);
+// 	}
+// })();
+
+/* TODO This is a temporary solution for style flicker issue when the transition is activated */
+/* issue link: https://github.com/withastro/astro/issues/8711, the solution get from here too */
+/* update: fixed in Astro 3.2.4 */
+/*
+function disableAnimation() {
+	const css = document.createElement('style')
+	css.appendChild(
+		document.createTextNode(
+			`*{
+              -webkit-transition:none!important;
+              -moz-transition:none!important;
+              -o-transition:none!important;
+              -ms-transition:none!important;
+              transition:none!important
+              }`
+		)
+	)
+	document.head.appendChild(css)
+
+	return () => {
+		// Force restyle
+		;(() => window.getComputedStyle(document.body))()
+
+		// Wait for next tick before removing
+		setTimeout(() => {
+			document.head.removeChild(css)
+		}, 1)
+	}
+}
+*/
+
+const isBannerEnabled = () => document.body?.classList?.contains('enable-banner');
+
+function setClickOutsideToClose(panel: string, ignores: string[]) {
+	const isIgnoredTarget = (target: Node | null) => {
+		if (!(target instanceof Node)) return false;
+		for (let ig of ignores) {
+			let ie = document.getElementById(ig);
+			if (ie == target || ie?.contains(target)) {
+				return true;
+			}
+		}
+		return false;
+	};
+
+	let pointerStartedInside = false;
+
+	document.addEventListener("pointerdown", event => {
+		pointerStartedInside = isIgnoredTarget(event.target);
+	});
+
+	document.addEventListener("click", event => {
+		let panelDom = document.getElementById(panel);
+		let tDom = event.target;
+		if (!(tDom instanceof Node)) return;
+		if (isIgnoredTarget(tDom) || pointerStartedInside) {
+			pointerStartedInside = false;
+			return;
+		}
+		pointerStartedInside = false;
+		panelDom?.classList.add("float-panel-closed");
+	});
+}
+setClickOutsideToClose("display-setting", ["display-setting", "display-settings-switch"])
+setClickOutsideToClose("nav-menu-panel", ["nav-menu-panel", "nav-menu-switch"])
+setClickOutsideToClose("search-panel", ["search-panel", "search-bar", "search-switch"])
+
+
+function loadTheme() {
+	const theme = getStoredTheme()
+	setTheme(theme)
+}
+
+function loadHue() {
+	setHue(getHue())
+}
+
+let postNavScrollHandlerBound = false;
+let postNavTransitionRunning = false;
+let postNavVisitPending = false;
+let postListReturnHandlerBound = false;
+let backToTopButtonBound = false;
+
+const POST_LIST_RETURN_STATE_KEY = "posts-list-return-state-v1";
+const POST_LIST_RETURN_MAX_AGE_MS = 1000 * 60 * 30;
+const POST_RETURN_PENDING_CLASS = "post-return-pending";
+
+function setPostReturnPending(enabled: boolean) {
+	if (enabled) {
+		document.documentElement.classList.add(POST_RETURN_PENDING_CLASS);
+		return;
+	}
+	document.documentElement.classList.remove(POST_RETURN_PENDING_CLASS);
+}
+
+function readPostListReturnState() {
+	try {
+		const raw = sessionStorage.getItem(POST_LIST_RETURN_STATE_KEY);
+		if (!raw) return null;
+		const parsed = JSON.parse(raw);
+		if (!parsed || typeof parsed !== "object") return null;
+		const ts = Number(parsed.ts || 0);
+		if (!Number.isFinite(ts) || Date.now() - ts > POST_LIST_RETURN_MAX_AGE_MS) {
+			sessionStorage.removeItem(POST_LIST_RETURN_STATE_KEY);
+			return null;
+		}
+		return parsed;
+	} catch {
+		return null;
+	}
+}
+
+function getReturnQuery() {
+	try {
+		const currentUrl = new URL(window.location.href);
+		return {
+			isReturn: currentUrl.searchParams.get("return") === "1",
+			slug: (currentUrl.searchParams.get("slug") || "").trim(),
+		};
+	} catch {
+		return { isReturn: false, slug: "" };
+	}
+}
+
+function clearPostListReturnQuery() {
+	try {
+		const currentUrl = new URL(window.location.href);
+		const hasReturnQuery =
+			currentUrl.searchParams.has("return") || currentUrl.searchParams.has("slug");
+		const hasPostItemHash = /^#post-item-/.test(currentUrl.hash);
+		if (!hasReturnQuery && !hasPostItemHash) return;
+		currentUrl.searchParams.delete("return");
+		currentUrl.searchParams.delete("slug");
+		const nextSearch = currentUrl.searchParams.toString();
+		const nextHash = hasPostItemHash ? "" : currentUrl.hash;
+		const nextUrl = `${currentUrl.pathname}${nextSearch ? `?${nextSearch}` : ""}${nextHash}`;
+		window.history.replaceState(window.history.state, "", nextUrl);
+	} catch {}
+}
+
+function decodePathPart(value: string) {
+	try {
+		return decodeURIComponent(value);
+	} catch {
+		return value;
+	}
+}
+
+function getArticleSlugFromHref(rawHref: string) {
+	try {
+		const nextUrl = new URL(rawHref, window.location.origin);
+		const pathname = nextUrl.pathname.replace(/\/+$/, "") || "/";
+		if (!pathname.startsWith("/posts/") || pathname === "/posts") return "";
+		return decodePathPart(pathname.replace(/^\/posts\//, ""));
+	} catch {
+		return "";
+	}
+}
+
+function getPostItemAnchorId(slug: string) {
+	if (!slug) return "";
+	return `post-item-${encodeURIComponent(slug).replace(/%/g, "_")}`;
+}
+
+function savePostListReturnState(link: HTMLAnchorElement) {
+	const list = link.closest("[data-post-list]");
+	if (!(list instanceof HTMLElement)) return;
+
+	const slug = getArticleSlugFromHref(link.href);
+	if (!slug) return;
+
+	const holder = link.closest("[data-post-item]");
+	const itemIndex = Number(holder?.getAttribute("data-item-index") ?? "");
+	const anchorId = holder instanceof HTMLElement && holder.id
+		? holder.id
+		: getPostItemAnchorId(slug);
+	const pager = document.getElementById("client-post-pager");
+	const pageSize = Number(pager?.dataset?.pageSize || "8");
+	const currentPage = Number(pager?.dataset?.currentPage || "1");
+	const inferredPage = Number.isFinite(itemIndex) && Number.isFinite(pageSize) && pageSize > 0
+		? Math.floor(itemIndex / pageSize) + 1
+		: currentPage;
+
+	try {
+		const currentUrl = new URL(window.location.href);
+		currentUrl.searchParams.delete("return");
+		currentUrl.searchParams.delete("slug");
+		currentUrl.searchParams.delete("scrollTo");
+		sessionStorage.setItem(
+			POST_LIST_RETURN_STATE_KEY,
+			JSON.stringify({
+				slug,
+				anchorId,
+				page: Math.max(1, Math.floor(Number(inferredPage) || 1)),
+				scrollY: Math.max(0, Math.floor(window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0)),
+				listUrl: `${currentUrl.pathname}${currentUrl.search}`,
+				ts: Date.now(),
+			}),
+		);
+	} catch {}
+}
+
+function hasPendingPostListRestore() {
+	const list = document.querySelector("[data-post-list]");
+	if (!(list instanceof HTMLElement)) return false;
+	const returnQuery = getReturnQuery();
+	return returnQuery.isReturn || Boolean(readPostListReturnState());
+}
+
+function revealPostListPage(list: HTMLElement, slug: string, state: any) {
+	const items = Array.from(list.querySelectorAll("[data-post-item]"));
+	if (items.length === 0) return;
+
+	const matchIndex = slug
+		? items.findIndex((node) => node.getAttribute("data-post-slug") === slug)
+		: -1;
+	const pager = document.getElementById("client-post-pager");
+	const pageSize = Number(pager?.dataset?.pageSize || "8");
+	const statePage = Number(state?.page);
+	let pageNumber = Number.isFinite(statePage) ? Math.floor(statePage) : 1;
+	if (matchIndex >= 0 && Number.isFinite(pageSize) && pageSize > 0) {
+		pageNumber = Math.floor(matchIndex / pageSize) + 1;
+	}
+	pageNumber = Math.max(1, pageNumber);
+
+	if (typeof list.__setPostListPage === "function") {
+		list.__setPostListPage(pageNumber);
+		return;
+	}
+
+	if (list.dataset.clientPagination === "true" && Number.isFinite(pageSize) && pageSize > 0) {
+		items.forEach((node, index) => {
+			if (!(node instanceof HTMLElement)) return;
+			const itemPage = Math.floor(index / pageSize) + 1;
+			node.style.display = itemPage === pageNumber ? "" : "none";
+		});
+	}
+}
+
+function restoreScrollPosition(targetY: number) {
+	const safeTarget = Math.max(0, Math.floor(Number(targetY) || 0));
+	window.scrollTo(0, safeTarget);
+	document.documentElement.scrollTop = safeTarget;
+	document.body.scrollTop = safeTarget;
+}
+
+function restorePostListReturnPosition(_reason = "manual") {
+	const list = document.querySelector("[data-post-list]");
+	if (!(list instanceof HTMLElement)) {
+		setPostReturnPending(false);
+		return false;
+	}
+
+	const returnQuery = getReturnQuery();
+	const state = readPostListReturnState();
+	if (!returnQuery.isReturn && !state) {
+		setPostReturnPending(false);
+		return false;
+	}
+
+	const targetSlug = returnQuery.slug || state?.slug || "";
+	revealPostListPage(list, targetSlug, state);
+
+	let targetY: number | null = null;
+	const stateScrollY = Number(state?.scrollY);
+	if (Number.isFinite(stateScrollY)) {
+		targetY = Math.max(0, Math.floor(stateScrollY));
+	}
+
+	if (targetY === null && targetSlug) {
+		const targetItem = list.querySelector(`[data-post-slug="${CSS.escape(targetSlug)}"]`);
+		if (targetItem instanceof HTMLElement) {
+			targetY = Math.max(0, Math.floor(targetItem.getBoundingClientRect().top + window.scrollY - 110));
+		}
+	}
+
+	if (targetY === null) {
+		setPostReturnPending(false);
+		return false;
+	}
+
+	restoreScrollPosition(targetY);
+	window.requestAnimationFrame(() => restoreScrollPosition(targetY));
+	window.setTimeout(() => restoreScrollPosition(targetY), 80);
+	window.setTimeout(() => {
+		restoreScrollPosition(targetY);
+		try {
+			sessionStorage.removeItem(POST_LIST_RETURN_STATE_KEY);
+		} catch {}
+		clearPostListReturnQuery();
+		setPostReturnPending(false);
+	}, 220);
+
+	return true;
+}
+
+function syncArticleBackLinkToSavedList() {
+	const backLink = document.querySelector(".article-back-btn");
+	if (!(backLink instanceof HTMLAnchorElement)) return;
+	const state = readPostListReturnState();
+	if (!state?.listUrl || !state?.slug) return;
+	try {
+		const targetUrl = new URL(state.listUrl, window.location.origin);
+		targetUrl.searchParams.delete("scrollTo");
+		targetUrl.hash = "";
+		targetUrl.searchParams.set("return", "1");
+		targetUrl.searchParams.set("slug", state.slug);
+		backLink.href = `${targetUrl.pathname}${targetUrl.search}`;
+	} catch {}
+}
+
+function initPostListReturnState() {
+	if (!postListReturnHandlerBound) {
+		postListReturnHandlerBound = true;
+		document.addEventListener("click", (event) => {
+			const target = event.target;
+			if (!(target instanceof Element)) return;
+			const link = target.closest("[data-post-list] a[href]");
+			if (!(link instanceof HTMLAnchorElement)) return;
+			savePostListReturnState(link);
+		}, true);
+	}
+
+	syncArticleBackLinkToSavedList();
+	const restored = restorePostListReturnPosition("init");
+	if (!restored) {
+		clearPostListReturnQuery();
+	}
+	window.setTimeout(() => {
+		setPostReturnPending(false);
+	}, 1400);
+}
+
+function animateScrollToTop(duration: number) {
+	return new Promise<void>((resolve) => {
+		const startY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+		if (startY <= 4 || duration <= 0) {
+			window.scrollTo(0, 0);
+			resolve();
+			return;
+		}
+
+		const startTime = performance.now();
+		const easeInOutCubic = (t: number) => (
+			t < 0.5
+				? 4 * t * t * t
+				: 1 - ((-2 * t + 2) ** 3) / 2
+		);
+
+		const tick = (now: number) => {
+			const progress = Math.min(1, (now - startTime) / duration);
+			const eased = easeInOutCubic(progress);
+			const nextY = Math.max(0, Math.round(startY * (1 - eased)));
+			window.scrollTo(0, nextY);
+
+			if (progress < 1) {
+				requestAnimationFrame(tick);
+				return;
+			}
+
+			window.scrollTo(0, 0);
+			resolve();
+		};
+
+		requestAnimationFrame(tick);
+	});
+}
+
+function initBackToTopButton() {
+	if (backToTopButtonBound) return;
+	backToTopButtonBound = true;
+
+	document.addEventListener("click", (event) => {
+		const target = event.target;
+		if (!(target instanceof Element)) return;
+
+		const button = target.closest("#back-to-top-btn");
+		if (!(button instanceof HTMLButtonElement)) return;
+
+		event.preventDefault();
+		const currentY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+		const duration = Math.min(620, Math.max(260, currentY * 0.18));
+		animateScrollToTop(duration).catch(() => {
+			window.scrollTo({ top: 0, behavior: "smooth" });
+		});
+	});
+}
+
+function initPostNavScrollTransition() {
+	if (postNavScrollHandlerBound) return;
+	postNavScrollHandlerBound = true;
+
+	document.addEventListener("click", (event) => {
+		const target = event.target;
+		if (!(target instanceof Element)) return;
+
+		const link = target.closest("a[data-post-nav-link='true']");
+		if (!(link instanceof HTMLAnchorElement)) return;
+		if (!link.href || link.getAttribute("href") === "#") return;
+		if (
+			event.defaultPrevented ||
+			event.button !== 0 ||
+			link.target === "_blank" ||
+			event.metaKey ||
+			event.ctrlKey ||
+			event.shiftKey ||
+			event.altKey
+		) {
+			return;
+		}
+		if (postNavTransitionRunning) {
+			event.preventDefault();
+			return;
+		}
+
+		event.preventDefault();
+		postNavTransitionRunning = true;
+		postNavVisitPending = true;
+
+		const currentY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+		const duration = Math.min(760, Math.max(300, currentY * 0.2));
+		document.documentElement.classList.add("post-nav-scrolling");
+		document.documentElement.style.setProperty("--content-delay", "0ms");
+
+		animateScrollToTop(duration)
+			.catch(() => {})
+			.finally(() => {
+				document.documentElement.classList.remove("post-nav-scrolling");
+				document.documentElement.classList.add("post-nav-visit");
+				const href = link.href;
+				if (window?.swup?.navigate) {
+					window.swup.navigate(href);
+				} else {
+					window.location.href = href;
+				}
+				window.setTimeout(() => {
+					postNavTransitionRunning = false;
+				}, 120);
+			});
+	}, { passive: false, capture: true });
+}
+
+function initCustomScrollbar() {
+	// Hub homepage uses a bespoke static layout; body-level scrollbar enhancement
+	// can trigger measurable refresh-time reflow/jitter there.
+	if (document.body?.dataset?.pageType === "hub") return;
+
+	const bodyElement = document.querySelector('body');
+	if (!bodyElement) return;
+	OverlayScrollbars(
+		// docs say that a initialization to the body element would affect native functionality like window.scrollTo
+		// but just leave it here for now
+		{
+			target: bodyElement,
+			cancel: {
+				nativeScrollbarsOverlaid: true,    // don't initialize the overlay scrollbar if there is a native one
+			}
+		}, {
+		scrollbars: {
+			theme: 'scrollbar-base scrollbar-auto py-1',
+			autoHide: 'move',
+			autoHideDelay: 500,
+			autoHideSuspend: false,
+		},
+	});
+
+	const katexElements = document.querySelectorAll('.katex-display') as NodeListOf<HTMLElement>;
+
+	const katexObserverOptions = {
+		root: null,
+		rootMargin: '100px',
+		threshold: 0.1
+	};
+
+	const processKatexElement = (element: HTMLElement) => {
+		if (!element.parentNode) return;
+		if (element.hasAttribute('data-scrollbar-initialized')) return;
+
+		const container = document.createElement('div');
+		container.className = 'katex-display-container';
+		container.setAttribute('aria-label', 'scrollable container for formulas');
+
+		element.parentNode.insertBefore(container, element);
+		container.appendChild(element);
+
+		OverlayScrollbars(container, {
+			scrollbars: {
+				theme: 'scrollbar-base scrollbar-auto',
+				autoHide: 'leave',
+				autoHideDelay: 500,
+				autoHideSuspend: false
+			}
+		});
+
+		element.setAttribute('data-scrollbar-initialized', 'true');
+	};
+
+	const katexObserver = new IntersectionObserver((entries, observer) => {
+		entries.forEach(entry => {
+			if (entry.isIntersecting) {
+			processKatexElement(entry.target as HTMLElement);
+			observer.unobserve(entry.target);
+			}
+		});
+	}, katexObserverOptions);
+
+	katexElements.forEach(element => {
+		katexObserver.observe(element);
+	});
+}
+
+const AVATAR_BANNER_CUT_RATIO = 2 / 3;
+
+function syncHomeBannerHeightToAvatar() {
+	if (typeof window !== "undefined" && window.__bannerToggleInProgress) {
+		return;
+	}
+
+	const root = document.documentElement;
+	const body = document.body;
+
+	// Only adjust on the homepage where the profile avatar exists.
+	if (!body?.classList?.contains("lg:is-home")) {
+		root.style.removeProperty("--home-banner-height-custom");
+		return;
+	}
+
+	const bannerWrapper = document.getElementById("banner-wrapper");
+	const avatar = document.querySelector("#profile-card .profile-avatar-frame");
+	if (!(bannerWrapper instanceof HTMLElement) || !(avatar instanceof HTMLElement)) {
+		return;
+	}
+
+	const bannerRect = bannerWrapper.getBoundingClientRect();
+	const avatarRect = avatar.getBoundingClientRect();
+
+	const bannerTop = bannerRect.top + window.scrollY;
+	const avatarTop = avatarRect.top + window.scrollY;
+	const desiredBottom = avatarTop + avatarRect.height * AVATAR_BANNER_CUT_RATIO;
+
+	let desiredHeight = desiredBottom - bannerTop;
+	if (!Number.isFinite(desiredHeight)) return;
+	desiredHeight = Math.max(0, desiredHeight);
+	// Snap to a multiple of 4px to avoid blurry edges on some displays.
+	desiredHeight = desiredHeight - (desiredHeight % 4);
+
+	root.style.setProperty("--home-banner-height-custom", `${desiredHeight}px`);
+}
+
+function showBanner() {
+	if (!isBannerEnabled()) return;
+
+	const banner = document.getElementById('banner');
+	if (!banner) {
+		console.error('Banner element not found');
+		return;
+	}
+
+	banner.classList.remove('opacity-0', 'scale-105');
+	syncHomeBannerHeightToAvatar();
+}
+
+let backToTopBtn = document.getElementById('back-to-top-btn');
+let toc = document.getElementById('toc-wrapper');
+let navbar = document.getElementById('navbar-wrapper')
+
+function init() {
+	// disableAnimation()()		// TODO
+	loadTheme();
+	loadHue();
+	initCustomScrollbar();
+	initBackToTopButton();
+	initPostNavScrollTransition();
+	showBanner();
+	const pendingPostListRestore = hasPendingPostListRestore();
+	let shouldPreserveScroll = false;
+	try {
+		const entry = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+		const currentUrl = new URL(window.location.href);
+		const isPostsReturn =
+			/^\/posts\/?$/.test(currentUrl.pathname) &&
+			currentUrl.searchParams.get("return") === "1";
+		shouldPreserveScroll = entry?.type === "back_forward" || isPostsReturn || pendingPostListRestore;
+	} catch {
+		shouldPreserveScroll = pendingPostListRestore;
+	}
+	if (document.body?.dataset?.pageType === "hub" && !shouldPreserveScroll) {
+		window.scrollTo(0, 0);
+	}
+	initPostListReturnState();
+	scrollFunction();
+}
+
+window.addEventListener("banner-enabled-updated", () => {
+	requestAnimationFrame(() => {
+		showBanner();
+		requestAnimationFrame(() => {
+			syncHomeBannerHeightToAvatar();
+			scrollFunction();
+		});
+	});
+});
+
+/* Load settings when entering the site */
+init();
+
+const setup = () => {
+	const toPathname = (rawUrl: string) => {
+		try {
+			return new URL(rawUrl, window.location.origin).pathname;
+		} catch {
+			return rawUrl;
+		}
+	};
+	const syncHomeCenteredState = (isHome: boolean) => {
+		const shellElement = document.querySelector(".hub-shell");
+		if (shellElement instanceof HTMLElement) {
+			shellElement.classList.toggle("home-centered", isHome);
+		}
+		const swupContainer = document.getElementById("swup-container");
+		if (swupContainer instanceof HTMLElement) {
+			swupContainer.classList.toggle("home-centered", isHome);
+		}
+	};
+
+	// TODO: temp solution to change the height of the banner
+/*
+	window.swup.hooks.on('animation:out:start', () => {
+		const path = window.location.pathname
+		const body = document.querySelector('body')
+		if (path[path.length - 1] === '/' && !body.classList.contains('is-home')) {
+			body.classList.add('is-home')
+		} else if (path[path.length - 1] !== '/' && body.classList.contains('is-home')) {
+			body.classList.remove('is-home')
+		}
+	})
+*/
+	window.swup.hooks.on('link:click', () => {
+		// Remove the delay for the first time page load
+		document.documentElement.style.setProperty('--content-delay', '0ms')
+
+		// prevent elements from overlapping the navbar
+		if (!isBannerEnabled()) {
+			return
+		}
+		let threshold = window.innerHeight * (BANNER_HEIGHT / 100) - 72 - 16
+		let navbar = document.getElementById('navbar-wrapper')
+		if (!navbar || !document.body.classList.contains('lg:is-home')) {
+			return
+		}
+		if (document.body.scrollTop >= threshold || document.documentElement.scrollTop >= threshold) {
+			navbar.classList.add('navbar-hidden')
+		}
+	})
+	window.swup.hooks.on('content:replace', () => {
+		initCustomScrollbar();
+		restorePostListReturnPosition("content:replace");
+	})
+	window.swup.hooks.before('content:scroll', (visit: {scroll: {reset: boolean; target?: unknown}}) => {
+		if (!hasPendingPostListRestore()) return;
+		visit.scroll.reset = false;
+		visit.scroll.target = undefined;
+	})
+	window.swup.hooks.on('visit:start', (visit: {to: {url: string}}) => {
+		// change banner height immediately when a link is clicked
+		const bodyElement = document.querySelector('body')
+		const targetPathname = toPathname(visit.to.url);
+		const isTargetHome = pathsEqual(targetPathname, url('/'));
+		if (isTargetHome) {
+			bodyElement!.classList.add('lg:is-home');
+		} else {
+			bodyElement!.classList.remove('lg:is-home');
+		}
+		syncHomeCenteredState(isTargetHome);
+
+		// increase the page height during page transition to prevent the scrolling animation from jumping
+		const heightExtend = document.getElementById('page-height-extend')
+		if (heightExtend) {
+			heightExtend.classList.remove('hidden')
+		}
+
+		// Hide the TOC while scrolling back to top
+		let toc = document.getElementById('toc-wrapper');
+		if (toc) {
+			toc.classList.add('toc-not-ready')
+		}
+
+	});
+	window.swup.hooks.on('page:view', () => {
+		// hide the temp high element when the transition is done
+		const heightExtend = document.getElementById('page-height-extend')
+		if (heightExtend) {
+			heightExtend.classList.add('hidden')
+		}
+
+        // Reset all onload animations
+        const isPostNavVisit = postNavVisitPending || document.documentElement.classList.contains('post-nav-visit');
+        if (!isPostNavVisit) {
+            const animatedElements = document.querySelectorAll('.onload-animation');
+            animatedElements.forEach((element) => {
+                if (!(element instanceof HTMLElement)) return;
+                element.style.animation = 'none';
+                void element.offsetHeight; // Force reflow
+                element.style.animation = '';
+            });
+        } else {
+            document.documentElement.style.setProperty('--content-delay', '0ms');
+        }
+
+        // Just make the transition looks better
+        const toc = document.getElementById('toc-wrapper');
+        if (toc) {
+            toc.classList.remove('toc-not-ready')
+        }
+
+        // Re-initialize layout-dependent components
+		const isCurrentHome = pathsEqual(window.location.pathname, url('/'));
+		syncHomeCenteredState(isCurrentHome);
+		if (isCurrentHome) {
+			window.scrollTo(0, 0);
+			window.requestAnimationFrame(() => {
+				syncHomeBannerHeightToAvatar();
+			});
+		}
+        initCustomScrollbar();
+        showBanner();
+		restorePostListReturnPosition("page:view");
+		scrollFunction();
+		if (isPostNavVisit) {
+			postNavVisitPending = false;
+			window.requestAnimationFrame(() => {
+				document.documentElement.classList.remove('post-nav-visit');
+			});
+		}
+	});
+	window.swup.hooks.on('visit:end', (_visit: {to: {url: string}}) => {
+		// No need for setTimeout here, handled in page:view
+	});
+}
+if (window?.swup?.hooks) {
+	setup()
+} else {
+	document.addEventListener('swup:enable', setup)
+}
+
+function scrollFunction() {
+	let bannerHeight = window.innerHeight * (BANNER_HEIGHT / 100)
+	const backToTopShowOffset = 180
+	const isPostNavTransitionActive =
+		document.documentElement.classList.contains('post-nav-scrolling') ||
+		document.documentElement.classList.contains('post-nav-visit');
+	const isPostPage = /^\/posts(?:\/|$)/.test(window.location.pathname)
+	backToTopBtn = document.getElementById('back-to-top-btn');
+
+	if (backToTopBtn) {
+		if (isPostPage && (document.body.scrollTop > backToTopShowOffset || document.documentElement.scrollTop > backToTopShowOffset)) {
+			backToTopBtn.classList.remove('hide')
+		} else {
+			backToTopBtn.classList.add('hide')
+		}
+	}
+
+	if (isBannerEnabled() && toc) {
+		if (isPostPage) {
+			toc.classList.remove('toc-hide')
+		} else if (document.body.scrollTop > bannerHeight || document.documentElement.scrollTop > bannerHeight) {
+			toc.classList.remove('toc-hide')
+		} else {
+			toc.classList.add('toc-hide')
+		}
+	}
+
+	if (!isBannerEnabled()) return
+	if (navbar) {
+		if (isPostNavTransitionActive) {
+			navbar.classList.remove('navbar-hidden')
+			return
+		}
+		const NAVBAR_HEIGHT = 72
+		const MAIN_PANEL_EXCESS_HEIGHT = MAIN_PANEL_OVERLAPS_BANNER_HEIGHT * 16			// The height the main panel overlaps the banner
+
+		let bannerHeight = BANNER_HEIGHT
+		if (document.body.classList.contains('lg:is-home') && window.innerWidth >= 1024) {
+			bannerHeight = BANNER_HEIGHT_HOME
+		}
+		let threshold = window.innerHeight * (bannerHeight / 100) - NAVBAR_HEIGHT - MAIN_PANEL_EXCESS_HEIGHT - 16
+		if (document.body.scrollTop >= threshold || document.documentElement.scrollTop >= threshold) {
+			navbar.classList.add('navbar-hidden')
+		} else {
+			navbar.classList.remove('navbar-hidden')
+		}
+	}
+}
+window.onscroll = scrollFunction
+
+window.onresize = () => {
+	// calculate the --banner-height-extend, which needs to be a multiple of 4 to avoid blurry text
+	let offset = Math.floor(window.innerHeight * (BANNER_HEIGHT_EXTEND / 100));
+	offset = offset - offset % 4;
+	document.documentElement.style.setProperty('--banner-height-extend', `${offset}px`);
+	window.requestAnimationFrame(() => syncHomeBannerHeightToAvatar());
+}
+
+</script>
+
+<script>
+import PhotoSwipeLightbox from "photoswipe/lightbox"
+import "photoswipe/style.css"
+
+let lightbox: PhotoSwipeLightbox
+let pswp = import("photoswipe")
+
+function createPhotoSwipe() {
+	lightbox = new PhotoSwipeLightbox({
+		gallery: ".custom-md img, #post-cover img",
+		pswpModule: () => pswp,
+		closeSVG: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M480-424 284-228q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536-480l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480-424Z"/></svg>',
+		zoomSVG: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M340-540h-40q-17 0-28.5-11.5T260-580q0-17 11.5-28.5T300-620h40v-40q0-17 11.5-28.5T380-700q17 0 28.5 11.5T420-660v40h40q17 0 28.5 11.5T500-580q0 17-11.5 28.5T460-540h-40v40q0 17-11.5 28.5T380-460q-17 0-28.5-11.5T340-500v-40Zm40 220q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l224 224q11 11 11 28t-11 28q-11 11-28 11t-28-11L532-372q-30 24-69 38t-83 14Zm0-80q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/></svg>',
+		padding: { top: 20, bottom: 20, left: 20, right: 20 },
+		wheelToZoom: true,
+		arrowPrev: false,
+		arrowNext: false,
+		imageClickAction: 'close',
+		tapAction: 'close',
+		doubleTapAction: 'zoom',
+	})
+
+	lightbox.addFilter("domItemData", (itemData, element) => {
+		if (element instanceof HTMLImageElement) {
+			itemData.src = element.src
+
+			itemData.w = Number(element.naturalWidth || window.innerWidth)
+			itemData.h = Number(element.naturalHeight || window.innerHeight)
+
+			itemData.msrc = element.src
+		}
+
+		return itemData
+	})
+
+	lightbox.init()
+}
+
+const setup = () => {
+	if (!lightbox) {
+		createPhotoSwipe()
+	}
+	window.swup.hooks.on("page:view", () => {
+		createPhotoSwipe()
+	})
+
+	window.swup.hooks.on(
+		"content:replace",
+		() => {
+			lightbox?.destroy?.()
+		},
+		{ before: true },
+	)
+}
+
+if (window.swup) {
+	setup()
+} else {
+	document.addEventListener("swup:enable", setup)
+}
+</script>
+
+<script>
+const PRESS_SELECTOR = 'button:not(:disabled), a[href], [role="button"]';
+const PRESS_CLASS = "press-feedback-active";
+const RELEASE_DELAY_MS = 110;
+
+const pressReleaseTimers = new WeakMap<HTMLElement, number>();
+let activePressTarget: HTMLElement | null = null;
+const pressWindow = window as Window & { __pressFeedbackBound?: boolean };
+
+function findPressTarget(target: EventTarget | null): HTMLElement | null {
+	if (!(target instanceof Element)) return null;
+	const el = target.closest(PRESS_SELECTOR);
+	if (!(el instanceof HTMLElement)) return null;
+	if (el.getAttribute("aria-disabled") === "true") return null;
+	if (el.classList.contains("disabled")) return null;
+	return el;
+}
+
+function applyPressState(el: HTMLElement) {
+	const oldTimer = pressReleaseTimers.get(el);
+	if (oldTimer) {
+		window.clearTimeout(oldTimer);
+		pressReleaseTimers.delete(el);
+	}
+	el.classList.add(PRESS_CLASS);
+	el.style.setProperty("transform", "translateY(1px) scale(0.94)", "important");
+	el.style.setProperty("filter", "brightness(0.94)", "important");
+}
+
+function clearPressState(el: HTMLElement | null) {
+	if (!el) return;
+	el.classList.remove(PRESS_CLASS);
+	el.style.removeProperty("transform");
+	el.style.removeProperty("filter");
+}
+
+function releasePressState(el: HTMLElement | null) {
+	if (!el) return;
+	const oldTimer = pressReleaseTimers.get(el);
+	if (oldTimer) window.clearTimeout(oldTimer);
+	const timer = window.setTimeout(() => {
+		clearPressState(el);
+		pressReleaseTimers.delete(el);
+		if (activePressTarget === el) {
+			activePressTarget = null;
+		}
+	}, RELEASE_DELAY_MS);
+	pressReleaseTimers.set(el, timer);
+}
+
+function bindPressFeedback() {
+	if (pressWindow.__pressFeedbackBound) return;
+	pressWindow.__pressFeedbackBound = true;
+
+	document.addEventListener("pointerdown", (event) => {
+		const target = findPressTarget(event.target);
+		if (!target) return;
+		if (activePressTarget && activePressTarget !== target) {
+			clearPressState(activePressTarget);
+		}
+		activePressTarget = target;
+		applyPressState(target);
+	}, true);
+
+	document.addEventListener("pointerup", () => {
+		releasePressState(activePressTarget);
+	}, true);
+
+	document.addEventListener("pointercancel", () => {
+		releasePressState(activePressTarget);
+	}, true);
+
+	document.addEventListener("dragstart", () => {
+		releasePressState(activePressTarget);
+	}, true);
+
+	window.addEventListener("blur", () => {
+		clearPressState(activePressTarget);
+		activePressTarget = null;
+	});
+
+	document.addEventListener("visibilitychange", () => {
+		if (document.hidden) {
+			clearPressState(activePressTarget);
+			activePressTarget = null;
+		}
+	});
+}
+
+bindPressFeedback();
+</script>
+

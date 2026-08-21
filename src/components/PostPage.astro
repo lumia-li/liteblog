@@ -1,0 +1,249 @@
+---
+import type { CollectionEntry } from "astro:content";
+import HomeBatchDeleteToolbar from "@components/editor/HomeBatchDeleteToolbar.svelte";
+import { getPostUrlBySlug } from "@utils/url-utils";
+import { Icon } from "astro-icon/components";
+import PostCard from "./PostCard.astro";
+
+const { page } = Astro.props;
+const clientPagination = Boolean(Astro.props.clientPagination);
+const pageSize = Number(Astro.props.pageSize ?? 8);
+const toPostItemAnchorId = (slug: string) =>
+	`post-item-${encodeURIComponent(slug).replace(/%/g, "_")}`;
+
+let delay = 0;
+const interval = 50;
+const postSummaries = page.data.map((entry: CollectionEntry<"posts">) => ({
+	id: entry.id,
+	title: entry.data.title,
+}));
+---
+<div
+	id={clientPagination ? "client-post-list" : undefined}
+	data-post-list="true"
+	data-client-pagination={clientPagination ? "true" : undefined}
+	class="transition flex flex-col rounded-[var(--radius-large)] bg-[var(--card-bg)] py-1 md:py-0 md:bg-transparent md:gap-4 mb-4 relative"
+>
+    <HomeBatchDeleteToolbar client:only="svelte" posts={postSummaries} />
+    {page.data.map((entry: CollectionEntry<"posts">, index: number) => (
+        <div
+            id={toPostItemAnchorId(entry.slug)}
+            data-post-item="true"
+            data-item-index={index}
+            data-post-slug={entry.slug}
+            style={clientPagination && index >= pageSize ? "display: none;" : undefined}
+        >
+            <PostCard
+                entry={entry}
+                title={entry.data.title}
+                tags={entry.data.tags}
+                category={entry.data.category}
+                published={entry.data.published}
+                updated={entry.data.updated}
+                url={getPostUrlBySlug(entry.slug)}
+                image={entry.data.image}
+                description={entry.data.description}
+                draft={entry.data.draft}
+                class:list="onload-animation"
+                style={`animation-delay: calc(var(--content-delay) + ${delay++ * interval}ms);`}
+            ></PostCard>
+        </div>
+    ))}
+</div>
+
+{clientPagination && (
+    <div id="client-post-pager" class="mx-auto onload-animation client-pager" data-page-size={pageSize}>
+        <button type="button" class="pager-link pager-side" data-prev>
+            <Icon name="material-symbols:chevron-left-rounded" class="pager-chevron" />
+            <span>上一页</span>
+        </button>
+        <div class="pager-pages" data-pages></div>
+        <button type="button" class="pager-link pager-side" data-next>
+            <span>下一页</span>
+            <Icon name="material-symbols:chevron-right-rounded" class="pager-chevron" />
+        </button>
+    </div>
+)}
+
+{clientPagination && (
+    <script is:inline>
+        (() => {
+            const list = document.getElementById("client-post-list");
+            const pager = document.getElementById("client-post-pager");
+            if (!list || !pager) return;
+
+            const pageSize = Number(pager.dataset.pageSize || "8");
+            const items = Array.from(list.querySelectorAll("[data-post-item]"));
+            const pagesWrap = pager.querySelector("[data-pages]");
+            const prevBtn = pager.querySelector("[data-prev]");
+            const nextBtn = pager.querySelector("[data-next]");
+            if (!pagesWrap || !prevBtn || !nextBtn || items.length === 0) return;
+
+            const totalPages = Math.max(1, Math.ceil(items.length / pageSize));
+            let currentPage = 1;
+
+            const renderItems = () => {
+                items.forEach((node, idx) => {
+                    const pageNumber = Math.floor(idx / pageSize) + 1;
+                    node.style.display = pageNumber === currentPage ? "" : "none";
+                });
+            };
+
+            const createPageButton = (pageNumber) => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = pageNumber === currentPage ? "pager-current" : "pager-link pager-page";
+                btn.textContent = String(pageNumber);
+                btn.dataset.page = String(pageNumber);
+                return btn;
+            };
+
+            const renderPageButtons = () => {
+                pagesWrap.innerHTML = "";
+                for (let p = 1; p <= totalPages; p += 1) {
+                    pagesWrap.appendChild(createPageButton(p));
+                }
+            };
+
+            const renderState = () => {
+                renderItems();
+                renderPageButtons();
+                prevBtn.classList.toggle("pager-disabled", currentPage <= 1);
+                nextBtn.classList.toggle("pager-disabled", currentPage >= totalPages);
+                pager.dataset.currentPage = String(currentPage);
+            };
+
+            const revealPage = (pageNumber) => {
+                const nextPage = Number(pageNumber);
+                if (!Number.isFinite(nextPage)) return;
+                currentPage = Math.min(totalPages, Math.max(1, Math.floor(nextPage)));
+                renderState();
+            };
+
+            list.__setPostListPage = revealPage;
+
+            pagesWrap.addEventListener("click", (event) => {
+                const target = event.target;
+                if (!(target instanceof HTMLElement)) return;
+                const btn = target.closest("button[data-page]");
+                if (!(btn instanceof HTMLButtonElement)) return;
+                const nextPage = Number(btn.dataset.page || "1");
+                if (!Number.isFinite(nextPage)) return;
+                currentPage = Math.min(totalPages, Math.max(1, nextPage));
+                renderState();
+            });
+
+            prevBtn.addEventListener("click", () => {
+                if (currentPage <= 1) return;
+                currentPage -= 1;
+                renderState();
+            });
+
+            nextBtn.addEventListener("click", () => {
+                if (currentPage >= totalPages) return;
+                currentPage += 1;
+                renderState();
+            });
+
+            renderState();
+        })();
+    </script>
+)}
+
+<style is:global>
+    #client-post-pager {
+        --pager-text: #1f1f1f;
+        --pager-disabled: #b3b3b3;
+        --pager-current-bg: #ececec;
+        --pager-current-text: #111111;
+        --pager-current-border: #dbdbdb;
+    }
+
+    :root.dark #client-post-pager {
+        --pager-text: #e5ebf7;
+        --pager-disabled: #73819a;
+        --pager-current-bg: #1e2838;
+        --pager-current-text: #f8fbff;
+        --pager-current-border: #33455f;
+    }
+
+    #client-post-pager.client-pager {
+        display: flex;
+        flex-direction: row;
+        gap: 0.75rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    #client-post-pager .pager-link {
+        color: var(--pager-text);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        user-select: none;
+    }
+
+    #client-post-pager .pager-side {
+        gap: 2px;
+        font-size: 1.0625rem;
+        min-height: 2.5rem;
+        padding: 0 0.25rem;
+    }
+
+    #client-post-pager .pager-pages {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    #client-post-pager .pager-page,
+    #client-post-pager .pager-current {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 9999px;
+        font-size: 1.125rem;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-variant-numeric: tabular-nums;
+    }
+
+    #client-post-pager .pager-page {
+        background: transparent;
+        border: 0;
+        cursor: pointer;
+    }
+
+    #client-post-pager .pager-current {
+        background: var(--pager-current-bg);
+        color: var(--pager-current-text);
+        border: 1px solid var(--pager-current-border);
+        font-weight: 500;
+    }
+
+    #client-post-pager .pager-chevron {
+        font-size: 1.25rem;
+    }
+
+    #client-post-pager .pager-disabled {
+        color: var(--pager-disabled);
+        pointer-events: none;
+    }
+
+    @media (max-width: 640px) {
+        #client-post-pager .pager-side {
+            font-size: 0.95rem;
+        }
+        #client-post-pager .pager-page,
+        #client-post-pager .pager-current {
+            width: 2.15rem;
+            height: 2.15rem;
+            font-size: 1rem;
+            line-height: 1;
+        }
+    }
+</style>

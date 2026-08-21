@@ -1,0 +1,29 @@
+---
+import type { GetStaticPaths } from "astro";
+import Pagination from "../components/control/Pagination.astro";
+import PostPage from "../components/PostPage.astro";
+import { PAGE_SIZE } from "../constants/constants";
+import MainGridLayout from "../layouts/MainGridLayout.astro";
+import { getSortedPosts } from "../utils/content-utils";
+import { pathsEqual, url } from "../utils/url-utils";
+
+export const getStaticPaths = (async ({ paginate }) => {
+	const allBlogPosts = await getSortedPosts();
+	return paginate(allBlogPosts, { pageSize: PAGE_SIZE });
+}) satisfies GetStaticPaths;
+// https://github.com/withastro/astro/issues/6507#issuecomment-1489916992
+
+const { page } = Astro.props;
+const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
+
+const len = page.data.length;
+---
+
+<MainGridLayout pageType={isHomePage ? "home" : "hub"} homeCentered={isHomePage}>
+    {!isHomePage && (
+        <>
+            <PostPage page={page}></PostPage>
+            <Pagination class="mx-auto onload-animation" page={page} style={`animation-delay: calc(var(--content-delay) + ${(len)*50}ms)`}></Pagination>
+        </>
+    )}
+</MainGridLayout>

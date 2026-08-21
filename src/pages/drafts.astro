@@ -1,0 +1,12 @@
+﻿---
+import DraftManager from "@components/editor/DraftManager.svelte";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { getSortedPostsList } from "@utils/content-utils";
+
+const publishedSlugs = (await getSortedPostsList()).map((post) => post.slug);
+---
+
+<MainGridLayout title="草稿箱" description="本地草稿管理">
+	<DraftManager client:only="svelte" publishedSlugs={publishedSlugs} />
+</MainGridLayout>
+

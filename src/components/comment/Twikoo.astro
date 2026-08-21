@@ -1,0 +1,193 @@
+---
+const config = {
+	el: "#comment",
+	path: Astro.props.path,
+};
+---
+<div id="comment" class="comment-container">
+  <div class="text-center text-gray-500 dark:text-white/75 p-8">
+    <p>评论区加载中...</p>
+    <p class="text-sm mt-2">如果长时间无法显示，请尝试刷新页面。</p>
+  </div>
+</div>
+<script is:inline define:vars={{ config }}>
+  // 优化：使用 Intersection Observer 实现懒加载
+  function initTwikoo() {
+    console.log('开始初始化 Twikoo 评论系统');
+    const commentContainer = document.getElementById('comment');
+    if (!commentContainer) {
+      console.error('评论容器不存在');
+      return;
+    }
+
+    // 直接初始化 Twikoo（如果已加载）
+    if (window.twikoo) {
+      console.log('Twikoo 已加载，直接初始化');
+      window.twikoo.init({
+        ...config,
+        envId: "https://twikoo.liyueovo.top",
+        lang: 'zh-CN',
+        region: 'cn',
+        visitor: true,
+        onCommentLoaded: function() {
+          console.log('评论加载完成');
+        },
+        onCommentPosted: function() {
+          console.log('评论发送完成');
+        }
+      });
+      return;
+    }
+
+    // 检查脚本是否已存在
+    let script = document.getElementById('twikoo-script');
+    if (!script) {
+      console.log('创建新的 Twikoo 脚本标签');
+      // 使用本地脚本文件
+      script = document.createElement('script');
+      script.id = 'twikoo-script';
+      script.src = '/twikoo/twikoo.min.js';
+      script.defer = true;
+
+      // 脚本加载后初始化 Twikoo
+      script.onload = () => {
+        console.log('Twikoo 脚本加载完成');
+        if (window.twikoo) {
+          console.log('Twikoo 初始化开始');
+          window.twikoo.init({
+            ...config,
+            envId: "https://twikoo.liyueovo.top",
+            lang: 'zh-CN',
+            region: 'cn',
+            visitor: true,
+            onCommentLoaded: function() {
+              console.log('评论加载完成');
+            },
+            onCommentPosted: function() {
+              console.log('评论发送完成');
+            }
+          });
+          console.log('Twikoo 初始化完成');
+        } else {
+          console.error('Twikoo 加载失败，window.twikoo 未定义');
+        }
+      };
+
+      script.onerror = () => {
+        console.error('Twikoo 脚本加载失败');
+        const commentContainer = document.getElementById('comment');
+        if (commentContainer) {
+          commentContainer.innerHTML = `
+            <div class="text-center text-red-500 dark:text-red-300 p-8">
+              <p>评论区加载失败</p>
+              <p class="text-sm mt-2">请检查网络连接后刷新页面重试。</p>
+            </div>
+          `;
+        }
+      };
+
+      document.head.appendChild(script);
+    }
+  }
+
+  // 实现懒加载
+  function setupLazyLoading() {
+    const commentContainer = document.getElementById('comment');
+    if (!commentContainer) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          console.log('评论区进入视口，开始加载');
+          initTwikoo();
+          observer.disconnect();
+        }
+      });
+    }, {
+      rootMargin: '200px 0px', // 提前 200px 开始加载
+      threshold: 0.1
+    });
+
+    observer.observe(commentContainer);
+  }
+
+  // 初始化
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupLazyLoading);
+  } else {
+    setupLazyLoading();
+  }
+
+  // 监听 Astro 的页面加载事件
+  document.addEventListener('astro:page-load', setupLazyLoading);
+
+  // 监听 Swup 页面过渡事件
+  function setupSwupHooks() {
+    if (window.swup) {
+      // 在内容替换前清理旧的 Twikoo 实例
+      window.swup.hooks.on('content:replace', () => {
+        console.log('Swup: 内容替换前，清理旧的 Twikoo 实例');
+        // 移除 Twikoo 脚本
+        const script = document.getElementById('twikoo-script');
+        if (script) {
+          script.remove();
+        }
+        // 清理评论容器
+        const commentContainer = document.getElementById('comment');
+        if (commentContainer) {
+          commentContainer.innerHTML = `
+            <div class="text-center text-gray-500 dark:text-white/75 p-8">
+              <p>评论区加载中...</p>
+              <p class="text-sm mt-2">如果长时间无法显示，请尝试刷新页面。</p>
+            </div>
+          `;
+        }
+        // 清理 window.twikoo 实例
+        if (window.twikoo) {
+          console.log('清理 window.twikoo 实例');
+          // 尝试销毁实例（如果有 destroy 方法）
+          if (window.twikoo.destroy) {
+            window.twikoo.destroy();
+          }
+          // 移除 twikoo 对象
+          delete window.twikoo;
+        }
+      });
+
+      // 在页面视图加载后重新初始化
+      window.swup.hooks.on('page:view', () => {
+        console.log('Swup: 页面视图加载后，重新初始化评论区');
+        setupLazyLoading();
+      });
+    } else {
+      // 如果 Swup 还未加载，监听其启用事件
+      document.addEventListener('swup:enable', setupSwupHooks);
+    }
+  }
+
+  // 设置 Swup 钩子
+  setupSwupHooks();
+</script>
+<style>
+  .comment-container {
+    min-height: 200px;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+  }
+
+  #comment {
+    width: 100%;
+    position: relative;
+  }
+
+  /* 确保评论区的弹窗和下拉菜单正确显示 */
+  .twikoo {
+    z-index: 10 !important;
+  }
+
+  .twikoo .el-dropdown-menu,
+  .twikoo .el-dialog {
+    z-index: 1000 !important;
+  }
+</style>

@@ -58,6 +58,11 @@ function handleKeydown(event: KeyboardEvent) {
 	if (event.key === "Escape") closeMenu();
 }
 
+function openAuthModal(tab: "login" | "register") {
+	closeMenu();
+	window.dispatchEvent(new CustomEvent("open-auth-modal", { detail: { tab } }));
+}
+
 onMount(() => {
 	void fetchUser();
 
@@ -153,6 +158,15 @@ onMount(() => {
 				role="menu"
 				transition:fade={{ duration: 120 }}
 			>
+				<button type="button" class="user-dropdown-item" role="menuitem" on:click={() => openAuthModal("login")}>
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="currentColor"/></svg>
+					邮箱登录
+				</button>
+				<button type="button" class="user-dropdown-item user-dropdown-register" role="menuitem" on:click={() => openAuthModal("register")}>
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="currentColor"/></svg>
+					注册账号
+				</button>
+				<div class="user-dropdown-divider" role="separator"></div>
 				<a href="/api/auth/login" class="user-dropdown-item" role="menuitem" on:click={closeMenu}>
 					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z" fill="currentColor"/></svg>
 					使用 Airliny 登录
@@ -301,6 +315,17 @@ onMount(() => {
 	width 18px
 	height 18px
 	flex-shrink 0
+
+.user-dropdown-divider
+	height 1px
+	margin 4px 8px
+	background var(--capsule-border, rgba(205, 213, 224, 0.7))
+
+.user-dropdown-register
+	color var(--primary, #16a34a)
+
+	&:hover
+		background rgba(22, 163, 74, 0.08)
 
 .user-dropdown-danger
 	color #dc2626

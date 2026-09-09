@@ -1,11 +1,14 @@
 ---
 import MainGridLayout from "@layouts/MainGridLayout.astro";
 import { readSession } from "@utils/auth-server";
+import AccountSettings from "@components/auth/AccountSettings.svelte";
 
 export const prerender = false;
 
 const session = readSession(Astro.request);
 const user = session?.user ?? null;
+// 邮箱注册账号的 id 是纯数字（MySQL 自增）；OAuth 用户 id 由各 Provider 签发
+const isEmailAccount = Boolean(user && /^\d+$/.test(user.id));
 ---
 
 <MainGridLayout title="个人资料" description="用户个人资料页" showHero={false}>
@@ -55,6 +58,7 @@ const user = session?.user ?? null;
 					<a href="/" class="profile-btn profile-btn-default">返回首页</a>
 					<a href="/api/auth/logout" class="profile-btn profile-btn-danger">退出登录</a>
 				</div>
+				<AccountSettings client:only="svelte" isEmailAccount={isEmailAccount} />
 			</>
 		) : (
 			<div class="profile-guest">

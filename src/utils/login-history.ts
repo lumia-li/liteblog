@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
 import type { OAuthUser } from "./auth-server";
 
-export type LoginProvider = "airliny" | "qq" | "google" | "github" | "microsoft";
+export type LoginProvider = "airliny" | "qq" | "google" | "github" | "microsoft" | "email";
 
 export type LoginRecord = {
 	/** 唯一记录 id */

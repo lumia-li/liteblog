@@ -49,3 +49,6 @@ dev*.err
 
 # private runtime data (login history etc.)
 data/
+
+# CodeBuddy local data
+.codebuddy/

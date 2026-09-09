@@ -8,7 +8,7 @@ import {
 
 type LoginRecord = {
 	id: string;
-	provider: "airliny" | "qq" | "google" | "github" | "microsoft";
+	provider: "airliny" | "qq" | "google" | "github" | "microsoft" | "email";
 	loginAt: number;
 	ip?: string;
 	ua?: string;
@@ -28,6 +28,7 @@ const PROVIDER_LABEL: Record<LoginRecord["provider"], string> = {
 	google: "Google",
 	github: "GitHub",
 	microsoft: "Microsoft",
+	email: "邮箱",
 };
 
 let locked = true;
@@ -644,6 +645,10 @@ onMount(() => {
 .provider-badge[data-provider="microsoft"]
 	background rgba(0, 120, 212, 0.1)
 	color #0078d4
+
+.provider-badge[data-provider="email"]
+	background rgba(22, 163, 74, 0.1)
+	color #16a34a
 
 .role-badge[data-role="admin"]
 	background rgba(245, 158, 11, 0.12)

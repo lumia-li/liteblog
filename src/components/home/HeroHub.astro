@@ -1,5 +1,6 @@
 ---
 import UserMenu from "@components/auth/UserMenu.svelte";
+import AuthModal from "@components/auth/AuthModal.svelte";
 import { navBarConfig, profileConfig, siteConfig } from "@/config";
 import { Icon } from "astro-icon/components";
 import ImageWrapper from "@components/misc/ImageWrapper.astro";
@@ -85,6 +86,7 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 		<div class="hero-control-divider" aria-hidden="true"></div>
 		<div class="hero-control-user-menu">
 			<UserMenu client:only="svelte" />
+			<AuthModal client:only="svelte" />
 		</div>
 	</div>
 

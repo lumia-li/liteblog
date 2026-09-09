@@ -1377,8 +1377,6 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 	}
 
 	.hero-class-card-link:hover {
-		border-color: #f97316;
-		box-shadow: 0 10px 26px rgba(249, 115, 22, 0.16);
 		transform: translateY(-2px);
 	}
 
@@ -1640,9 +1638,7 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 	}
 
 	.hero-pill:hover {
-		border-color: #f97316;
 		transform: translateY(-2px);
-		box-shadow: 0 6px 16px rgba(249, 115, 22, 0.14);
 	}
 
 	.hero-pill:active {
@@ -1650,11 +1646,6 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 		box-shadow: none;
 		transition-duration: 0.07s;
 		background: color-mix(in oklab, var(--hero-pill-bg) 94%, black);
-	}
-
-	:global(html.dark) .hero-pill:hover {
-		border-color: #fb923c;
-		box-shadow: 0 8px 20px rgba(249, 115, 22, 0.18);
 	}
 
 	.hero-pill-icon {
@@ -1693,9 +1684,7 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 	}
 
 	.hero-chip:hover:not(.hero-chip-active) {
-		border-color: #f97316;
 		transform: translateY(-2px);
-		box-shadow: 0 6px 16px rgba(249, 115, 22, 0.14);
 	}
 
 	.hero-chip:active:not(.hero-chip-active) {
@@ -1714,11 +1703,6 @@ const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 	.hero-chip-active:active {
 		transform: scale(0.93);
 		transition-duration: 0.07s;
-	}
-
-	:global(html.dark) .hero-chip:hover:not(.hero-chip-active) {
-		border-color: #fb923c;
-		box-shadow: 0 8px 20px rgba(249, 115, 22, 0.18);
 	}
 
 	.hero-chip-badge {

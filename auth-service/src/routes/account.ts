@@ -1,3 +1,5 @@
+import { mkdirSync, renameSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import type { RowDataPacket } from "mysql2";
 import { Router } from "express";
 import bcrypt from "bcryptjs";
@@ -8,6 +10,7 @@ import {
 	pool,
 	toPublicUser,
 } from "../db.ts";
+import { env } from "../env.ts";
 import { fail, ok, readJsonBody } from "../middleware.ts";
 import { isValidPassword, isValidUsername, sha256Hex, safeEqualHex } from "../util.ts";
 
@@ -47,6 +50,61 @@ router.patch("/username", async (req, res) => {
 		return ok(res, { user: toPublicUser({ ...user, username, display_name: username }) });
 	} catch (error) {
 		console.error("[account/username] 修改用户名失败:", error);
+		return fail(res, 500, "服务器错误，请稍后重试");
+	}
+});
+
+/** 单个头像文件上限（博客端已转 512 WebP，通常几十 KB，此值仅为兜底） */
+const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
+
+/**
+ * POST /account/avatar
+ * 头像上传并落库。图片在博客端已裁剪并转为 WebP（512x512），
+ * 这里以 base64 接收 → 写入服务器本地磁盘 → 更新 users.avatar_url。
+ * body: { userId, imageBase64 }
+ */
+router.post("/avatar", async (req, res) => {
+	let body: Record<string, unknown>;
+	try {
+		body = JSON.parse(typeof req.body === "string" ? req.body : "{}") as Record<string, unknown>;
+	} catch {
+		return fail(res, 400, "请求体不是合法 JSON");
+	}
+	const userId = parseUserId(body.userId);
+	if (!userId) return fail(res, 400, "缺少用户标识");
+	const raw = typeof body.imageBase64 === "string" ? body.imageBase64 : "";
+	if (!raw) return fail(res, 400, "缺少图片数据");
+
+	let image: Buffer;
+	try {
+		image = Buffer.from(raw, "base64");
+	} catch {
+		return fail(res, 400, "图片数据无法解析");
+	}
+	if (!image.length) return fail(res, 400, "图片数据为空");
+	if (image.length > MAX_AVATAR_BYTES) return fail(res, 413, "图片数据过大");
+
+	try {
+		const user = await findUserById(userId);
+		if (!user) return fail(res, 404, "用户不存在");
+
+		// 先写临时文件再原子重命名，避免并发/中断导致半个文件
+		const dir = env.avatarDir;
+		mkdirSync(dir, { recursive: true });
+		const filename = `${userId}.webp`;
+		const finalPath = join(dir, filename);
+		const tmpPath = join(dir, `.${filename}.${process.pid}.${Date.now()}.tmp`);
+		writeFileSync(tmpPath, image);
+		renameSync(tmpPath, finalPath);
+
+		// 对外地址：优先环境变量，否则用请求 Host（Nginx 反代已配 X-Forwarded-*）
+		const base = env.avatarPublicBase || `${req.protocol}://${req.get("host")}`;
+		const avatarUrl = `${base.replace(/\/+$/, "")}/avatars/${filename}?v=${Date.now()}`;
+
+		await pool.execute("UPDATE users SET avatar_url = ? WHERE id = ?", [avatarUrl, userId]);
+		return ok(res, { user: toPublicUser({ ...user, avatar_url: avatarUrl }) });
+	} catch (error) {
+		console.error("[account/avatar] 上传头像失败:", error);
 		return fail(res, 500, "服务器错误，请稍后重试");
 	}
 });

@@ -17,13 +17,27 @@ const isEmailAccount = Boolean(user && /^\d+$/.test(user.id));
 			<>
 				<aside class="profile-aside">
 					<div class="profile-summary">
-						{user.avatar_url ? (
-							<img src={user.avatar_url} alt={user.display_name || user.username} class="profile-avatar" />
-						) : (
-							<div class="profile-avatar profile-avatar-fallback">
-								{(user.display_name || user.username).charAt(0).toUpperCase()}
-							</div>
-						)}
+						<button
+							type="button"
+							class="profile-avatar-btn"
+							class:list={[!isEmailAccount && "profile-avatar-btn--disabled"]}
+							title={isEmailAccount ? "点击更换头像" : "该账号头像由对应平台管理，无法在此修改"}
+							aria-label="更换头像"
+							onclick={isEmailAccount
+								? "window.dispatchEvent(new CustomEvent('avatar-change-request'))"
+								: "window.dispatchEvent(new CustomEvent('avatar-change-denied'))"}
+						>
+							{user.avatar_url ? (
+								<img src={user.avatar_url} alt={user.display_name || user.username} class="profile-avatar" />
+							) : (
+								<div class="profile-avatar profile-avatar-fallback">
+									{(user.display_name || user.username).charAt(0).toUpperCase()}
+								</div>
+							)}
+							<span class="profile-avatar-cam" aria-hidden="true">
+								<svg viewBox="0 0 24 24"><path d="M12 15.2c1.77 0 3.2-1.43 3.2-3.2s-1.43-3.2-3.2-3.2-3.2 1.43-3.2 3.2 1.43 3.2 3.2 3.2zM9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" fill="currentColor"/></svg>
+							</span>
+						</button>
 						<div class="profile-name-row">
 							<h1 class="profile-name">{user.display_name || user.username}</h1>
 							{["1", "4"].includes(user.id) ? (
@@ -85,7 +99,7 @@ const isEmailAccount = Boolean(user && /^\d+$/.test(user.id));
 					</section>
 					{isEmailAccount && (
 						<section class="profile-panel" id="panel-account" hidden>
-							<AccountSettings client:only="svelte" isEmailAccount={isEmailAccount} />
+							<AccountSettings client:only="svelte" isEmailAccount={isEmailAccount} avatarUrl={user.avatar_url} />
 						</section>
 					)}
 				</main>
@@ -163,7 +177,47 @@ const isEmailAccount = Boolean(user && /^\d+$/.test(user.id));
 			panel.hidden = panel.id !== target;
 		});
 	});
+
+	// 非邮箱账号点击头像：全局 toast 提示原因
+	document.addEventListener("avatar-change-denied", () => {
+		document.querySelectorAll(".avatar-toast").forEach((t) => t.remove());
+		const toast = document.createElement("div");
+		toast.className = "avatar-toast";
+		toast.textContent = "该账号的头像由对应平台管理，无法在此修改";
+		document.body.appendChild(toast);
+		setTimeout(() => toast.remove(), 3000);
+	});
 </script>
+
+<style is:global>
+	.avatar-toast {
+		position: fixed;
+		left: 50%;
+		bottom: 2.2rem;
+		transform: translateX(-50%);
+		z-index: 1200;
+		padding: 0.65rem 1.1rem;
+		border-radius: 12px;
+		background: rgba(20, 24, 32, 0.92);
+		color: #ffffff;
+		font-size: 0.85rem;
+		font-weight: 600;
+		box-shadow: 0 12px 32px rgba(2, 6, 23, 0.35);
+		animation: avatar-toast-in 0.2s ease;
+		white-space: nowrap;
+	}
+
+	@keyframes avatar-toast-in {
+		from {
+			opacity: 0;
+			transform: translate(-50%, 8px);
+		}
+		to {
+			opacity: 1;
+			transform: translate(-50%, 0);
+		}
+	}
+</style>
 
 <style>
 	:root {
@@ -228,6 +282,69 @@ const isEmailAccount = Boolean(user && /^\d+$/.test(user.id));
 		-webkit-user-drag: none;
 		user-drag: none;
 		user-select: none;
+	}
+
+	/* 可点击头像（邮箱账号）：悬停显示相机角标 */
+	.profile-avatar-btn {
+		position: relative;
+		display: inline-flex;
+		padding: 0;
+		border: none;
+		background: none;
+		cursor: pointer;
+		border-radius: 22px;
+	}
+
+	.profile-avatar-btn .profile-avatar {
+		transition: filter 0.15s ease, transform 0.15s ease;
+	}
+
+	.profile-avatar-btn:hover .profile-avatar {
+		filter: brightness(0.82);
+	}
+
+	.profile-avatar-btn:active .profile-avatar {
+		transform: scale(0.97);
+	}
+
+	.profile-avatar-cam {
+		position: absolute;
+		right: -6px;
+		bottom: -6px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 28px;
+		height: 28px;
+		border-radius: 999px;
+		background: linear-gradient(135deg, #ea6c0a, #f97316);
+		color: #ffffff;
+		box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+		opacity: 0;
+		transform: scale(0.7);
+		transition: opacity 0.15s ease, transform 0.15s ease;
+		pointer-events: none;
+	}
+
+	.profile-avatar-cam svg {
+		width: 16px;
+		height: 16px;
+	}
+
+	.profile-avatar-btn:hover .profile-avatar-cam,
+	.profile-avatar-btn:focus-visible .profile-avatar-cam {
+		opacity: 1;
+		transform: scale(1);
+	}
+
+	/* 非邮箱账号：相机角标置灰，点击仅弹出提示 */
+	.profile-avatar-btn--disabled .profile-avatar-cam {
+		background: rgba(120, 128, 145, 0.75);
+		box-shadow: none;
+	}
+
+	.profile-avatar-btn--disabled {
+		cursor: not-allowed;
 	}
 
 	.profile-avatar-guest {

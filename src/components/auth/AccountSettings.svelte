@@ -1,7 +1,10 @@
 <script lang="ts">
 import { fade } from "svelte/transition";
+import { onMount } from "svelte";
+import AvatarCropper from "./AvatarCropper.svelte";
 
 export let isEmailAccount = true; // 是否为邮箱注册账号（id 为纯数字）
+export let avatarUrl = ""; // 当前头像（服务端传入，用于预览）
 
 /* ── 改用户名 ── */
 let username = "";
@@ -30,6 +33,100 @@ let showConfirm = false;
 let passwordLoading = false;
 let passwordMessage = "";
 let passwordState: "idle" | "success" | "error" = "idle";
+
+/* ── 更换头像 ── */
+const MAX_AVATAR_BYTES = 4 * 1024 * 1024; // 4MB（Vercel 请求体上限 4.5MB，留余量）
+
+let fileInput: HTMLInputElement | null = null;
+let pendingFile: File | null = null;
+let cropSrc = "";
+let uploading = false;
+let avatarMessage = "";
+let avatarState: "idle" | "success" | "error" = "idle";
+
+function openFilePicker() {
+	fileInput?.click();
+}
+
+/**
+ * 头像流程提示：面板可能处于隐藏状态（如从 profile 侧栏头像触发），
+ * 除面板内消息外，同步弹出全局 toast 保证用户可见。
+ */
+function notifyAvatar(message: string, state: "success" | "error") {
+	avatarState = state;
+	avatarMessage = message;
+	if (typeof document === "undefined") return;
+	document.querySelectorAll(".avatar-toast").forEach((el) => el.remove());
+	const toast = document.createElement("div");
+	toast.className = `avatar-toast avatar-toast--${state}`;
+	toast.textContent = message;
+	document.body.appendChild(toast);
+	setTimeout(() => toast.remove(), 3000);
+}
+
+// profile 页点击左侧头像时，通过全局事件直接打开头像选择（仅邮箱账号挂载了本组件）
+onMount(() => {
+	const onRequest = () => openFilePicker();
+	window.addEventListener("avatar-change-request", onRequest);
+	return () => window.removeEventListener("avatar-change-request", onRequest);
+});
+
+function handleFileChange(event: Event) {
+	const input = event.currentTarget as HTMLInputElement;
+	const file = input.files?.[0] ?? null;
+	input.value = ""; // 允许再次选择同一文件
+	if (!file) return;
+	if (!file.type.startsWith("image/")) {
+		notifyAvatar("请选择图片文件", "error");
+		return;
+	}
+	if (file.size > MAX_AVATAR_BYTES) {
+		notifyAvatar("图片不能超过 4MB，请压缩后重试", "error");
+		return;
+	}
+	avatarState = "idle";
+	avatarMessage = "";
+	pendingFile = file;
+	const reader = new FileReader();
+	reader.onload = () => {
+		cropSrc = String(reader.result); // 打开裁剪弹窗
+	};
+	reader.readAsDataURL(file);
+}
+
+function handleCropCancel() {
+	cropSrc = "";
+	pendingFile = null;
+}
+
+async function handleCropConfirm(rect: { left: number; top: number; size: number }) {
+	if (!pendingFile || uploading) return;
+	const file = pendingFile;
+	cropSrc = "";
+	pendingFile = null;
+	uploading = true;
+	avatarMessage = "";
+	try {
+		const form = new FormData();
+		form.append("file", file);
+		form.append("crop", JSON.stringify(rect));
+		const response = await fetch("/api/account/avatar", {
+			method: "POST",
+			body: form,
+		});
+		const data = await response.json();
+		if (!response.ok || !data.ok) {
+			notifyAvatar(data.message || "上传失败，请稍后重试", "error");
+			return;
+		}
+		notifyAvatar("头像已更新，正在刷新…", "success");
+		setTimeout(() => window.location.reload(), 800);
+	} catch {
+		notifyAvatar("网络异常，请稍后重试", "error");
+	} finally {
+		uploading = false;
+	}
+}
 
 function startEmailCountdown() {
 	emailCountdown = 60;
@@ -171,6 +268,34 @@ async function handlePassword(event: SubmitEvent) {
 		<div class="profile-section">
 			<h2 class="profile-section-title">账户设置</h2>
 			<div class="profile-body account-body">
+				<!-- 更换头像 -->
+				<div class="account-form">
+					<span class="account-form-title">头像</span>
+					<div class="account-avatar-row">
+						{#if avatarUrl}
+							<img src={avatarUrl} alt="当前头像" class="account-avatar-preview" />
+						{:else}
+							<div class="account-avatar-preview account-avatar-fallback">?</div>
+						{/if}
+						<button type="button" class="account-btn" disabled={uploading} on:click={openFilePicker}>
+							{uploading ? "上传中…" : "更换头像"}
+						</button>
+					</div>
+					<p class="account-avatar-hint">支持 JPG / PNG / WebP / GIF / AVIF，最大 4MB；选择图片后可拖动调整裁剪位置和大小</p>
+					{#if avatarMessage}
+						<p class="account-message {avatarState === 'error' ? 'error' : 'success'}" transition:fade={{ duration: 120 }}>
+							{avatarMessage}
+						</p>
+					{/if}
+					<input
+						type="file"
+						accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+						hidden
+						bind:this={fileInput}
+						on:change={handleFileChange}
+					/>
+				</div>
+
 				<!-- 修改用户名 -->
 				<form class="account-form" on:submit={handleUsername}>
 					<span class="account-form-title">修改用户名</span>
@@ -328,6 +453,10 @@ async function handlePassword(event: SubmitEvent) {
 	</div>
 {/if}
 
+{#if cropSrc}
+	<AvatarCropper src={cropSrc} onConfirm={handleCropConfirm} onCancel={handleCropCancel} />
+{/if}
+
 <style lang="stylus">
 .account-body
 	display flex
@@ -476,6 +605,36 @@ async function handlePassword(event: SubmitEvent) {
 	&.success
 		color #16a34a
 
+/* ── 头像区块 ── */
+.account-avatar-row
+	display flex
+	align-items center
+	gap 1rem
+
+.account-avatar-preview
+	width 72px
+	height 72px
+	border-radius 20px
+	object-fit cover
+	background #f4f5f7
+	border 1px solid #e2e5ea
+	user-select none
+	-webkit-user-drag none
+
+.account-avatar-fallback
+	display inline-flex
+	align-items center
+	justify-content center
+	font-size 1.7rem
+	font-weight 700
+	color #9ca3af
+
+.account-avatar-hint
+	margin 0
+	font-size 0.76rem
+	line-height 1.6
+	color #9ca3af
+
 /* ── 深色模式 ── */
 :global(.dark) .account-form-title
 	color #e8ebf1
@@ -508,4 +667,11 @@ async function handlePassword(event: SubmitEvent) {
 
 	&:hover
 		color #ea6c0a
+
+::global(.dark) .account-avatar-preview
+	background #212733
+	border-color #333b49
+
+::global(.dark) .account-avatar-hint
+	color #6b7280
 </style>

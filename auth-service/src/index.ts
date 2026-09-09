@@ -12,10 +12,15 @@ import { pool } from "./db.ts";
 const app = express();
 
 // 保留原始 body 字符串，readJsonBody 统一解析
-app.use(express.text({ type: () => true, limit: "64kb" }));
+// 上限放宽到 4MB：头像上传走 base64 JSON（512 WebP 通常只有几十 KB，留足余量）
+app.use(express.text({ type: () => true, limit: "4mb" }));
 app.disable("x-powered-by");
 app.set("trust proxy", true);
 app.use(corsMiddleware);
+
+// 头像静态资源（无需 API Key，供 <img> 直接访问）。
+// 注意：若认证服务挂在 Nginx 反代后，需把 /avatars 路径也代理出去。
+app.use("/avatars", express.static(env.avatarDir, { maxAge: "30d", index: false }));
 
 // 健康检查（无需鉴权）
 app.get("/health", asyncHandler(async (_req, res) => {
@@ -35,6 +40,8 @@ app.get("/health", asyncHandler(async (_req, res) => {
 //   POST /email/set-password         凭 token 设密码（注册建号 / 换绑邮箱）
 //   POST /email/login                邮箱密码登录
 //   PATCH /account/username          改用户名
+//   POST  /account/avatar            上传头像并落库（base64 WebP）
+//   GET   /avatars/*                 头像静态资源（公开）
 //   POST  /account/email/verify      凭验证码换绑邮箱
 //   POST  /account/password          改密码
 //   GET   /account/me                读取邮箱账号信息

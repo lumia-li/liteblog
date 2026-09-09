@@ -45,4 +45,9 @@ export const env = {
 	verifyExpireMinutes: num("VERIFY_EXPIRE_MINUTES", 15),
 	siteUrl: optional("SITE_URL", "https://li.liyueovo.top"),
 	sessionDays: num("SESSION_DAYS", 7),
+
+	/** 头像图片磁盘存储目录（相对启动目录或绝对路径） */
+	avatarDir: optional("AVATAR_DIR", "data/avatars"),
+	/** 头像对外访问地址前缀，如 https://api.liyueovo.top/avatars（留空则用请求 Host 推导） */
+	avatarPublicBase: optional("AVATAR_PUBLIC_BASE"),
 } as const;

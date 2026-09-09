@@ -925,7 +925,7 @@ export async function fetchMicrosoftUserInfo(
  *   GITHUB_REPO（仓库名，默认 liteblog）
  *   GITHUB_OWNER（仓库所属账号，默认 lumia-li）
  */
-async function uploadAvatarToGitHub(
+export async function uploadAvatarToGitHub(
 	userId: string,
 	photoBuf: Uint8Array,
 	contentType: string,
@@ -1011,6 +1011,15 @@ async function uploadAvatarToGitHub(
 				await putRes.text(),
 			);
 			return "";
+		}
+
+		// 刷新 jsDelivr 边缘缓存，避免更新头像后 CDN 仍返回旧图
+		try {
+			await fetch(
+				`https://purge.jsdelivr.net/gh/${owner}/${repo}@${branch}/avatars/${filename}`,
+			);
+		} catch {
+			/* purge 失败不影响主流程，URL 上的时间戳参数也能绕过浏览器缓存 */
 		}
 
 		return `https://cdn.jsdelivr.net/gh/${owner}/${repo}@${branch}/avatars/${filename}`;

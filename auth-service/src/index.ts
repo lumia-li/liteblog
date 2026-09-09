@@ -44,6 +44,7 @@ app.get("/health", asyncHandler(async (_req, res) => {
 //   GET   /avatars/*                 头像静态资源（公开）
 //   POST  /account/email/verify      凭验证码换绑邮箱
 //   POST  /account/password          改密码
+//   DELETE /account                  注销账号（需邮箱验证码）
 //   GET   /account/me                读取邮箱账号信息
 app.use("/email", requireApiKey, registerRoutes);
 app.use("/email", requireApiKey, verifyRoutes);

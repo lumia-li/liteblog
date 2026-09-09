@@ -99,7 +99,7 @@ const isEmailAccount = Boolean(user && /^\d+$/.test(user.id));
 					</section>
 					{isEmailAccount && (
 						<section class="profile-panel" id="panel-account" hidden>
-							<AccountSettings client:only="svelte" isEmailAccount={isEmailAccount} avatarUrl={user.avatar_url} />
+							<AccountSettings client:only="svelte" isEmailAccount={isEmailAccount} avatarUrl={user.avatar_url} email={user.email || ""} />
 						</section>
 					)}
 				</main>
@@ -538,6 +538,58 @@ const isEmailAccount = Boolean(user && /^\d+$/.test(user.id));
 	.profile-main {
 		padding: 2.2rem 2.3rem 2.6rem;
 		min-width: 0;
+	}
+
+	/* 桌面端：内容过长时限高整卡，右侧改为卡片内滚动（鼠标滚轮）；内容不长时保持自然高度 */
+	@media (min-width: 901px) {
+		.profile-shell:not(.profile-shell--guest) {
+			max-height: min(720px, calc(100vh - 8rem));
+			grid-template-rows: minmax(0, 1fr);
+		}
+
+		.profile-main {
+			min-height: 0;
+			overflow-y: auto;
+			overscroll-behavior: contain;
+			scrollbar-width: thin;
+			scrollbar-color: rgba(120, 128, 145, 0.45) transparent;
+		}
+
+		.profile-aside {
+			min-height: 0;
+			overflow-y: auto;
+			scrollbar-width: thin;
+			scrollbar-color: rgba(120, 128, 145, 0.45) transparent;
+		}
+
+		.profile-main::-webkit-scrollbar {
+			width: 8px;
+		}
+
+		.profile-main::-webkit-scrollbar-track {
+			background: transparent;
+		}
+
+		.profile-main::-webkit-scrollbar-thumb {
+			border-radius: 999px;
+			background: rgba(120, 128, 145, 0.35);
+		}
+
+		.profile-main::-webkit-scrollbar-thumb:hover {
+			background: rgba(120, 128, 145, 0.55);
+		}
+
+		:root.dark .profile-main {
+			scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+		}
+
+		:root.dark .profile-main::-webkit-scrollbar-thumb {
+			background: rgba(255, 255, 255, 0.22);
+		}
+
+		:root.dark .profile-main::-webkit-scrollbar-thumb:hover {
+			background: rgba(255, 255, 255, 0.38);
+		}
 	}
 
 	.profile-panel[hidden] {

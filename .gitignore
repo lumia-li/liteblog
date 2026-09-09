@@ -47,6 +47,9 @@ yarn.lock
 dev*.log
 dev*.err
 
+# local runtime data
+data/
+
 # private runtime data (login history etc.)
 data/
 

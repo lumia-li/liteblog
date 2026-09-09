@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { pool, findUserByEmail, purgeExpiredVerifications } from "../db.ts";
+import { pool, findUserByEmail, findUserById, purgeExpiredVerifications } from "../db.ts";
 import { env } from "../env.ts";
 import { sendVerificationMail } from "../mailer.ts";
 import { fail, getClientIp, ok, readJsonBody } from "../middleware.ts";
@@ -12,19 +12,36 @@ type Body = { email?: unknown; purpose?: unknown };
 
 /**
  * POST /email/send-code
- * 发送验证码邮件（注册 或 换绑邮箱）
- * body: { email, purpose: "register" | "change-email" }
- * change-email 时额外要求 { userId }（目标用户），由博客端从会话中取
+ * 发送验证码邮件（注册 / 换绑邮箱 / 注销账号）
+ * body: { email, purpose: "register" | "change-email" | "delete-account" }
+ * change-email / delete-account 时额外要求 { userId }，由博客端从会话中取
  */
 router.post("/send-code", async (req, res) => {
 	const body = readJsonBody<Body>(req);
 	if (!body) return fail(res, 400, "请求体不是合法 JSON");
 
-	const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
-	const purpose = body.purpose === "change-email" ? "change-email" : "register";
+	let email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+	const purpose = body.purpose === "change-email"
+		? "change-email"
+		: body.purpose === "delete-account"
+			? "delete-account"
+			: "register";
 	const userId = typeof (body as { userId?: unknown }).userId === "string"
 		? String((body as { userId: string }).userId)
 		: "";
+
+	// 注销账号：不信任客户端传入的邮箱，以 userId 反查账号邮箱
+	if (purpose === "delete-account") {
+		if (!/^\d{1,10}$/.test(userId)) return fail(res, 400, "缺少用户标识");
+		try {
+			const user = await findUserById(userId);
+			if (!user) return fail(res, 404, "用户不存在");
+			email = user.email;
+		} catch (error) {
+			console.error("[send-code] 查询用户失败:", error);
+			return fail(res, 500, "服务器错误，请稍后重试");
+		}
+	}
 
 	if (!isValidEmail(email)) return fail(res, 400, "邮箱格式不正确");
 	if (purpose === "change-email" && !/^\d{1,10}$/.test(userId)) {
@@ -63,7 +80,15 @@ router.post("/send-code", async (req, res) => {
 		await pool.execute(
 			`INSERT INTO email_verifications (email, purpose, code_hash, token_hash, user_id, ip, expires_at)
 			 VALUES (?, ?, ?, ?, ?, ?, ?)`,
-			[email, purpose, codeHash, tokenHash, purpose === "change-email" ? Number(userId) : null, ip, expiresAt],
+			[
+				email,
+				purpose,
+				codeHash,
+				tokenHash,
+				purpose === "change-email" || purpose === "delete-account" ? Number(userId) : null,
+				ip,
+				expiresAt,
+			],
 		);
 
 		await sendVerificationMail({ to: email, code, purpose, token });

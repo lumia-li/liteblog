@@ -1,4 +1,4 @@
-import { mkdirSync, renameSync, writeFileSync } from "node:fs";
+import { mkdirSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { RowDataPacket } from "mysql2";
 import { Router } from "express";
@@ -194,6 +194,80 @@ router.post("/password", async (req, res) => {
 		return ok(res, {});
 	} catch (error) {
 		console.error("[account/password] 修改密码失败:", error);
+		return fail(res, 500, "服务器错误，请稍后重试");
+	}
+});
+
+/**
+ * DELETE /account
+ * 注销账号（需先向账号邮箱发送 purpose=delete-account 的验证码）。
+ * body: { userId, code }
+ * 事务内：消费验证码 → 删除用户 → 清理验证记录与登录失败锁定；头像文件尽力删除。
+ */
+router.delete("/", async (req, res) => {
+	const body = readJsonBody<Body>(req);
+	if (!body) return fail(res, 400, "请求体不是合法 JSON");
+	const userId = parseUserId(body.userId);
+	const code = typeof body.code === "string" ? body.code.trim() : "";
+	if (!userId) return fail(res, 400, "缺少用户标识");
+	if (!/^\d{6}$/.test(code)) return fail(res, 400, "验证码格式不正确");
+
+	try {
+		const user = await findUserById(userId);
+		if (!user) return fail(res, 404, "用户不存在");
+
+		// 找到该用户最近一条 delete-account 验证记录
+		const [rows] = await pool.execute<RowDataPacket[]>(
+			`SELECT * FROM email_verifications
+			 WHERE email = ? AND purpose = 'delete-account' AND user_id = ? AND consumed = 0
+			 ORDER BY id DESC LIMIT 1`,
+			[user.email, Number(userId)],
+		);
+		const row = rows[0] as
+			| { id: number; code_hash: string; verified: number; consumed: number; expires_at: Date }
+			| undefined;
+		if (!row) return fail(res, 400, "请先获取验证码");
+		if (new Date(row.expires_at).getTime() < Date.now()) {
+			return fail(res, 400, "验证码已过期，请重新获取");
+		}
+		if (row.verified === 0 && !safeEqualHex(sha256Hex(code), row.code_hash)) {
+			return fail(res, 400, "验证码不正确");
+		}
+
+		// 原子消费验证码，防止并发重复注销
+		const [update] = await pool.execute(
+			"UPDATE email_verifications SET consumed = 1, verified = 1 WHERE id = ? AND consumed = 0",
+			[row.id],
+		);
+		if ((update as { affectedRows?: number }).affectedRows !== 1) {
+			return fail(res, 400, "验证码已被使用，请重新获取");
+		}
+
+		// 事务删除账号及其关联数据
+		const conn = await pool.getConnection();
+		try {
+			await conn.beginTransaction();
+			await conn.execute("DELETE FROM users WHERE id = ?", [Number(userId)]);
+			await conn.execute("DELETE FROM email_verifications WHERE email = ?", [user.email]);
+			await conn.execute("DELETE FROM login_attempts WHERE email = ?", [user.email]);
+			await conn.commit();
+		} catch (error) {
+			await conn.rollback();
+			throw error;
+		} finally {
+			conn.release();
+		}
+
+		// 尽力删除本服务器上的头像文件（失败不影响注销结果）
+		try {
+			unlinkSync(join(env.avatarDir, `${userId}.webp`));
+		} catch {
+			/* 文件不存在或无权限时忽略 */
+		}
+
+		return ok(res, {});
+	} catch (error) {
+		console.error("[account/delete] 注销账号失败:", error);
 		return fail(res, 500, "服务器错误，请稍后重试");
 	}
 });

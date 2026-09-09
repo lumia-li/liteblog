@@ -45,36 +45,48 @@ function buildHtml(title: string, body: string, link?: { href: string; label: st
 export async function sendVerificationMail(params: {
 	to: string;
 	code: string;
-	purpose: "register" | "change-email";
+	purpose: "register" | "change-email" | "delete-account";
 	token: string;
 }): Promise<void> {
 	const isRegister = params.purpose === "register";
+	const isDelete = params.purpose === "delete-account";
 	const setUrl = `${env.siteUrl}/auth/set-password?token=${params.token}`;
 	const minutes = env.verifyExpireMinutes;
 
 	const title = isRegister
 		? `注册验证码：${params.code}`
-		: `换绑邮箱验证码：${params.code}`;
+		: isDelete
+			? `注销账号验证码：${params.code}`
+			: `换绑邮箱验证码：${params.code}`;
+
+	const intro = isRegister
+		? "你正在注册博客账号。"
+		: isDelete
+			? "你正在注销博客账号，账号将被永久删除且无法恢复。"
+			: "你正在为博客账号换绑邮箱。";
 
 	const body = `
       <p style="margin:0 0 8px;font-size:14px;color:#374151;">你好！</p>
-      <p style="margin:0 0 12px;font-size:14px;color:#374151;">${
-				isRegister ? "你正在注册博客账号。" : "你正在为博客账号换绑邮箱。"
-			}本次验证码 <strong style="font-size:22px;letter-spacing:4px;color:#1d2838;">${params.code}</strong>（${minutes} 分钟内有效）。</p>
+      <p style="margin:0 0 12px;font-size:14px;color:#374151;">${intro}本次验证码 <strong style="font-size:22px;letter-spacing:4px;color:#1d2838;">${params.code}</strong>（${minutes} 分钟内有效）。</p>
       ${
-				isRegister
-					? `<p style="margin:0;font-size:14px;color:#374151;">点击下方链接即可直接设置密码，完成注册：</p>`
-					: `<p style="margin:0;font-size:14px;color:#374151;">点击下方链接确认换绑：</p>`
+				isDelete
+					? `<p style="margin:0;font-size:14px;color:#dc2626;font-weight:600;">请勿将验证码透露给任何人。若非本人操作，请立即修改密码以确保账号安全。</p>`
+					: isRegister
+						? `<p style="margin:0;font-size:14px;color:#374151;">点击下方链接即可直接设置密码，完成注册：</p>`
+						: `<p style="margin:0;font-size:14px;color:#374151;">点击下方链接确认换绑：</p>`
 			}`;
 
 	await transporter.sendMail({
 		from: fromAddress(),
 		to: params.to,
 		subject: title,
-		html: buildHtml(title, body, {
-			href: setUrl,
-			label: isRegister ? "设置密码，完成注册" : "确认换绑邮箱",
-		}),
-		text: `${title}\n\n验证码：${params.code}（${minutes} 分钟内有效）\n链接：${setUrl}\n\n若非本人操作，请忽略此邮件。`,
+		html: buildHtml(
+			title,
+			body,
+			isDelete ? undefined : { href: setUrl, label: isRegister ? "设置密码，完成注册" : "确认换绑邮箱" },
+		),
+		text: isDelete
+			? `${title}\n\n验证码：${params.code}（${minutes} 分钟内有效）\n\n若非本人操作，请立即修改密码以确保账号安全。`
+			: `${title}\n\n验证码：${params.code}（${minutes} 分钟内有效）\n链接：${setUrl}\n\n若非本人操作，请忽略此邮件。`,
 	});
 }

@@ -153,29 +153,6 @@ async function handleLogin(event: SubmitEvent) {
 	}
 }
 
-/* ── 模拟账号一键登录（仅供测试，不产生任何数据） ── */
-async function handleMockLogin() {
-	if (loginLoading) return;
-	loginError = "";
-	loginSuccess = "";
-	loginLoading = true;
-	try {
-		const response = await fetch("/api/auth/mock-login", { method: "POST" });
-		const data = await response.json();
-		if (!response.ok || !data.ok) {
-			loginError = data.message || "测试登录不可用";
-			return;
-		}
-		loginSuccess = "测试账号登录成功，正在刷新…";
-		window.dispatchEvent(new CustomEvent("auth-login-success"));
-		setTimeout(() => window.location.reload(), 600);
-	} catch {
-		loginError = "网络异常，请稍后重试";
-	} finally {
-		loginLoading = false;
-	}
-}
-
 /* ── 注册：发送验证码（兼容 form submit 与按钮 click 两种触发） ── */
 async function handleSendCode(event?: { preventDefault(): void }) {
 	event?.preventDefault();
@@ -330,16 +307,7 @@ async function handleVerifyCode(event: SubmitEvent) {
 						<button type="button" class="link-btn" on:click={() => (forgotMsg = !forgotMsg)}>
 							忘记密码
 						</button>
-						<span class="footer-divider" aria-hidden="true"></span>
-						<button
-							type="button"
-							class="link-btn link-btn-mock"
-							disabled={loginLoading}
-							on:click={handleMockLogin}
-						>
-							测试账号登录
-						</button>
-					</footer>
+						</footer>
 					{#if forgotMsg}
 						<p class="msg msg-hint" transition:fade={{ duration: 120 }}>
 							暂未开放自助找回，请发邮件至 me@liyueovo.top，验证后帮你重置。
@@ -731,13 +699,6 @@ async function handleVerifyCode(event: SubmitEvent) {
 	&:disabled
 		opacity 0.55
 		cursor not-allowed
-
-.link-btn-mock
-	color #9ca3af
-
-	&:hover:not(:disabled)
-		color #6b7280
-		text-decoration underline
 
 .panel-note
 	margin 0

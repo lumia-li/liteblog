@@ -57,6 +57,20 @@ function closeModal() {
 	open = false;
 }
 
+/**
+ * Portal：把弹窗 DOM 移到 document.body 下。
+ * HeroHub 的控制胶囊带 backdrop-filter，会让祖先内 position:fixed 失效
+ * （弹窗被钉在胶囊角落），portal 到 body 后 fixed 才真正相对视口居中。
+ */
+function portal(node: HTMLElement) {
+	document.body.appendChild(node);
+	return {
+		destroy() {
+			node.remove();
+		},
+	};
+}
+
 function resetForms() {
 	loginEmail = "";
 	loginPassword = "";
@@ -193,6 +207,8 @@ async function handleVerifyCode(event: SubmitEvent) {
 
 {#if open}
 	<div
+		bind:this={modalElement}
+		use:portal
 		class="auth-modal-overlay"
 		transition:fade={{ duration: 160 }}
 		on:click={(event) => {
@@ -201,7 +217,6 @@ async function handleVerifyCode(event: SubmitEvent) {
 		role="presentation"
 	>
 		<div
-			bind:this={modalElement}
 			class="auth-modal"
 			role="dialog"
 			aria-modal="true"
@@ -320,7 +335,8 @@ async function handleVerifyCode(event: SubmitEvent) {
 
 .auth-modal
 	position relative
-	width min(92vw, 380px)
+	width 380px
+	max-width 92vw
 	padding 1.75rem 1.75rem 1.5rem
 	border-radius 18px
 	border 1px solid var(--capsule-menu-border, rgba(214, 222, 233, 0.95))

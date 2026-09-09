@@ -218,6 +218,7 @@ async function handleVerifyCode(event: SubmitEvent) {
 		}}
 		role="presentation"
 	>
+		<p class="overlay-title" transition:fade={{ duration: 160 }}>登录LiyueAccount账号</p>
 		<div
 			class="auth-card"
 			role="dialog"
@@ -393,12 +394,23 @@ async function handleVerifyCode(event: SubmitEvent) {
 	inset 0
 	z-index 1000
 	display flex
+	flex-direction column
 	align-items center
 	justify-content center
+	gap 0.9rem
 	padding 1rem
 	background rgba(10, 14, 22, 0.5)
 	backdrop-filter blur(8px)
 	-webkit-backdrop-filter blur(8px)
+
+.overlay-title
+	margin 0
+	font-size 1.05rem
+	font-weight 700
+	letter-spacing 0.02em
+	color rgba(255, 255, 255, 0.92)
+	text-shadow 0 2px 12px rgba(0, 0, 0, 0.35)
+	text-align center
 
 /* ── 双面板卡片 ── */
 .auth-card

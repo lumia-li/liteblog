@@ -1,20 +1,22 @@
 <script lang="ts">
+import { fade } from "svelte/transition";
 import { onMount } from "svelte";
 
 export let token = "";
-export let mode: "register" | "change-email" | "checking" | "invalid" = "checking";
+export let mode: "register" | "change-email" | "checking" | "invalid" | "success" = "checking";
 export let email = "";
 export let errorMessage = "";
 
 let password = "";
 let confirmPassword = "";
-let showPassword = false;
-let showConfirm = false;
 let username = "";
 let showUsername = false;
 let loading = false;
 let error = "";
 let success = "";
+let successTitle = "";
+let showPassword = false;
+let showConfirm = false;
 
 async function checkToken() {
 	if (!token) {
@@ -64,13 +66,16 @@ async function handleSubmit(event: SubmitEvent) {
 			error = data.message || "设置密码失败";
 			return;
 		}
+		mode = "success";
 		if (data.purpose === "change-email") {
+			successTitle = "换绑成功";
 			success = "邮箱换绑成功，正在返回…";
 			sessionStorage.removeItem("auth-modal-open");
 			setTimeout(() => {
 				window.location.href = "/profile";
 			}, 900);
 		} else {
+			successTitle = "注册完成";
 			success = "注册完成！即将前往登录…";
 			// 回到首页并自动打开登录弹窗
 			sessionStorage.setItem("auth-modal-open", "login");
@@ -90,203 +95,339 @@ onMount(() => {
 });
 </script>
 
-<div class="setpw-card">
-	{#if mode === "checking"}
-		<p class="setpw-status">正在校验链接…</p>
-	{:else if mode === "invalid"}
-		<div class="setpw-icon setpw-icon-error" aria-hidden="true">
-			<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor"/></svg>
-		</div>
-		<h2 class="setpw-title">链接无效</h2>
-		<p class="setpw-message error">{errorMessage}</p>
-		<a href="/" class="setpw-btn setpw-btn-primary">返回首页</a>
-	{:else if success}
-		<div class="setpw-icon setpw-icon-success" aria-hidden="true">
-			<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="currentColor"/></svg>
-		</div>
-		<h2 class="setpw-title">{mode === "change-email" ? "换绑成功" : "注册完成"}</h2>
-		<p class="setpw-message success">{success}</p>
-	{:else}
-		<h2 class="setpw-title">{mode === "change-email" ? "确认换绑邮箱" : "设置密码"}</h2>
-		<p class="setpw-subtitle">
-			{mode === "change-email"
-				? `验证通过，即将把账号邮箱换绑为 ${email}`
-				: `为 ${email} 设置登录密码，完成注册`}
-		</p>
-		<form class="setpw-form" on:submit={handleSubmit}>
-			{#if mode === "register" && showUsername}
-				<label class="setpw-field">
-					<span class="setpw-label">用户名（可选，不填自动生成）</span>
-					<input
-						type="text"
-						class="setpw-input"
-						placeholder="1-24 位，中文/字母/数字/下划线"
-						bind:value={username}
-						maxlength="24"
-					/>
-				</label>
+<div class="auth-page">
+	<p class="page-title">登录LiyueAccount账号</p>
+	<div class="auth-card">
+		<!-- 左侧品牌面板（与登录弹窗同款） -->
+		<aside class="brand-panel">
+			<div class="brand-glow brand-glow-1" aria-hidden="true"></div>
+			<div class="brand-glow brand-glow-2" aria-hidden="true"></div>
+			<span class="brand-badge" aria-hidden="true">
+				<svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="currentColor"/></svg>
+			</span>
+			<h1 class="brand-title">liyue blog</h1>
+			<p class="brand-subtitle">分享技术与生活的博客</p>
+			<div class="brand-footer" aria-hidden="true">
+				<span class="brand-dot"></span>
+				<span class="brand-dot"></span>
+				<span class="brand-dot"></span>
+			</div>
+		</aside>
+
+		<!-- 右侧内容面板 -->
+		<section class="form-panel">
+			{#if mode === "checking"}
+				<header class="panel-header">
+					<h2 class="panel-title">正在校验链接</h2>
+					<p class="panel-subtitle">请稍候…</p>
+				</header>
+			{:else if mode === "invalid"}
+				<header class="panel-header">
+					<h2 class="panel-title">链接无效</h2>
+				</header>
+				<div class="state-block">
+					<span class="state-icon state-icon-error" aria-hidden="true">
+						<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor"/></svg>
+					</span>
+					<p class="msg msg-error">{errorMessage}</p>
+					<a href="/" class="submit-btn state-btn">返回首页</a>
+				</div>
+			{:else if mode === "success"}
+				<header class="panel-header">
+					<h2 class="panel-title">{successTitle}</h2>
+				</header>
+				<div class="state-block">
+					<span class="state-icon state-icon-success" aria-hidden="true">
+						<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="currentColor"/></svg>
+					</span>
+					<p class="msg msg-success">{success}</p>
+				</div>
+			{:else}
+				<header class="panel-header">
+					<h2 class="panel-title">{mode === "change-email" ? "确认换绑邮箱" : "设置密码"}</h2>
+					<p class="panel-subtitle">
+						{mode === "change-email"
+							? `验证通过，即将把账号邮箱换绑为`
+							: "为下面的邮箱设置登录密码，完成注册"}
+						{#if mode === "change-email"}<strong class="sent-mail">{email}</strong>{/if}
+					</p>
+					{#if mode === "register"}
+						<p class="panel-mail sent-mail">{email}</p>
+					{/if}
+				</header>
+				<form class="form" on:submit={handleSubmit}>
+					{#if mode === "register" && showUsername}
+						<label class="field">
+							<span class="field-label">用户名（可选，不填自动生成）</span>
+							<input
+								type="text"
+								class="input"
+								placeholder="1-24 位，中文/字母/数字/下划线"
+								bind:value={username}
+								maxlength="24"
+							/>
+						</label>
+					{/if}
+					<label class="field">
+						<span class="field-label">设置密码</span>
+						<div class="input-wrap">
+							<input
+								type={showPassword ? "text" : "password"}
+								class="input"
+								placeholder="8-64 位"
+								bind:value={password}
+								required
+								minlength="8"
+								maxlength="64"
+								autocomplete={mode === "register" ? "new-password" : "current-password"}
+							/>
+							<button
+								type="button"
+								class="eye-btn"
+								on:click={() => (showPassword = !showPassword)}
+								aria-label={showPassword ? "隐藏密码" : "显示密码"}
+								tabindex="-1"
+							>
+								{#if showPassword}
+									<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z" fill="currentColor"/></svg>
+								{:else}
+									<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/></svg>
+								{/if}
+							</button>
+						</div>
+					</label>
+					<label class="field">
+						<span class="field-label">确认密码</span>
+						<div class="input-wrap">
+							<input
+								type={showConfirm ? "text" : "password"}
+								class="input"
+								placeholder="再次输入密码"
+								bind:value={confirmPassword}
+								required
+								autocomplete="new-password"
+							/>
+							<button
+								type="button"
+								class="eye-btn"
+								on:click={() => (showConfirm = !showConfirm)}
+								aria-label={showConfirm ? "隐藏密码" : "显示密码"}
+								tabindex="-1"
+							>
+								{#if showConfirm}
+									<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z" fill="currentColor"/></svg>
+								{:else}
+									<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/></svg>
+								{/if}
+							</button>
+						</div>
+					</label>
+					{#if error}<p class="msg msg-error">{error}</p>{/if}
+					<button type="submit" class="submit-btn" disabled={loading}>
+						{loading ? "提交中…" : mode === "change-email" ? "确认换绑" : "完成注册"}
+					</button>
+				</form>
 			{/if}
-			<label class="setpw-field">
-				<span class="setpw-label">设置密码</span>
-				<div class="setpw-input-wrap">
-					<input
-						type={showPassword ? "text" : "password"}
-						class="setpw-input"
-						placeholder="8-64 位"
-						bind:value={password}
-						required
-						minlength="8"
-						maxlength="64"
-						autocomplete={mode === "register" ? "new-password" : "current-password"}
-					/>
-					<button
-						type="button"
-						class="setpw-eye"
-						on:click={() => (showPassword = !showPassword)}
-						aria-label={showPassword ? "隐藏密码" : "显示密码"}
-						tabindex="-1"
-					>
-						{#if showPassword}
-							<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z" fill="currentColor"/></svg>
-						{:else}
-							<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/></svg>
-						{/if}
-					</button>
-				</div>
-			</label>
-			<label class="setpw-field">
-				<span class="setpw-label">确认密码</span>
-				<div class="setpw-input-wrap">
-					<input
-						type={showConfirm ? "text" : "password"}
-						class="setpw-input"
-						placeholder="再次输入密码"
-						bind:value={confirmPassword}
-						required
-						autocomplete="new-password"
-					/>
-					<button
-						type="button"
-						class="setpw-eye"
-						on:click={() => (showConfirm = !showConfirm)}
-						aria-label={showConfirm ? "隐藏密码" : "显示密码"}
-						tabindex="-1"
-					>
-						{#if showConfirm}
-							<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z" fill="currentColor"/></svg>
-						{:else}
-							<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/></svg>
-						{/if}
-					</button>
-				</div>
-			</label>
-			{#if error}<p class="setpw-message error">{error}</p>{/if}
-			<button type="submit" class="setpw-btn setpw-btn-primary" disabled={loading}>
-				{loading ? "提交中…" : mode === "change-email" ? "确认换绑" : "完成注册"}
-			</button>
-		</form>
-	{/if}
+		</section>
+	</div>
 </div>
 
 <style lang="stylus">
-.setpw-card
-	max-width 420px
-	margin 2rem auto
-	padding 2rem
-	border-radius 18px
-	border 1px solid var(--capsule-menu-border, rgba(214, 222, 233, 0.95))
-	background var(--capsule-menu-bg, rgba(255, 255, 255, 0.9))
-	backdrop-filter blur(12px)
-	box-shadow 0 16px 40px rgba(2, 6, 23, 0.1)
+/* 页面容器：卡片居中（与登录弹窗同款双面板） */
+.auth-page
+	display flex
+	flex-direction column
+	align-items center
+	justify-content center
+	gap 0.9rem
+	padding 2rem 1rem
+	min-height 60vh
 
-.setpw-title
-	margin 0 0 0.4rem
-	font-size 1.25rem
-	font-weight 700
-	color var(--capsule-text, #1d2838)
-
-.setpw-subtitle
-	margin 0 0 1.4rem
-	font-size 0.86rem
-	line-height 1.6
-	color #6b7280
-	word-break break-all
-
-.setpw-status
+.page-title
 	margin 0
-	font-size 0.9rem
-	color #6b7280
+	font-size 1.05rem
+	font-weight 700
+	letter-spacing 0.02em
+	color #1d2838
+	text-align center
 
-.setpw-icon
+.auth-card
+	position relative
+	display grid
+	grid-template-columns 1fr 1fr
+	width 720px
+	max-width 94vw
+	border-radius 20px
+	overflow hidden
+	border 1px solid rgba(228, 232, 240, 0.9)
+	background #ffffff
+	box-shadow 0 28px 72px rgba(2, 6, 23, 0.18)
+
+/* ── 左侧品牌面板 ── */
+.brand-panel
+	position relative
+	display flex
+	flex-direction column
+	justify-content center
+	gap 0.65rem
+	padding 2.5rem 2.2rem
+	background linear-gradient(160deg, #f4f5f7 0%, #e9ebef 100%)
+	overflow hidden
+
+.brand-glow
+	position absolute
+	border-radius 999px
+	filter blur(56px)
+	opacity 0.5
+	pointer-events none
+
+.brand-glow-1
+	width 220px
+	height 220px
+	top -60px
+	right -60px
+	background rgba(249, 115, 22, 0.22)
+
+.brand-glow-2
+	width 180px
+	height 180px
+	bottom -50px
+	left -50px
+	background rgba(99, 102, 241, 0.16)
+
+.brand-badge
 	display inline-flex
 	align-items center
 	justify-content center
-	width 48px
-	height 48px
-	border-radius 999px
-	margin-bottom 0.8rem
+	width 42px
+	height 42px
+	border-radius 13px
+	background linear-gradient(135deg, #f97316, #fb923c)
+	color #ffffff
+	box-shadow 0 8px 20px rgba(249, 115, 22, 0.35)
+	margin-bottom 0.4rem
 
 	& svg
-		width 26px
-		height 26px
+		width 21px
+		height 21px
 
-.setpw-icon-success
-	background rgba(22, 163, 74, 0.12)
-	color #16a34a
+.brand-title
+	margin 0
+	font-size 1.5rem
+	font-weight 800
+	letter-spacing -0.02em
+	color #1d2838
 
-.setpw-icon-error
-	background rgba(220, 38, 38, 0.1)
-	color #dc2626
+.brand-subtitle
+	margin 0
+	font-size 0.9rem
+	line-height 1.7
+	color #6b7280
 
-.setpw-form
+.brand-footer
+	display flex
+	gap 7px
+	margin-top 1.6rem
+
+.brand-dot
+	width 8px
+	height 8px
+	border-radius 999px
+	background #f97316
+	opacity 0.85
+
+	&:nth-child(2)
+		opacity 0.45
+
+	&:nth-child(3)
+		opacity 0.2
+
+/* ── 右侧表单面板 ── */
+.form-panel
 	display flex
 	flex-direction column
-	gap 0.9rem
+	justify-content center
+	gap 1.1rem
+	min-height 420px
+	padding 2.5rem 2.4rem
+	background #ffffff
 
-.setpw-field
+.panel-header
 	display flex
 	flex-direction column
-	gap 0.35rem
+	gap 0.3rem
 
-.setpw-label
+.panel-title
+	margin 0
+	font-size 1.35rem
+	font-weight 700
+	color #1d2838
+
+.panel-subtitle
+	margin 0
+	font-size 0.85rem
+	color #6b7280
+
+.panel-mail
+	font-size 1rem
+	font-weight 700
+
+.sent-mail
+	color #f97316
+	word-break break-all
+
+.form
+	display flex
+	flex-direction column
+	gap 0.95rem
+
+.field
+	display flex
+	flex-direction column
+	gap 0.4rem
+
+.field-label
 	font-size 0.78rem
 	font-weight 600
-	color var(--capsule-text, #1d2838)
-	opacity 0.75
+	color #4b5563
 
-.setpw-input
-	padding 0.6rem 0.8rem
+/* 输入框：聚焦橙色光效（与登录弹窗一致） */
+.input
+	padding 0.62rem 0.85rem
 	border-radius 12px
-	border 1px solid var(--capsule-border, rgba(205, 213, 224, 0.95))
-	background var(--capsule-bg, rgba(255, 255, 255, 0.8))
-	color var(--capsule-text, #1d2838)
+	border 1.5px solid #e2e5ea
+	background #fafbfc
+	color #1d2838
 	font-size 0.92rem
 	outline none
-	transition border-color 0.15s ease, box-shadow 0.15s ease
+	transition border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease
 
 	/* 隐藏浏览器原生密码显隐按钮 */
 	&::-ms-reveal
 	&::-ms-clear
 		display none
 
-	&:focus
-		border-color var(--primary, #4f8ef7)
-		box-shadow 0 0 0 3px rgba(79, 142, 247, 0.16)
-
 	&::placeholder
-		opacity 0.45
+		color #b3b9c4
 
-/* 密码可见性切换 */
-.setpw-input-wrap
+	&:hover
+		border-color #d3d7de
+
+	&:focus
+		border-color #f97316
+		background #ffffff
+		box-shadow 0 0 0 4px rgba(249, 115, 22, 0.16), 0 1px 6px rgba(249, 115, 22, 0.12)
+
+.input-wrap
 	position relative
 	display flex
 	align-items center
 
-	& .setpw-input
+	& .input
 		width 100%
 		padding-right 2.7rem
 
-.setpw-eye
+.eye-btn
 	position absolute
 	right 6px
 	display inline-flex
@@ -309,41 +450,172 @@ onMount(() => {
 		width 19px
 		height 19px
 
-.setpw-message
-	margin 0
-	font-size 0.82rem
-	line-height 1.55
-
-	&.error
-		color #dc2626
-
-	&.success
-		color #16a34a
-
-.setpw-btn
+/* 主按钮 */
+.submit-btn
 	display inline-flex
 	align-items center
 	justify-content center
-	padding 0.65rem 1.2rem
-	border-radius 12px
-	font-size 0.9rem
-	font-weight 600
-	text-decoration none
-	cursor pointer
-	transition transform 0.15s ease, box-shadow 0.15s ease
-
-.setpw-btn-primary
-	margin-top 0.25rem
+	padding 0.68rem 0
 	border none
-	background var(--primary, #1d2838)
-	color #fff
-	box-shadow 0 6px 18px rgba(29, 40, 56, 0.22)
+	border-radius 12px
+	background linear-gradient(135deg, #ea6c0a, #f97316)
+	color #ffffff
+	font-size 0.94rem
+	font-weight 700
+	letter-spacing 0.02em
+	cursor pointer
+	text-decoration none
+	box-shadow 0 8px 20px rgba(249, 115, 22, 0.32)
+	transition transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease
 
 	&:hover:not(:disabled)
 		transform translateY(-1px)
-		box-shadow 0 10px 24px rgba(29, 40, 56, 0.28)
+		box-shadow 0 12px 26px rgba(249, 115, 22, 0.4)
+
+	&:active:not(:disabled)
+		transform scale(0.985)
 
 	&:disabled
-		opacity 0.6
+		opacity 0.62
 		cursor not-allowed
+
+.state-btn
+	margin-top 0.4rem
+	padding 0.6rem 1.5rem
+	background transparent
+	border 1.5px solid #e2e5ea
+	color #4b5563
+	box-shadow none
+	font-weight 600
+
+	&:hover:not(:disabled)
+		border-color #f97316
+		color #f97316
+		box-shadow none
+		transform none
+
+	&:active:not(:disabled)
+		transform scale(0.985)
+
+/* 状态块（成功 / 失败） */
+.state-block
+	display flex
+	flex-direction column
+	align-items flex-start
+	gap 0.8rem
+
+.state-icon
+	display inline-flex
+	align-items center
+	justify-content center
+	width 46px
+	height 46px
+	border-radius 999px
+
+	& svg
+		width 24px
+		height 24px
+
+.state-icon-success
+	background rgba(22, 163, 74, 0.12)
+	color #16a34a
+
+.state-icon-error
+	background rgba(220, 38, 38, 0.1)
+	color #dc2626
+
+/* 消息 */
+.msg
+	margin 0
+	font-size 0.85rem
+	line-height 1.55
+
+	&.msg-error
+		color #dc2626
+
+	&.msg-success
+		color #16a34a
+
+/* ── 深色模式 ── */
+:global(.dark) .auth-card
+	border-color rgba(63, 70, 84, 0.85)
+	background #191e26
+
+:global(.dark) .page-title
+	color #e8ebf1
+
+:global(.dark) .brand-panel
+	background linear-gradient(160deg, #232936 0%, #1b202b 100%)
+
+:global(.dark) .brand-title
+	color #e8ebf1
+
+:global(.dark) .brand-subtitle
+	color #9aa2b1
+
+:global(.dark) .form-panel
+	background #191e26
+
+:global(.dark) .panel-title
+	color #e8ebf1
+
+:global(.dark) .panel-subtitle
+	color #9aa2b1
+
+:global(.dark) .field-label
+	color #b9c0cc
+
+:global(.dark) .input
+	border-color #333b49
+	background #212733
+	color #e8ebf1
+
+	&::placeholder
+		color #5b6472
+
+	&:hover
+		border-color #414b5c
+
+	&:focus
+		border-color #fb923c
+		background #232a37
+		box-shadow 0 0 0 4px rgba(249, 115, 22, 0.2), 0 1px 6px rgba(249, 115, 22, 0.14)
+
+:global(.dark) .eye-btn
+	color #6b7280
+
+	&:hover
+		color #d6dae2
+		background rgba(255, 255, 255, 0.08)
+
+:global(.dark) .state-btn
+	border-color #333b49
+	color #b9c0cc
+
+	&:hover:not(:disabled)
+		border-color #fb923c
+		color #fb923c
+		background transparent
+
+/* ── 移动端 ── */
+@media (max-width: 760px)
+	.auth-card
+		grid-template-columns 1fr
+		width 420px
+		max-width 92vw
+		border-radius 18px
+
+	.brand-panel
+		display none
+
+	.form-panel
+		min-height 360px
+		padding 2rem 1.6rem 1.8rem
+
+@media (max-width: 420px)
+	.auth-card
+		max-width 96vw
+
+	.form-panel
+		padding 1.7rem 1.25rem 1.5rem
 </style>

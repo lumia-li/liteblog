@@ -459,8 +459,9 @@ async function handleVerifyCode(event: SubmitEvent) {
 	display flex
 	flex-direction column
 	justify-content center
+	align-items flex-start
 	gap 0.65rem
-	padding 2.5rem 2.2rem
+	padding 2.5rem 1.5rem
 	background linear-gradient(160deg, #f4f5f7 0%, #e9ebef 100%)
 	overflow hidden
 

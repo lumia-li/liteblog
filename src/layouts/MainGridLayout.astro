@@ -1,6 +1,7 @@
 ﻿---
 import Footer from "@components/Footer.astro";
 import GlobalControlCapsule from "@components/home/GlobalControlCapsule.astro";
+import AuthModal from "@components/auth/AuthModal.svelte";
 import HeroHub from "@components/home/HeroHub.astro";
 import type { MarkdownHeading } from "astro";
 import { Icon } from "astro-icon/components";
@@ -51,6 +52,8 @@ const {
 			<Footer />
 		</main>
 	</div>
+	{/* 全局登录/注册弹窗：挂在 swup 容器外，全站单实例，任意页面可通过 open-auth-modal 事件唤起 */}
+	<AuthModal client:only="svelte" />
 	<div id="floating-actions" aria-label="文章快捷操作">
 		<button id="comments-shortcut-btn" class="floating-action-btn comments-shortcut-btn hide" type="button" aria-label="跳到评论区" title="跳到评论区">
 			<Icon name="material-symbols:forum-outline-rounded" />

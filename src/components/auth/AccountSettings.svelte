@@ -419,25 +419,38 @@ async function handlePassword(event: SubmitEvent) {
 		height 19px
 
 .account-btn
-	padding 0.55rem 1.1rem
-	border none
+	padding 0.68rem 1.6rem
+	border 1.5px solid #e2e5ea
 	border-radius 12px
-	background linear-gradient(135deg, #ea6c0a, #f97316)
-	color #fff
-	font-size 0.85rem
-	font-weight 700
+	background transparent
+	color #4b5563
+	font-size 0.94rem
+	font-weight 600
+	letter-spacing 0.02em
 	cursor pointer
-	box-shadow 0 6px 16px rgba(249, 115, 22, 0.3)
-	transition transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease
+	box-shadow none
+	transition transform 0.16s ease, opacity 0.16s ease, border-color 0.16s ease, color 0.16s ease
 	white-space nowrap
 
 	&:hover:not(:disabled)
-		transform translateY(-1px)
-		box-shadow 0 10px 22px rgba(249, 115, 22, 0.38)
+		border-color #f97316
+		color #f97316
+		transform none
+
+	&:active:not(:disabled)
+		transform scale(0.985)
 
 	&:disabled
 		opacity 0.62
 		cursor not-allowed
+
+::global(.dark) .account-btn
+	border-color #4b5563
+	color #e2e5ea
+
+	&:hover:not(:disabled)
+		border-color #fb923c
+		color #fb923c
 
 .account-link
 	align-self flex-start

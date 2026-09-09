@@ -8,6 +8,8 @@ export let errorMessage = "";
 
 let password = "";
 let confirmPassword = "";
+let showPassword = false;
+let showConfirm = false;
 let username = "";
 let showUsername = false;
 let loading = false;
@@ -126,27 +128,57 @@ onMount(() => {
 			{/if}
 			<label class="setpw-field">
 				<span class="setpw-label">设置密码</span>
-				<input
-					type="password"
-					class="setpw-input"
-					placeholder="8-64 位"
-					bind:value={password}
-					required
-					minlength="8"
-					maxlength="64"
-					autocomplete={mode === "register" ? "new-password" : "current-password"}
-				/>
+				<div class="setpw-input-wrap">
+					<input
+						type={showPassword ? "text" : "password"}
+						class="setpw-input"
+						placeholder="8-64 位"
+						bind:value={password}
+						required
+						minlength="8"
+						maxlength="64"
+						autocomplete={mode === "register" ? "new-password" : "current-password"}
+					/>
+					<button
+						type="button"
+						class="setpw-eye"
+						on:click={() => (showPassword = !showPassword)}
+						aria-label={showPassword ? "隐藏密码" : "显示密码"}
+						tabindex="-1"
+					>
+						{#if showPassword}
+							<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z" fill="currentColor"/></svg>
+						{:else}
+							<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/></svg>
+						{/if}
+					</button>
+				</div>
 			</label>
 			<label class="setpw-field">
 				<span class="setpw-label">确认密码</span>
-				<input
-					type="password"
-					class="setpw-input"
-					placeholder="再次输入密码"
-					bind:value={confirmPassword}
-					required
-					autocomplete="new-password"
-				/>
+				<div class="setpw-input-wrap">
+					<input
+						type={showConfirm ? "text" : "password"}
+						class="setpw-input"
+						placeholder="再次输入密码"
+						bind:value={confirmPassword}
+						required
+						autocomplete="new-password"
+					/>
+					<button
+						type="button"
+						class="setpw-eye"
+						on:click={() => (showConfirm = !showConfirm)}
+						aria-label={showConfirm ? "隐藏密码" : "显示密码"}
+						tabindex="-1"
+					>
+						{#if showConfirm}
+							<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z" fill="currentColor"/></svg>
+						{:else}
+							<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/></svg>
+						{/if}
+					</button>
+				</div>
 			</label>
 			{#if error}<p class="setpw-message error">{error}</p>{/if}
 			<button type="submit" class="setpw-btn setpw-btn-primary" disabled={loading}>
@@ -232,12 +264,50 @@ onMount(() => {
 	outline none
 	transition border-color 0.15s ease, box-shadow 0.15s ease
 
+	/* 隐藏浏览器原生密码显隐按钮 */
+	&::-ms-reveal
+	&::-ms-clear
+		display none
+
 	&:focus
 		border-color var(--primary, #4f8ef7)
 		box-shadow 0 0 0 3px rgba(79, 142, 247, 0.16)
 
 	&::placeholder
 		opacity 0.45
+
+/* 密码可见性切换 */
+.setpw-input-wrap
+	position relative
+	display flex
+	align-items center
+
+	& .setpw-input
+		width 100%
+		padding-right 2.7rem
+
+.setpw-eye
+	position absolute
+	right 6px
+	display inline-flex
+	align-items center
+	justify-content center
+	width 30px
+	height 30px
+	border none
+	border-radius 8px
+	background transparent
+	color #9ca3af
+	cursor pointer
+	transition color 0.15s ease, background-color 0.15s ease
+
+	&:hover
+		color #6b7280
+		background rgba(120, 128, 145, 0.1)
+
+	& svg
+		width 19px
+		height 19px
 
 .setpw-message
 	margin 0

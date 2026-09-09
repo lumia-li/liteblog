@@ -24,6 +24,9 @@ let emailState: "idle" | "success" | "error" = "idle";
 let currentPassword = "";
 let newPassword = "";
 let confirmPassword = "";
+let showCurrent = false;
+let showNew = false;
+let showConfirm = false;
 let passwordLoading = false;
 let passwordMessage = "";
 let passwordState: "idle" | "success" | "error" = "idle";
@@ -89,7 +92,7 @@ async function handleSendChangeEmailCode(event: SubmitEvent) {
 		}
 		emailStep = "code";
 		emailState = "success";
-		emailMessage = "验证码已发送至新邮箱，请查收（也可点击邮件内链接直接确认换绑）";
+		emailMessage = "验证码已发送至新邮箱，请查收";
 		startEmailCountdown();
 	} catch {
 		emailState = "error";
@@ -237,34 +240,79 @@ async function handlePassword(event: SubmitEvent) {
 				<form class="account-form" on:submit={handlePassword}>
 					<span class="account-form-title">修改密码</span>
 					<div class="account-row">
-						<input
-							type="password"
-							class="account-input"
-							placeholder="当前密码"
-							bind:value={currentPassword}
-							required
-							autocomplete="current-password"
-						/>
+						<div class="account-input-wrap">
+							<input
+								type={showCurrent ? "text" : "password"}
+								class="account-input"
+								placeholder="当前密码"
+								bind:value={currentPassword}
+								required
+								autocomplete="current-password"
+							/>
+							<button
+								type="button"
+								class="account-eye"
+								on:click={() => (showCurrent = !showCurrent)}
+								aria-label={showCurrent ? "隐藏密码" : "显示密码"}
+								tabindex="-1"
+							>
+								{#if showCurrent}
+									<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z" fill="currentColor"/></svg>
+								{:else}
+									<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/></svg>
+								{/if}
+							</button>
+						</div>
 					</div>
 					<div class="account-row">
-						<input
-							type="password"
-							class="account-input"
-							placeholder="新密码（8-64 位）"
-							bind:value={newPassword}
-							required
-							minlength="8"
-							maxlength="64"
-							autocomplete="new-password"
-						/>
-						<input
-							type="password"
-							class="account-input"
-							placeholder="确认新密码"
-							bind:value={confirmPassword}
-							required
-							autocomplete="new-password"
-						/>
+						<div class="account-input-wrap account-input-grow">
+							<input
+								type={showNew ? "text" : "password"}
+								class="account-input"
+								placeholder="新密码（8-64 位）"
+								bind:value={newPassword}
+								required
+								minlength="8"
+								maxlength="64"
+								autocomplete="new-password"
+							/>
+							<button
+								type="button"
+								class="account-eye"
+								on:click={() => (showNew = !showNew)}
+								aria-label={showNew ? "隐藏密码" : "显示密码"}
+								tabindex="-1"
+							>
+								{#if showNew}
+									<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z" fill="currentColor"/></svg>
+								{:else}
+									<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/></svg>
+								{/if}
+							</button>
+						</div>
+						<div class="account-input-wrap account-input-grow">
+							<input
+								type={showConfirm ? "text" : "password"}
+								class="account-input"
+								placeholder="确认新密码"
+								bind:value={confirmPassword}
+								required
+								autocomplete="new-password"
+							/>
+							<button
+								type="button"
+								class="account-eye"
+								on:click={() => (showConfirm = !showConfirm)}
+								aria-label={showConfirm ? "隐藏密码" : "显示密码"}
+								tabindex="-1"
+							>
+								{#if showConfirm}
+									<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z" fill="currentColor"/></svg>
+								{:else}
+									<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/></svg>
+								{/if}
+							</button>
+						</div>
 						<button type="submit" class="account-btn" disabled={passwordLoading}>
 							{passwordLoading ? "提交中…" : "保存"}
 						</button>
@@ -316,6 +364,11 @@ async function handlePassword(event: SubmitEvent) {
 	outline none
 	transition border-color 0.15s ease, box-shadow 0.15s ease
 
+	/* 隐藏浏览器原生密码显隐按钮 */
+	&::-ms-reveal
+	&::-ms-clear
+		display none
+
 	&:focus
 		border-color var(--primary, #4f8ef7)
 		box-shadow 0 0 0 3px rgba(79, 142, 247, 0.16)
@@ -326,6 +379,41 @@ async function handlePassword(event: SubmitEvent) {
 .account-input-code
 	letter-spacing 0.35em
 	text-align center
+
+/* 密码可见性切换 */
+.account-input-wrap
+	position relative
+	display flex
+	align-items center
+	flex 1
+	min-width 180px
+
+	& .account-input
+		width 100%
+		padding-right 2.7rem
+
+.account-eye
+	position absolute
+	right 6px
+	display inline-flex
+	align-items center
+	justify-content center
+	width 30px
+	height 30px
+	border none
+	border-radius 8px
+	background transparent
+	color #9ca3af
+	cursor pointer
+	transition color 0.15s ease, background-color 0.15s ease
+
+	&:hover
+		color #6b7280
+		background rgba(120, 128, 145, 0.1)
+
+	& svg
+		width 19px
+		height 19px
 
 .account-btn
 	padding 0.55rem 1.1rem

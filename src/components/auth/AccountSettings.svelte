@@ -342,8 +342,7 @@ async function handlePassword(event: SubmitEvent) {
 .account-form-title
 	font-size 0.82rem
 	font-weight 700
-	color var(--capsule-text, #1d2838)
-	opacity 0.85
+	color #1d2838
 
 .account-row
 	display flex
@@ -357,24 +356,28 @@ async function handlePassword(event: SubmitEvent) {
 .account-input
 	padding 0.55rem 0.75rem
 	border-radius 12px
-	border 1px solid var(--capsule-border, rgba(205, 213, 224, 0.95))
-	background var(--capsule-bg, rgba(255, 255, 255, 0.8))
-	color var(--capsule-text, #1d2838)
+	border 1.5px solid #e2e5ea
+	background #fafbfc
+	color #1d2838
 	font-size 0.88rem
 	outline none
-	transition border-color 0.15s ease, box-shadow 0.15s ease
+	transition border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease
 
 	/* 隐藏浏览器原生密码显隐按钮 */
 	&::-ms-reveal
 	&::-ms-clear
 		display none
 
-	&:focus
-		border-color var(--primary, #4f8ef7)
-		box-shadow 0 0 0 3px rgba(79, 142, 247, 0.16)
-
 	&::placeholder
-		opacity 0.45
+		color #b3b9c4
+
+	&:hover
+		border-color #d3d7de
+
+	&:focus
+		border-color #f97316
+		background #ffffff
+		box-shadow 0 0 0 4px rgba(249, 115, 22, 0.16), 0 1px 6px rgba(249, 115, 22, 0.12)
 
 .account-input-code
 	letter-spacing 0.35em
@@ -419,19 +422,21 @@ async function handlePassword(event: SubmitEvent) {
 	padding 0.55rem 1.1rem
 	border none
 	border-radius 12px
-	background var(--primary, #1d2838)
+	background linear-gradient(135deg, #ea6c0a, #f97316)
 	color #fff
 	font-size 0.85rem
-	font-weight 600
+	font-weight 700
 	cursor pointer
-	transition transform 0.15s ease, opacity 0.15s ease
+	box-shadow 0 6px 16px rgba(249, 115, 22, 0.3)
+	transition transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease
 	white-space nowrap
 
 	&:hover:not(:disabled)
 		transform translateY(-1px)
+		box-shadow 0 10px 22px rgba(249, 115, 22, 0.38)
 
 	&:disabled
-		opacity 0.6
+		opacity 0.62
 		cursor not-allowed
 
 .account-link
@@ -439,10 +444,14 @@ async function handlePassword(event: SubmitEvent) {
 	padding 0
 	border none
 	background transparent
-	color var(--primary, #4f8ef7)
+	color #f97316
 	font-size 0.78rem
 	font-weight 600
 	cursor pointer
+	transition color 0.15s ease
+
+	&:hover
+		color #ea6c0a
 
 .account-message
 	margin 0
@@ -453,4 +462,37 @@ async function handlePassword(event: SubmitEvent) {
 
 	&.success
 		color #16a34a
+
+/* ── 深色模式 ── */
+:global(.dark) .account-form-title
+	color #e8ebf1
+
+:global(.dark) .account-input
+	border-color #333b49
+	background #212733
+	color #e8ebf1
+
+	&::placeholder
+		color #5b6472
+
+	&:hover
+		border-color #414b5c
+
+	&:focus
+		border-color #fb923c
+		background #232a37
+		box-shadow 0 0 0 4px rgba(249, 115, 22, 0.2), 0 1px 6px rgba(249, 115, 22, 0.14)
+
+:global(.dark) .account-eye
+	color #6b7280
+
+	&:hover
+		color #d6dae2
+		background rgba(255, 255, 255, 0.08)
+
+:global(.dark) .account-link
+	color #fb923c
+
+	&:hover
+		color #ea6c0a
 </style>

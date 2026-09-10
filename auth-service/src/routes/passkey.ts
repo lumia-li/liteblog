@@ -204,15 +204,15 @@ passkeyAccountRoutes.post("/passkeys/register/verify", async (req, res) => {
 	}
 });
 
-/** DELETE /account/passkeys/:credentialId?userId=xxx —— 删除通行密钥 */
-passkeyAccountRoutes.delete("/passkeys/:credentialId", async (req, res) => {
+/** DELETE /account/passkeys/:id?userId=xxx —— 删除通行密钥（id 为 user_passkeys 主键） */
+passkeyAccountRoutes.delete("/passkeys/:id", async (req, res) => {
 	const userId = parseUserId(req.query.userId);
-	const credentialId = typeof req.params.credentialId === "string" ? req.params.credentialId.slice(0, 512) : "";
-	if (!userId || !credentialId) return fail(res, 400, "参数无效");
+	const id = typeof req.params.id === "string" ? req.params.id.trim() : "";
+	if (!userId || !/^\d{1,20}$/.test(id)) return fail(res, 400, "参数无效");
 	try {
 		const [result] = await pool.execute(
-			"DELETE FROM user_passkeys WHERE user_id = ? AND credential_id = ?",
-			[userId, credentialId],
+			"DELETE FROM user_passkeys WHERE user_id = ? AND id = ?",
+			[userId, id],
 		);
 		const affected = (result as { affectedRows?: number }).affectedRows ?? 0;
 		if (!affected) return fail(res, 404, "通行密钥不存在");

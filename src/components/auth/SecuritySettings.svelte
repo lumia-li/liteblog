@@ -120,6 +120,14 @@
 			: new Intl.DateTimeFormat("zh-CN", { dateStyle: "medium", timeStyle: "medium" }).format(date);
 	}
 
+	function formatShortDate(value: string | number | undefined) {
+		if (!value) return "未知时间";
+		const date = new Date(value);
+		return Number.isNaN(date.getTime())
+			? "未知时间"
+			: new Intl.DateTimeFormat("zh-CN", { dateStyle: "medium" }).format(date);
+	}
+
 	function browserLabel(userAgent = "") {
 		const browser = /Edg\//.test(userAgent)
 			? "Edge"
@@ -330,7 +338,7 @@
 					{#each passkeys as item (item.id)}
 						<li class="passkey-item">
 							<span class="passkey-name">🔐 {item.deviceLabel}</span>
-							<span class="passkey-date">添加于 {formatDate(item.createdAt)}</span>
+							<span class="passkey-date">添加于 {formatShortDate(item.createdAt)}</span>
 							<button type="button" class="passkey-delete" on:click={() => deletePasskey(item.id)}>删除</button>
 						</li>
 					{/each}
@@ -595,9 +603,8 @@
 
 .passkey-item
 	display flex
-	flex-wrap wrap
 	align-items center
-	gap 0.4rem 0.6rem
+	gap 0.6rem
 	padding 0.5rem 0.7rem
 	border 1px solid var(--surface-border, #dddddd)
 	border-radius 10px
@@ -605,19 +612,19 @@
 	font-size 0.78rem
 
 .passkey-name
-	flex 1 1 12rem
+	flex 1 1 auto
 	min-width 0
 	font-weight 650
 	color var(--text-color, #111111)
-	word-break break-word
-	white-space normal
+	overflow hidden
+	text-overflow ellipsis
+	white-space nowrap
 
 .passkey-date
-	flex 1 1 auto
+	flex-shrink 0
 	color rgba(17, 17, 17, 0.5)
 	white-space nowrap
 	font-size 0.72rem
-	text-align right
 
 .passkey-delete
 	padding 0.3rem 0.6rem
@@ -747,7 +754,8 @@
 :global(:root.dark) .security-status,
 :global(:root.dark) .device-head p,
 :global(:root.dark) .device-copy p,
-:global(:root.dark) .device-note
+:global(:root.dark) .device-note,
+:global(:root.dark) .passkey-date
 	color rgba(232, 235, 241, 0.62)
 
 :global(:root.dark) .device-item

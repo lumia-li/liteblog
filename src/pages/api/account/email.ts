@@ -15,7 +15,7 @@ type ServiceUser = OAuthUser;
  * 成功后重签会话。
  */
 export const POST: APIRoute = async ({ request }) => {
-	const session = readSession(request);
+	const session = await readSession(request);
 	if (!session) return json(401, { ok: false, message: "请先登录" });
 
 	if (!/^\d+$/.test(session.user.id)) {

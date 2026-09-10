@@ -15,7 +15,7 @@ type ServiceUser = {
 	role: "admin" | "user";
 };
 
-type Body = { email?: unknown; password?: unknown };
+type Body = { email?: unknown; password?: unknown; totpCode?: unknown };
 
 /**
  * POST /api/auth/email/login —— 代理：邮箱密码登录。
@@ -26,12 +26,13 @@ export const POST: APIRoute = async ({ request }) => {
 	const body = await parseBody<Body>(request);
 	const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
 	const password = typeof body?.password === "string" ? body.password : "";
+	const totpCode = typeof body?.totpCode === "string" ? body.totpCode.trim() : "";
 	if (!email || !password) return json(400, { ok: false, message: "请填写邮箱和密码" });
 
 	try {
 		const data = await callAuthService<{ user: ServiceUser; accessTokenMaxAgeDays?: number }>(
 			"/email/login",
-			{ method: "POST", body: { email, password } },
+			{ method: "POST", body: { email, password, ...(totpCode ? { totpCode } : {}) } },
 		);
 
 		const u = data.user;
@@ -61,6 +62,10 @@ export const POST: APIRoute = async ({ request }) => {
 	} catch (error) {
 		const status = (error as { status?: number }).status ?? 500;
 		const message = error instanceof Error ? error.message : "登录失败";
-		return json(status >= 400 && status < 600 ? status : 500, { ok: false, message });
+		return json(status >= 400 && status < 600 ? status : 500, {
+			ok: false,
+			message,
+			...((error as { code?: string }).code ? { code: (error as { code: string }).code } : {}),
+		});
 	}
 };

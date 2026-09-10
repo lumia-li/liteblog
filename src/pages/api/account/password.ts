@@ -6,7 +6,7 @@ export const prerender = false;
 
 /** POST /api/account/password —— 修改密码（需验证旧密码，仅邮箱注册账号） */
 export const POST: APIRoute = async ({ request }) => {
-	const session = readSession(request);
+	const session = await readSession(request);
 	if (!session) return json(401, { ok: false, message: "请先登录" });
 
 	if (!/^\d+$/.test(session.user.id)) {

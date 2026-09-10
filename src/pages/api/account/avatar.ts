@@ -58,7 +58,7 @@ function parseCropRect(raw: FormDataEntryValue | null): CropRect | null {
 }
 
 export const POST: APIRoute = async ({ request }) => {
-	const session = readSession(request);
+	const session = await readSession(request);
 	if (!session) return json(401, { ok: false, message: "请先登录" });
 
 	// 仅邮箱注册账号支持自传头像；OAuth 用户头像由对应平台管理

@@ -1,4 +1,5 @@
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
+import { callAuthService, isAuthServiceConfigured } from "./auth-service";
 
 export type OAuthUser = {
 	id: string;
@@ -13,6 +14,9 @@ export type SessionPayload = {
 	user: OAuthUser;
 	accessToken: string;
 	expiresAt: number;
+	issuedAt?: number;
+	sessionId?: string;
+	provider?: string;
 };
 
 const SESSION_COOKIE = "airliny_session";
@@ -259,7 +263,7 @@ export function getGoogleOAuthConfig(): {
 	return { clientId, clientSecret, callback };
 }
 
-export function readSession(request: Request): SessionPayload | null {
+export async function readSession(request: Request): Promise<SessionPayload | null> {
 	const cookieHeader = request.headers.get("cookie") || "";
 	const match = cookieHeader.match(
 		new RegExp(`(?:^|\\s)${SESSION_COOKIE}=([^;]+)`),
@@ -267,6 +271,17 @@ export function readSession(request: Request): SessionPayload | null {
 	if (!match) return null;
 	const session = decodeToken<SessionPayload>(decodeURIComponent(match[1]));
 	if (!session || session.expiresAt < Date.now()) return null;
+	if (session.sessionId && isAuthServiceConfigured()) {
+		try {
+			const result = await callAuthService<{ active?: boolean }>(
+				`/account/sessions/${encodeURIComponent(session.sessionId)}/validate`,
+				{ query: { userId: session.user.id } },
+			);
+			if (result.active !== true) return null;
+		} catch {
+			// Registry outage must not invalidate an otherwise valid signed cookie.
+		}
+	}
 	return session;
 }
 
@@ -285,7 +300,10 @@ export function setSession(
 	session: SessionPayload,
 	request?: Request,
 ): Response {
-	const token = encodeToken(session);
+	const issuedAt = session.issuedAt ?? Date.now();
+	const sessionId = session.sessionId ?? randomBytes(32).toString("base64url");
+	const payload = { ...session, issuedAt, sessionId };
+	const token = encodeToken(payload);
 	const secure = isSecureContext(request);
 	const cookie = serializeCookie(SESSION_COOKIE, encodeURIComponent(token), {
 		maxAge: Math.floor(MAX_AGE_MS / 1000),
@@ -295,6 +313,20 @@ export function setSession(
 		path: "/",
 	});
 	response.headers.append("Set-Cookie", cookie);
+	if (isAuthServiceConfigured()) {
+		void callAuthService("/account/sessions", {
+			method: "POST",
+			body: {
+				sessionId,
+				userId: session.user.id,
+				provider: session.provider || (session.accessToken.startsWith("email-") ? "email" : "oauth"),
+				ip: request?.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || request?.headers.get("x-real-ip") || "",
+				userAgent: request?.headers.get("user-agent") || "",
+				issuedAt,
+				expiresAt: session.expiresAt,
+			},
+		}).catch((error) => console.error("[auth] session registration failed:", error));
+	}
 	return response;
 }
 

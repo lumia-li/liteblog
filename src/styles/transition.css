@@ -82,6 +82,41 @@ html.post-nav-visit .onload-animation {
     }
 }
 
+/* Profile controls use local motion while page-level transitions remain disabled. */
+#content-wrapper .profile-shell .profile-panels {
+    transition: height var(--panel-duration, 420ms) cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+#content-wrapper .profile-shell .profile-panel {
+    transition: opacity var(--panel-duration, 420ms) cubic-bezier(0.22, 1, 0.36, 1),
+        transform var(--panel-duration, 420ms) cubic-bezier(0.22, 1, 0.36, 1),
+        filter var(--panel-duration, 420ms) cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0s linear var(--panel-duration, 420ms) !important;
+}
+
+#content-wrapper .profile-shell .profile-panel.is-active {
+    transition-delay: 0s, 0s, 0s, 0s !important;
+}
+
+#content-wrapper .profile-shell .profile-menu-indicator {
+    transition: transform var(--panel-duration, 420ms) cubic-bezier(0.22, 1, 0.36, 1),
+        width var(--panel-duration, 420ms) cubic-bezier(0.22, 1, 0.36, 1),
+        height var(--panel-duration, 420ms) cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+#content-wrapper .profile-shell .profile-menu-item,
+#content-wrapper .profile-shell .profile-menu-item svg {
+    transition: color 480ms ease, opacity 480ms ease !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #content-wrapper .profile-shell .profile-panels,
+    #content-wrapper .profile-shell .profile-panel,
+    #content-wrapper .profile-shell .profile-menu-indicator {
+        transition: none !important;
+    }
+}
+
 /* Hard-disable entry transitions to prevent refresh jitter */
 html .onload-animation,
 html .transition-swup-fade {

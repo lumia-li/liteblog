@@ -17,6 +17,14 @@ function num(name: string, fallback: number): number {
 	return Number.isFinite(value) && value > 0 ? value : fallback;
 }
 
+function hostnameOf(url: string): string {
+	try {
+		return new URL(url).hostname;
+	} catch {
+		return "";
+	}
+}
+
 export const env = {
 	port: num("PORT", 4100),
 	/** 监听地址：默认仅本机（Nginx 反代场景），需要公网直连时显式设为 0.0.0.0 */
@@ -45,6 +53,24 @@ export const env = {
 	verifyExpireMinutes: num("VERIFY_EXPIRE_MINUTES", 15),
 	siteUrl: optional("SITE_URL", "https://li.liyueovo.top"),
 	sessionDays: num("SESSION_DAYS", 7),
+	/** TOTP seeds are encrypted at rest with this key. Defaults to the API key. */
+	totpEncryptionKey: optional("TOTP_ENCRYPTION_KEY", optional("AUTH_SERVICE_API_KEY")),
+	totpIssuer: optional("TOTP_ISSUER", "Liyue Blog"),
+
+	/**
+	 * WebAuthn / Passkey 配置。
+	 * rpId 默认取 SITE_URL 的主机名；origins 默认取 SITE_URL（浏览器在此域名上完成验证仪式）。
+	 * 若博客域名与 SITE_URL 不同，请显式设置 RP_ID 与 PASSKEY_ORIGINS（逗号分隔）。
+	 */
+	rpId: optional("RP_ID") || hostnameOf(optional("SITE_URL", "https://li.liyueovo.top")),
+	rpName: optional("RP_NAME", "liyue blog"),
+	passkeyOrigins: (() => {
+		const raw = optional("PASSKEY_ORIGINS");
+		const list = raw ? raw.split(",").map((item) => item.trim()).filter(Boolean) : [];
+		if (list.length) return list;
+		const site = optional("SITE_URL", "https://li.liyueovo.top");
+		return [site.replace(/\/+$/, "")];
+	})(),
 
 	/** 头像图片磁盘存储目录（相对启动目录或绝对路径） */
 	avatarDir: optional("AVATAR_DIR", "data/avatars"),

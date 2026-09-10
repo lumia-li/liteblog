@@ -15,7 +15,7 @@ type ServiceUser = {
 
 /** PATCH /api/account/username —— 修改用户名（登录态），成功后重签会话 */
 export const PATCH: APIRoute = async ({ request }) => {
-	const session = readSession(request);
+	const session = await readSession(request);
 	if (!session) return json(401, { ok: false, message: "请先登录" });
 
 	const body = await parseBody<{ username?: unknown }>(request);

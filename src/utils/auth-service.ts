@@ -8,9 +8,11 @@ const API_KEY = String(import.meta.env.AUTH_SERVICE_API_KEY || "").trim();
 
 export class AuthServiceError extends Error {
 	status: number;
-	constructor(status: number, message: string) {
+	code?: string;
+	constructor(status: number, message: string, code?: string) {
 		super(message);
 		this.status = status;
+		this.code = code;
 	}
 }
 
@@ -54,7 +56,7 @@ export async function callAuthService<T = Record<string, unknown>>(
 
 	if (!response.ok || data.ok !== true) {
 		const message = typeof data.message === "string" ? data.message : `认证服务错误（HTTP ${response.status}）`;
-		throw new AuthServiceError(response.status, message);
+		throw new AuthServiceError(response.status, message, typeof data.code === "string" ? data.code : undefined);
 	}
 	return data as T;
 }

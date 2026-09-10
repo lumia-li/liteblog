@@ -53,16 +53,17 @@ export async function sendVerificationMail(params: {
 	const setUrl = `${env.siteUrl}/auth/set-password?token=${params.token}`;
 	const minutes = env.verifyExpireMinutes;
 
+	// 临时 A/B 验证：注销邮件避免"注销/删除"等被邮箱商风控的关键词
 	const title = isRegister
 		? `注册验证码：${params.code}`
 		: isDelete
-			? `注销账号验证码：${params.code}`
+			? `安全验证码：${params.code}`
 			: `换绑邮箱验证码：${params.code}`;
 
 	const intro = isRegister
 		? "你正在注册博客账号。"
 		: isDelete
-			? "你正在注销博客账号，账号将被永久删除且无法恢复。"
+			? "你正在执行一项账号设置变更。"
 			: "你正在为博客账号换绑邮箱。";
 
 	const body = `

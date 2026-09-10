@@ -8,6 +8,8 @@ import registerRoutes from "./routes/register.ts";
 import setPasswordRoutes from "./routes/set-password.ts";
 import verifyRoutes from "./routes/verify.ts";
 import { pool } from "./db.ts";
+import sessionRoutes from "./routes/sessions.ts";
+import { passkeyAccountRoutes, passkeyLoginRoutes } from "./routes/passkey.ts";
 
 const app = express();
 
@@ -51,6 +53,9 @@ app.use("/email", requireApiKey, verifyRoutes);
 app.use("/email", requireApiKey, setPasswordRoutes);
 app.use("/email", requireApiKey, loginRoutes);
 app.use("/account", requireApiKey, accountRoutes);
+app.use("/account", requireApiKey, sessionRoutes);
+app.use("/account", requireApiKey, passkeyAccountRoutes);
+app.use("/passkey", requireApiKey, passkeyLoginRoutes);
 
 app.use((_req, res) => {
 	res.status(404).json({ ok: false, message: "Not Found" });

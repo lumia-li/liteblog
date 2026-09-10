@@ -1,8 +1,9 @@
 <script lang="ts">
 import { fade, scale } from "svelte/transition";
 import { onDestroy, onMount } from "svelte";
+import { startAuthentication } from "@simplewebauthn/browser";
 
-type View = "login" | "reg-email" | "reg-code";
+type View = "login" | "login-totp" | "reg-email" | "reg-code";
 
 let open = false;
 let view: View = "login";
@@ -16,6 +17,7 @@ let loginLoading = false;
 let loginError = "";
 let loginSuccess = "";
 let forgotMsg = false;
+let totpCode = "";
 
 /* ── 注册表单状态 ── */
 let regEmail = "";
@@ -40,7 +42,7 @@ function startCountdown(seconds: number) {
 	}, 1000);
 }
 
-$: overlayTitle = view === "login" ? "登录LiyueAccount账号" : "注册LiyueAccount账号";
+$: overlayTitle = view === "login" || view === "login-totp" ? "登录LiyueAccount账号" : "注册LiyueAccount账号";
 
 function openModal(detail?: { view?: "login" | "reg-email" }) {
 	view = detail?.view === "reg-email" ? "reg-email" : "login";
@@ -56,6 +58,7 @@ function switchView(next: View) {
 	view = next;
 	loginError = "";
 	loginSuccess = "";
+	totpCode = "";
 	regError = "";
 	regSuccess = "";
 	forgotMsg = false;
@@ -140,6 +143,11 @@ async function handleLogin(event: SubmitEvent) {
 		});
 		const data = await response.json();
 		if (!response.ok || !data.ok) {
+			if (data.code === "TOTP_REQUIRED") {
+				view = "login-totp";
+				loginError = "请输入验证器中的 6 位验证码";
+				return;
+			}
 			loginError = data.message || "登录失败，请稍后重试";
 			return;
 		}
@@ -153,8 +161,78 @@ async function handleLogin(event: SubmitEvent) {
 	}
 }
 
-/* ── 注册：发送验证码（兼容 form submit 与按钮 click 两种触发） ── */
-async function handleSendCode(event?: { preventDefault(): void }) {
+async function handleTotpLogin(event: SubmitEvent) {
+	event.preventDefault();
+	if (loginLoading || !/^\d{6}$/.test(totpCode)) {
+		loginError = "请输入 6 位验证码";
+		return;
+	}
+	loginLoading = true;
+	loginError = "";
+	try {
+		const response = await fetch("/api/auth/email/login", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ email: loginEmail, password: loginPassword, totpCode }),
+		});
+		const data = await response.json();
+		if (!response.ok || !data.ok) {
+			loginError = data.message || "验证码不正确";
+			return;
+		}
+		loginSuccess = "登录成功，正在刷新…";
+		window.dispatchEvent(new CustomEvent("auth-login-success"));
+		setTimeout(() => window.location.reload(), 600);
+	} catch {
+		loginError = "网络异常，请稍后重试";
+	} finally {
+		loginLoading = false;
+	}
+}
+
+/* ── 通行密钥登录（WebAuthn） ── */
+let passkeyLoading = false;
+
+async function handlePasskeyLogin() {
+	if (passkeyLoading) return;
+	loginError = "";
+	loginSuccess = "";
+	passkeyLoading = true;
+	try {
+		const optionsRes = await fetch("/api/auth/passkey/login", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ action: "options", ...(loginEmail ? { email: loginEmail } : {}) }),
+		});
+		const optionsData = await optionsRes.json();
+		if (!optionsRes.ok || !optionsData.ok) throw new Error(optionsData.message || "无法使用通行密钥登录");
+		const assertion = await startAuthentication({ optionsJSON: optionsData.options });
+		const verifyRes = await fetch("/api/auth/passkey/login", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ action: "verify", credential: assertion }),
+		});
+		const verifyData = await verifyRes.json();
+		if (!verifyRes.ok || !verifyData.ok) throw new Error(verifyData.message || "通行密钥验证失败");
+		loginSuccess = "登录成功，正在刷新…";
+		window.dispatchEvent(new CustomEvent("auth-login-success"));
+		setTimeout(() => window.location.reload(), 600);
+	} catch (error) {
+		const name = (error as { name?: string })?.name;
+		loginError =
+			name === "NotAllowedError"
+				? "已取消操作或验证超时"
+				: name === "NotSupportedError" || name === "TypeError"
+					? "当前环境不支持通行密钥（需 HTTPS 与现代浏览器）"
+					: error instanceof Error
+						? error.message
+						: "通行密钥登录失败";
+	} finally {
+		passkeyLoading = false;
+	}
+}
+
+/* ── 注册：发送验证码（兼容 form submit 与按钮 click 两种触发） ── */async function handleSendCode(event?: { preventDefault(): void }) {
 	event?.preventDefault();
 	if (sendLoading || countdown > 0) return;
 	regError = "";
@@ -298,7 +376,11 @@ async function handleVerifyCode(event: SubmitEvent) {
 						<button type="submit" class="submit-btn" disabled={loginLoading}>
 							{loginLoading ? "登录中…" : "登录"}
 						</button>
-					</form>
+						<button type="button" class="passkey-btn" disabled={passkeyLoading} on:click={handlePasskeyLogin}>
+							<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 8V6a5 5 0 0 0-10 0v2H5.5A2.5 2.5 0 0 0 3 10.5v8A2.5 2.5 0 0 0 5.5 21h13a2.5 2.5 0 0 0 2.5-2.5v-8A2.5 2.5 0 0 0 18.5 8H17zm-8-2a3 3 0 0 1 6 0v2H9V6zm3 11a2 2 0 1 1 0-4 2 2 0 0 1 0 4z" fill="currentColor"/></svg>
+							{passkeyLoading ? "等待验证…" : "使用通行密钥登录"}
+						</button>
+						</form>
 					<footer class="panel-footer">
 						<button type="button" class="link-btn" on:click={() => switchView("reg-email")}>
 							创建账号
@@ -313,6 +395,23 @@ async function handleVerifyCode(event: SubmitEvent) {
 							暂未开放自助找回，请发邮件至 me@liyueovo.top，验证后帮你重置。
 						</p>
 					{/if}
+				{:else if view === "login-totp"}
+					<header class="panel-header">
+						<h2 class="panel-title">二次验证</h2>
+						<p class="panel-subtitle">请输入验证器中的 6 位验证码</p>
+					</header>
+					<form class="form" on:submit={handleTotpLogin}>
+						<label class="field">
+							<span class="field-label">验证码</span>
+							<input class="input input-code" bind:value={totpCode} inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="6 位数字" required />
+						</label>
+						{#if loginError}<p class="msg msg-error">{loginError}</p>{/if}
+						{#if loginSuccess}<p class="msg msg-success">{loginSuccess}</p>{/if}
+						<button type="submit" class="submit-btn" disabled={loginLoading}>{loginLoading ? "验证中…" : "完成登录"}</button>
+					</form>
+					<footer class="panel-footer">
+						<button type="button" class="link-btn" on:click={() => switchView("login")}>返回登录</button>
+					</footer>
 				{:else if view === "reg-email"}
 					<header class="panel-header">
 						<h2 class="panel-title">创建账号</h2>
@@ -660,6 +759,37 @@ async function handleVerifyCode(event: SubmitEvent) {
 	cursor pointer
 	box-shadow 0 8px 20px rgba(249, 115, 22, 0.32)
 	transition transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease
+
+/* 通行密钥登录按钮 */
+.passkey-btn
+	margin-top 0.55rem
+	display inline-flex
+	align-items center
+	justify-content center
+	gap 0.45rem
+	width 100%
+	padding 0.62rem 0
+	border 1.5px solid rgba(249, 115, 22, 0.45)
+	border-radius 12px
+	background transparent
+	color #ea6c0a
+	font-size 0.88rem
+	font-weight 700
+	cursor pointer
+	transition background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease
+
+	& svg
+		width 18px
+		height 18px
+
+	&:hover
+		border-color #f97316
+		background rgba(249, 115, 22, 0.08)
+		color #c2410c
+
+	&:disabled
+		opacity 0.6
+		cursor not-allowed
 
 	&:hover:not(:disabled)
 		transform translateY(-1px)

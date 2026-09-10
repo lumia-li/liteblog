@@ -10,7 +10,7 @@ export const prerender = false;
  * 成功后账号从认证服务数据库中删除，并清除本站会话 Cookie。
  */
 export const POST: APIRoute = async ({ request }) => {
-	const session = readSession(request);
+	const session = await readSession(request);
 	if (!session) return json(401, { ok: false, message: "请先登录" });
 
 	if (!/^\d+$/.test(session.user.id)) {

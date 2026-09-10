@@ -6,10 +6,11 @@ import { env } from "../env.ts";
 import { fail, ok, readJsonBody } from "../middleware.ts";
 import { hit } from "../rate-limit.ts";
 import { getClientIp } from "../util.ts";
+import { decryptSecret, verifyCode } from "../totp.ts";
 
 const router = Router();
 
-type Body = { email?: unknown; password?: unknown };
+type Body = { email?: unknown; password?: unknown; totpCode?: unknown };
 type AttemptRow = RowDataPacket & { fail_count: number; locked_until: Date | null };
 
 const MAX_FAILS = 5;
@@ -25,6 +26,7 @@ router.post("/login", async (req, res) => {
 
 	const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
 	const password = typeof body.password === "string" ? body.password : "";
+	const totpCode = typeof body.totpCode === "string" ? body.totpCode.trim() : "";
 
 	if (!email || !password) return fail(res, 400, "请填写邮箱和密码");
 
@@ -55,8 +57,22 @@ router.post("/login", async (req, res) => {
 			return fail(res, 401, "邮箱或密码不正确");
 		}
 
-		// 登录成功：清空失败计数
+		// 密码正确后再检查 TOTP，避免泄露账号是否启用二次验证。
+		const [totpRows] = await pool.execute<RowDataPacket[]>(
+			"SELECT secret_ciphertext, enabled FROM user_totp WHERE user_id = ? LIMIT 1",
+			[user.id],
+		);
+		const totp = totpRows[0];
+		if (totp && Number(totp.enabled) === 1) {
+			if (!/^\d{6}$/.test(totpCode)) return fail(res, 401, "请输入双因素验证码", { code: "TOTP_REQUIRED" });
+			if (!verifyCode(decryptSecret(String(totp.secret_ciphertext)), totpCode)) {
+				return fail(res, 401, "双因素验证码不正确", { code: "TOTP_INVALID" });
+			}
+		}
+
+		// 登录成功：清空失败计数，并记录最近一次登录时间
 		await pool.execute("DELETE FROM login_attempts WHERE email = ?", [email]);
+		await pool.execute("UPDATE users SET last_login_at = NOW() WHERE id = ?", [user.id]);
 
 		return ok(res, {
 			user: toPublicUser(user),

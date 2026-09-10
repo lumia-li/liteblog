@@ -16,8 +16,9 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash VARCHAR(255)   NOT NULL,
   role         VARCHAR(16)     NOT NULL DEFAULT 'user',
   status       VARCHAR(16)     NOT NULL DEFAULT 'active',
-  created_at   TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at   TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  created_at    TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at    TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  last_login_at TIMESTAMP       NULL     DEFAULT NULL, -- 最近一次邮箱密码登录成功时间
   PRIMARY KEY (id),
   UNIQUE KEY uk_email (email),
   UNIQUE KEY uk_username (username)
@@ -51,4 +52,49 @@ CREATE TABLE IF NOT EXISTS login_attempts (
   locked_until TIMESTAMP NULL DEFAULT NULL,
   updated_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (email)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+-- TOTP 双因素认证。secret_ciphertext 使用 TOTP_ENCRYPTION_KEY 加密保存。
+CREATE TABLE IF NOT EXISTS user_totp (
+  user_id            BIGINT UNSIGNED NOT NULL,
+  secret_ciphertext  TEXT            NOT NULL,
+  enabled            TINYINT(1)      NOT NULL DEFAULT 0,
+  created_at         TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at         TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id),
+  CONSTRAINT fk_user_totp_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+-- Passkey 通行密钥（WebAuthn）。credential_id/public_key 以 base64url 存储。
+CREATE TABLE IF NOT EXISTS user_passkeys (
+  id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id        BIGINT UNSIGNED NOT NULL,
+  credential_id  VARCHAR(512)    NOT NULL,
+  public_key     TEXT            NOT NULL,
+  counter        INT UNSIGNED    NOT NULL DEFAULT 0,
+  transports     VARCHAR(255)    NOT NULL DEFAULT '',
+  device_label   VARCHAR(64)     NOT NULL DEFAULT '',
+  last_used_at   TIMESTAMP       NULL     DEFAULT NULL,
+  created_at     TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_passkey_credential (credential_id),
+  KEY idx_passkey_user (user_id),
+  CONSTRAINT fk_user_passkeys_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+-- 博客端登录会话登记，用于设备列表和撤销会话。
+-- user_id 使用字符串以兼容邮箱账号及 OAuth/QQ 账号 ID。
+CREATE TABLE IF NOT EXISTS auth_sessions (
+  session_id  CHAR(64)      NOT NULL,
+  user_id     VARCHAR(128)  NOT NULL,
+  provider    VARCHAR(32)   NOT NULL DEFAULT 'unknown',
+  ip          VARCHAR(64)   NOT NULL DEFAULT '',
+  user_agent  VARCHAR(512)  NOT NULL DEFAULT '',
+  issued_at   DATETIME      NOT NULL,
+  expires_at  DATETIME      NOT NULL,
+  revoked_at  DATETIME      NULL,
+  created_at  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (session_id),
+  KEY idx_auth_sessions_user (user_id, revoked_at, expires_at),
+  KEY idx_auth_sessions_expiry (expires_at)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;

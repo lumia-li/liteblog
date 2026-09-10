@@ -13,6 +13,7 @@ import {
 import { env } from "../env.ts";
 import { fail, ok, readJsonBody } from "../middleware.ts";
 import { isValidPassword, isValidUsername, sha256Hex, safeEqualHex } from "../util.ts";
+import { decryptSecret, encryptSecret, generateSecret, otpauthUri, verifyCode } from "../totp.ts";
 
 const router = Router();
 
@@ -285,6 +286,95 @@ router.get("/me", async (req, res) => {
 		return ok(res, { user: toPublicUser(user) });
 	} catch (error) {
 		console.error("[account/me] 读取失败:", error);
+		return fail(res, 500, "服务器错误，请稍后重试");
+	}
+});
+
+/** GET /account/totp/status?userId=xxx */
+router.get("/totp/status", async (req, res) => {
+	const userId = parseUserId(req.query.userId);
+	if (!userId) return fail(res, 400, "缺少用户标识");
+	try {
+		const [rows] = await pool.execute<RowDataPacket[]>(
+			"SELECT enabled FROM user_totp WHERE user_id = ? LIMIT 1",
+			[userId],
+		);
+		return ok(res, { enabled: rows.length > 0 && Number(rows[0].enabled) === 1 });
+	} catch (error) {
+		console.error("[account/totp/status] 读取失败:", error);
+		return fail(res, 500, "服务器错误，请稍后重试");
+	}
+});
+
+/** POST /account/totp/setup; body: { userId } */
+router.post("/totp/setup", async (req, res) => {
+	const body = readJsonBody<Body>(req);
+	const userId = parseUserId(body?.userId);
+	if (!userId) return fail(res, 400, "缺少用户标识");
+	try {
+		const user = await findUserById(userId);
+		if (!user) return fail(res, 404, "用户不存在");
+		const [existing] = await pool.execute<RowDataPacket[]>(
+			"SELECT secret_ciphertext, enabled FROM user_totp WHERE user_id = ? LIMIT 1",
+			[userId],
+		);
+		if (existing[0] && Number(existing[0].enabled) === 1) {
+			return fail(res, 409, "双因素登录验证已启用");
+		}
+		const secret = generateSecret();
+		await pool.execute(
+			`INSERT INTO user_totp (user_id, secret_ciphertext, enabled) VALUES (?, ?, 0)
+			 ON DUPLICATE KEY UPDATE secret_ciphertext = VALUES(secret_ciphertext), enabled = 0`,
+			[userId, encryptSecret(secret)],
+		);
+		return ok(res, { secret, otpauthUri: otpauthUri(secret, user.email) });
+	} catch (error) {
+		console.error("[account/totp/setup] 生成失败:", error);
+		return fail(res, 500, "服务器错误，请稍后重试");
+	}
+});
+
+/** POST /account/totp/verify; body: { userId, code } */
+router.post("/totp/verify", async (req, res) => {
+	const body = readJsonBody<Body>(req);
+	const userId = parseUserId(body?.userId);
+	const code = typeof body?.code === "string" ? body.code.trim() : "";
+	if (!userId || !/^\d{6}$/.test(code)) return fail(res, 400, "请输入 6 位验证码");
+	try {
+		const [rows] = await pool.execute<RowDataPacket[]>(
+			"SELECT secret_ciphertext, enabled FROM user_totp WHERE user_id = ? LIMIT 1",
+			[userId],
+		);
+		const row = rows[0];
+		if (!row) return fail(res, 400, "请先开始设置双因素验证");
+		if (Number(row.enabled) === 1) return ok(res, { enabled: true });
+		if (!verifyCode(decryptSecret(String(row.secret_ciphertext)), code)) return fail(res, 400, "验证码不正确或已过期");
+		await pool.execute("UPDATE user_totp SET enabled = 1 WHERE user_id = ?", [userId]);
+		return ok(res, { enabled: true });
+	} catch (error) {
+		console.error("[account/totp/verify] 验证失败:", error);
+		return fail(res, 500, "服务器错误，请稍后重试");
+	}
+});
+
+/** POST /account/totp/disable; body: { userId, code } */
+router.post("/totp/disable", async (req, res) => {
+	const body = readJsonBody<Body>(req);
+	const userId = parseUserId(body?.userId);
+	const code = typeof body?.code === "string" ? body.code.trim() : "";
+	if (!userId || !/^\d{6}$/.test(code)) return fail(res, 400, "请输入 6 位验证码");
+	try {
+		const [rows] = await pool.execute<RowDataPacket[]>(
+			"SELECT secret_ciphertext, enabled FROM user_totp WHERE user_id = ? LIMIT 1",
+			[userId],
+		);
+		const row = rows[0];
+		if (!row || Number(row.enabled) !== 1) return fail(res, 400, "双因素登录验证尚未启用");
+		if (!verifyCode(decryptSecret(String(row.secret_ciphertext)), code)) return fail(res, 400, "验证码不正确或已过期");
+		await pool.execute("DELETE FROM user_totp WHERE user_id = ?", [userId]);
+		return ok(res, { enabled: false });
+	} catch (error) {
+		console.error("[account/totp/disable] 停用失败:", error);
 		return fail(res, 500, "服务器错误，请稍后重试");
 	}
 });

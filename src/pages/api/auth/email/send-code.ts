@@ -23,7 +23,7 @@ export const POST: APIRoute = async ({ request }) => {
 	if (purpose !== "delete-account" && !email) return json(400, { ok: false, message: "请填写邮箱" });
 
 	if (purpose !== "register") {
-		const session = readSession(request);
+		const session = await readSession(request);
 		if (!session) return json(401, { ok: false, message: "请先登录" });
 		if (!/^\d+$/.test(session.user.id)) {
 			return json(400, {

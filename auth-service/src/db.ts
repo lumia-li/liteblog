@@ -23,6 +23,7 @@ export type UserRow = {
 	role: "admin" | "user";
 	status: string;
 	created_at: Date;
+	last_login_at: Date | null;
 };
 
 export function toPublicUser(row: UserRow) {

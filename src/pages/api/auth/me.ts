@@ -4,7 +4,7 @@ import { readSession } from "@utils/auth-server";
 export const prerender = false;
 
 export const GET: APIRoute = async ({ request }) => {
-	const session = readSession(request);
+	const session = await readSession(request);
 	if (!session) {
 		return new Response(JSON.stringify({ user: null }), {
 			status: 401,

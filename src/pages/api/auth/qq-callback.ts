@@ -88,7 +88,7 @@ export const GET: APIRoute = async ({ request }) => {
 		// 重定向到首页，设置会话 cookie，清除 state
 		let redirect = redirectResponse("/");
 		redirect = clearState(redirect, request, STATE_COOKIE_PATH);
-		redirect = setSession(redirect, session, request);
+		redirect = await setSession(redirect, session, request);
 
 		await recordLogin(user, "qq", {
 			ip: getClientIp(request),

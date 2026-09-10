@@ -57,7 +57,7 @@ export const GET: APIRoute = async ({ request }) => {
 
 		let response = redirectResponse("/profile");
 		response = clearState(response, request, STATE_COOKIE_PATH);
-		response = setSession(
+		response = await setSession(
 			response,
 			{
 				user,

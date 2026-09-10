@@ -55,7 +55,7 @@ export const GET: APIRoute = async ({ request }) => {
 
 		let response = redirectResponse("/profile");
 		response = clearState(response, request);
-		response = setSession(response, {
+		response = await setSession(response, {
 			user,
 			accessToken: tokenResult.data.access_token,
 			expiresAt: Date.now() + tokenResult.data.expires_in * 1000,

@@ -134,7 +134,7 @@ export const POST: APIRoute = async ({ request }) => {
 		});
 
 		const response = json(200, { ok: true, user: data.user });
-		setSession(response, {
+		await setSession(response, {
 			user: data.user,
 			accessToken: session.accessToken,
 			expiresAt: session.expiresAt,

@@ -295,11 +295,11 @@ function isSecureContext(request?: Request): boolean {
 	}
 }
 
-export function setSession(
+export async function setSession(
 	response: Response,
 	session: SessionPayload,
 	request?: Request,
-): Response {
+): Promise<Response> {
 	const issuedAt = session.issuedAt ?? Date.now();
 	const sessionId = session.sessionId ?? randomBytes(32).toString("base64url");
 	const payload = { ...session, issuedAt, sessionId };
@@ -314,18 +314,25 @@ export function setSession(
 	});
 	response.headers.append("Set-Cookie", cookie);
 	if (isAuthServiceConfigured()) {
-		void callAuthService("/account/sessions", {
-			method: "POST",
-			body: {
-				sessionId,
-				userId: session.user.id,
-				provider: session.provider || (session.accessToken.startsWith("email-") ? "email" : "oauth"),
-				ip: request?.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || request?.headers.get("x-real-ip") || "",
-				userAgent: request?.headers.get("user-agent") || "",
-				issuedAt,
-				expiresAt: session.expiresAt,
-			},
-		}).catch((error) => console.error("[auth] session registration failed:", error));
+		// 必须在返回响应前完成登记：Serverless 环境响应返回后
+		// 未 await 的后台请求会被冻结掐断，导致设备列表不同步。
+		try {
+			await callAuthService("/account/sessions", {
+				method: "POST",
+				body: {
+					sessionId,
+					userId: session.user.id,
+					provider: session.provider || (session.accessToken.startsWith("email-") ? "email" : "oauth"),
+					ip: request?.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || request?.headers.get("x-real-ip") || "",
+					userAgent: request?.headers.get("user-agent") || "",
+					issuedAt,
+					expiresAt: session.expiresAt,
+				},
+			});
+		} catch (error) {
+			// 登记失败不阻断登录，仅记录日志
+			console.error("[auth] session registration failed:", error);
+		}
 	}
 	return response;
 }

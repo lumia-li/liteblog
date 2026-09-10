@@ -33,7 +33,7 @@ export const PATCH: APIRoute = async ({ request }) => {
 			body: { userId: session.user.id, username },
 		});
 		const response = json(200, { ok: true, user: data.user });
-		setSession(response, {
+		await setSession(response, {
 			user: data.user,
 			accessToken: session.accessToken,
 			expiresAt: session.expiresAt,

@@ -48,7 +48,7 @@ export const POST: APIRoute = async ({ request }) => {
 		if (!user) return json(500, { ok: false, message: "换绑失败，请重试" });
 
 		const response = json(200, { ok: true, user });
-		setSession(response, {
+		await setSession(response, {
 			user,
 			accessToken: session.accessToken,
 			expiresAt: session.expiresAt,

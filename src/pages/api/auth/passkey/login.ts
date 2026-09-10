@@ -53,7 +53,7 @@ export const POST: APIRoute = async ({ request }) => {
 			};
 			const sessionDays = data.accessTokenMaxAgeDays ?? 7;
 			const response = json(200, { ok: true, user });
-			setSession(response, {
+			await setSession(response, {
 				user,
 				accessToken: `email-${user.id}`,
 				expiresAt: Date.now() + sessionDays * 24 * 60 * 60 * 1000,

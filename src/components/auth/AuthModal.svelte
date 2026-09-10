@@ -398,14 +398,18 @@ async function handleVerifyCode(event: SubmitEvent) {
 				{:else if view === "login-totp"}
 					<header class="panel-header">
 						<h2 class="panel-title">二次验证</h2>
-						<p class="panel-subtitle">请输入验证器中的 6 位验证码</p>
+						<p class="panel-subtitle">请输入<strong>验证器</strong>中的 6 位验证码</p>
 					</header>
 					<form class="form" on:submit={handleTotpLogin}>
 						<label class="field">
 							<span class="field-label">验证码</span>
 							<input class="input input-code" bind:value={totpCode} inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="6 位数字" required />
 						</label>
-						{#if loginError}<p class="msg msg-error">{loginError}</p>{/if}
+						{#if loginError}
+						<p class="msg msg-error">
+							{#each loginError.split("验证器") as part, i}{#if i > 0}<strong>验证器</strong>{/if}{part}{/each}
+						</p>
+					{/if}
 						{#if loginSuccess}<p class="msg msg-success">{loginSuccess}</p>{/if}
 						<button type="submit" class="submit-btn" disabled={loginLoading}>{loginLoading ? "验证中…" : "完成登录"}</button>
 					</form>
@@ -663,6 +667,12 @@ async function handleVerifyCode(event: SubmitEvent) {
 .sent-mail
 	color #f97316
 	word-break break-all
+
+/* 单字重字体下 strong 合成粗体不明显，用四向阴影实现自然的加粗 */
+.panel-subtitle strong,
+.msg strong
+	font-weight 700
+	text-shadow 0.45px 0 0 currentColor, 0 0.45px 0 currentColor, -0.45px 0 0 currentColor, 0 -0.45px 0 currentColor
 
 .form
 	display flex

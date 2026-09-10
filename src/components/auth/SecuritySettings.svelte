@@ -580,6 +580,7 @@
 	text-align center
 
 .totp-message
+	grid-column 1 / -1
 	margin 0.55rem 0 0
 	color #dc2626
 

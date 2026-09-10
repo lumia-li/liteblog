@@ -471,7 +471,7 @@
 						{:else if deviceIconKey(item.userAgent || "") === "chrome"}<img src="/icons/chrome.svg" alt="" />
 						{:else}<svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H14v2h2.5a1 1 0 1 1 0 2h-9a1 1 0 1 1 0-2H10v-2H6.5A2.5 2.5 0 0 1 4 13.5v-8zM6 5v8.5c0 .28.22.5.5.5h11c.28 0 .5-.22.5-.5V5H6z" fill="currentColor" /></svg>{/if}
 					</div>
-					{#if osIconKey(item.userAgent || "")}<img class="device-os" src={`/icons/${osIconKey(item.userAgent || "")}.svg`} alt="" />{/if}
+					{#if osIconKey(item.userAgent || "", item.sessionId === currentSessionId ? currentPlatformVersion : "")}<img class="device-os" src={`/icons/${osIconKey(item.userAgent || "", item.sessionId === currentSessionId ? currentPlatformVersion : "")}.svg`} alt="" />{/if}
 				</div>
 				<div class="device-copy">
 					<h4>{browserLabel(item.userAgent)}{item.sessionId === currentSessionId ? " · 当前设备" : ""}</h4>

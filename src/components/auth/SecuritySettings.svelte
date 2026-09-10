@@ -370,8 +370,10 @@
 						<input class="totp-input" bind:value={totpCode} inputmode="numeric" maxlength="6" placeholder="6 位验证码" aria-label="6 位验证码" />
 						<button type="button" class="security-action" disabled={totpLoading} on:click={totpEnabled ? disableTotp : verifyTotp}>{totpEnabled ? "确认停用" : "确认启用"}</button>
 					</div>
-					{#if totpMessage}<p class="totp-message">{totpMessage}</p>{/if}
 				</div>
+			{/if}
+			{#if isEmailAccount && totpMessage}
+				<p class="totp-message">{totpMessage}</p>
 			{/if}
 		</section>
 	</div>

@@ -29,6 +29,7 @@
 	let loginTime = "未知时间";
 	let sessions: DeviceSession[] = [];
 	let currentSessionId = "";
+	let currentIconKey = "";
 	let sessionsLoading = true;
 	let sessionMessage = "";
 	let totpEnabled = false;
@@ -152,6 +153,19 @@
 		return `${browser} · ${platform}`;
 	}
 
+	function deviceIconKey(userAgent = "") {
+		if (/Android/.test(userAgent)) return "android";
+		if (/Edg\//.test(userAgent)) return "edge";
+		if (/Chrome\//.test(userAgent)) return "chrome";
+		return "";
+	}
+
+	function sortSessionsNewestFirst(list: DeviceSession[]) {
+		return [...list].sort(
+			(a, b) => new Date(b.issuedAt ?? 0).getTime() - new Date(a.issuedAt ?? 0).getTime(),
+		);
+	}
+
 	async function loadSessions() {
 		sessionsLoading = true;
 		try {
@@ -159,7 +173,7 @@
 			const data = await response.json();
 			if (!response.ok || !data.ok) throw new Error(data.message || "设备读取失败");
 			currentSessionId = data.currentSessionId || "";
-			sessions = Array.isArray(data.sessions) ? data.sessions : [];
+			sessions = sortSessionsNewestFirst(Array.isArray(data.sessions) ? data.sessions : []);
 		} catch (error) {
 			sessionMessage = error instanceof Error ? error.message : "设备读取失败";
 		} finally {
@@ -295,6 +309,7 @@
 							? "Linux"
 							: "未知系统";
 		deviceName = `${browser} · ${platform}`;
+		currentIconKey = deviceIconKey(ua);
 		loginTime = formatDate(loginAt);
 		void Promise.all([loadSessions(), loadTotp(), loadPasskeys()]);
 	});
@@ -400,7 +415,12 @@
 				<p class="device-empty">正在读取设备…</p>
 			{:else if sessions.length === 0}
 				<div class="device-item">
-					<div class="device-icon" aria-hidden="true">◌</div>
+					<div class="device-icon" aria-hidden="true">
+						{#if currentIconKey === "android"}<img src="/icons/android.svg" alt="" />
+						{:else if currentIconKey === "edge"}<img src="/icons/edge.svg" alt="" />
+						{:else if currentIconKey === "chrome"}<img src="/icons/chrome.svg" alt="" />
+						{:else}◌{/if}
+					</div>
 					<div class="device-copy">
 						<h4>{deviceName}</h4>
 						<p>登录时间：{loginTime}</p>
@@ -413,7 +433,10 @@
 				{#each sessions as item}
 				<div class="device-item">
 				<div class="device-icon" aria-hidden="true">
-					<svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H14v2h2.5a1 1 0 1 1 0 2h-9a1 1 0 1 1 0-2H10v-2H6.5A2.5 2.5 0 0 1 4 13.5v-8zM6 5v8.5c0 .28.22.5.5.5h11c.28 0 .5-.22.5-.5V5H6z" fill="currentColor" /></svg>
+					{#if deviceIconKey(item.userAgent || "") === "android"}<img src="/icons/android.svg" alt="" />
+					{:else if deviceIconKey(item.userAgent || "") === "edge"}<img src="/icons/edge.svg" alt="" />
+					{:else if deviceIconKey(item.userAgent || "") === "chrome"}<img src="/icons/chrome.svg" alt="" />
+					{:else}<svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H14v2h2.5a1 1 0 1 1 0 2h-9a1 1 0 1 1 0-2H10v-2H6.5A2.5 2.5 0 0 1 4 13.5v-8zM6 5v8.5c0 .28.22.5.5.5h11c.28 0 .5-.22.5-.5V5H6z" fill="currentColor" /></svg>{/if}
 				</div>
 				<div class="device-copy">
 					<h4>{browserLabel(item.userAgent)}{item.sessionId === currentSessionId ? " · 当前设备" : ""}</h4>
@@ -672,6 +695,16 @@
 	display flex
 	flex-direction column
 	gap 0.65rem
+	max-height 17.5rem
+	overflow-y auto
+	overscroll-behavior contain
+	scrollbar-width none
+	-ms-overflow-style none
+
+	&::-webkit-scrollbar
+		display none
+		width 0
+		height 0
 
 .device-item
 	display grid
@@ -696,6 +729,11 @@
 	& svg
 		width 19px
 		height 19px
+
+	& img
+		width 20px
+		height 20px
+		object-fit contain
 
 .device-copy
 	min-width 0

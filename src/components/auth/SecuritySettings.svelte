@@ -595,8 +595,9 @@
 
 .passkey-item
 	display flex
+	flex-wrap wrap
 	align-items center
-	gap 0.6rem
+	gap 0.4rem 0.6rem
 	padding 0.5rem 0.7rem
 	border 1px solid var(--surface-border, #dddddd)
 	border-radius 10px
@@ -604,18 +605,19 @@
 	font-size 0.78rem
 
 .passkey-name
-	flex 1
+	flex 1 1 12rem
 	min-width 0
 	font-weight 650
 	color var(--text-color, #111111)
-	overflow hidden
-	text-overflow ellipsis
-	white-space nowrap
+	word-break break-word
+	white-space normal
 
 .passkey-date
+	flex 1 1 auto
 	color rgba(17, 17, 17, 0.5)
 	white-space nowrap
 	font-size 0.72rem
+	text-align right
 
 .passkey-delete
 	padding 0.3rem 0.6rem

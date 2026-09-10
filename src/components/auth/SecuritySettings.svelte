@@ -30,6 +30,8 @@
 	let sessions: DeviceSession[] = [];
 	let currentSessionId = "";
 	let currentIconKey = "";
+	let currentUa = "";
+	let currentPlatformVersion = "";
 	let sessionsLoading = true;
 	let sessionMessage = "";
 	let totpEnabled = false;
@@ -157,6 +159,18 @@
 		if (/Android/.test(userAgent)) return "android";
 		if (/Edg\//.test(userAgent)) return "edge";
 		if (/Chrome\//.test(userAgent)) return "chrome";
+		return "";
+	}
+
+	function osIconKey(userAgent = "", platformVersion = "") {
+		if (/Windows/.test(userAgent)) {
+			// UA 里 Windows 10/11 都是 NT 10.0；platformVersion 来自当前设备的
+			// userAgentData 高熵接口（>= 13 为 Win11），其他设备只能按 Win10 兜底
+			const major = Number((platformVersion || "").split(".")[0]);
+			if (Number.isFinite(major) && major >= 13) return "windows-11";
+			return "windows-10";
+		}
+		if (/Mac OS X|Macintosh|iPhone|iPad/.test(userAgent)) return "apple";
 		return "";
 	}
 
@@ -310,7 +324,22 @@
 							: "未知系统";
 		deviceName = `${browser} · ${platform}`;
 		currentIconKey = deviceIconKey(ua);
+		currentUa = ua;
 		loginTime = formatDate(loginAt);
+		// 当前设备可通过高熵 UA 数据区分 Windows 10 / 11（其他设备 UA 无此信息）
+		const uaData = (
+			navigator as Navigator & {
+				userAgentData?: {
+					getHighEntropyValues?: (hints: string[]) => Promise<{ platformVersion?: string }>;
+				};
+			}
+		).userAgentData;
+		uaData
+			?.getHighEntropyValues?.(["platformVersion"])
+			?.then?.((info) => {
+				currentPlatformVersion = info?.platformVersion || "";
+			})
+			?.catch?.(() => {});
 		void Promise.all([loadSessions(), loadTotp(), loadPasskeys()]);
 	});
 
@@ -415,11 +444,14 @@
 				<p class="device-empty">正在读取设备…</p>
 			{:else if sessions.length === 0}
 				<div class="device-item">
-					<div class="device-icon" aria-hidden="true">
-						{#if currentIconKey === "android"}<img src="/icons/android.svg" alt="" />
-						{:else if currentIconKey === "edge"}<img src="/icons/edge.svg" alt="" />
-						{:else if currentIconKey === "chrome"}<img src="/icons/chrome.svg" alt="" />
-						{:else}◌{/if}
+					<div class="device-icon-col" aria-hidden="true">
+						<div class="device-icon">
+							{#if currentIconKey === "android"}<img src="/icons/android.svg" alt="" />
+							{:else if currentIconKey === "edge"}<img src="/icons/edge.svg" alt="" />
+							{:else if currentIconKey === "chrome"}<img src="/icons/chrome.svg" alt="" />
+							{:else}◌{/if}
+						</div>
+						{#if osIconKey(currentUa, currentPlatformVersion)}<img class="device-os" src={`/icons/${osIconKey(currentUa, currentPlatformVersion)}.svg`} alt="" />{/if}
 					</div>
 					<div class="device-copy">
 						<h4>{deviceName}</h4>
@@ -432,11 +464,14 @@
 			{:else}
 				{#each sessions as item}
 				<div class="device-item">
-				<div class="device-icon" aria-hidden="true">
-					{#if deviceIconKey(item.userAgent || "") === "android"}<img src="/icons/android.svg" alt="" />
-					{:else if deviceIconKey(item.userAgent || "") === "edge"}<img src="/icons/edge.svg" alt="" />
-					{:else if deviceIconKey(item.userAgent || "") === "chrome"}<img src="/icons/chrome.svg" alt="" />
-					{:else}<svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H14v2h2.5a1 1 0 1 1 0 2h-9a1 1 0 1 1 0-2H10v-2H6.5A2.5 2.5 0 0 1 4 13.5v-8zM6 5v8.5c0 .28.22.5.5.5h11c.28 0 .5-.22.5-.5V5H6z" fill="currentColor" /></svg>{/if}
+				<div class="device-icon-col" aria-hidden="true">
+					<div class="device-icon">
+						{#if deviceIconKey(item.userAgent || "") === "android"}<img src="/icons/android.svg" alt="" />
+						{:else if deviceIconKey(item.userAgent || "") === "edge"}<img src="/icons/edge.svg" alt="" />
+						{:else if deviceIconKey(item.userAgent || "") === "chrome"}<img src="/icons/chrome.svg" alt="" />
+						{:else}<svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H14v2h2.5a1 1 0 1 1 0 2h-9a1 1 0 1 1 0-2H10v-2H6.5A2.5 2.5 0 0 1 4 13.5v-8zM6 5v8.5c0 .28.22.5.5.5h11c.28 0 .5-.22.5-.5V5H6z" fill="currentColor" /></svg>{/if}
+					</div>
+					{#if osIconKey(item.userAgent || "")}<img class="device-os" src={`/icons/${osIconKey(item.userAgent || "")}.svg`} alt="" />{/if}
 				</div>
 				<div class="device-copy">
 					<h4>{browserLabel(item.userAgent)}{item.sessionId === currentSessionId ? " · 当前设备" : ""}</h4>
@@ -716,6 +751,12 @@
 	border-radius 13px
 	background var(--card-bg, #f5f5f5)
 
+.device-icon-col
+	display flex
+	flex-direction column
+	align-items center
+	gap 4px
+
 .device-icon
 	display inline-flex
 	align-items center
@@ -734,6 +775,15 @@
 		width 20px
 		height 20px
 		object-fit contain
+
+.device-os
+	width 13px
+	height 13px
+	object-fit contain
+	opacity 0.85
+
+:global(:root.dark) .device-os[src*="/icons/apple"]
+	filter invert(1)
 
 .device-copy
 	min-width 0

@@ -76,4 +76,7 @@ export const env = {
 	avatarDir: optional("AVATAR_DIR", "data/avatars"),
 	/** 头像对外访问地址前缀，如 https://api.liyueovo.top/avatars（留空则用请求 Host 推导） */
 	avatarPublicBase: optional("AVATAR_PUBLIC_BASE"),
+
+	/** 用户身份徽章文件（由 dbviewer 后台写入，本服务只读） */
+	badgeFile: optional("BADGE_FILE", "/www/liteblog-data/user-badges.json"),
 } as const;

@@ -63,6 +63,7 @@ export const GET: APIRoute = async ({ request }) => {
 				user,
 				accessToken: tokenResult.data.access_token,
 				expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7, // 7 天
+				provider: "github",
 			},
 			request,
 		);

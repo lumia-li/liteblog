@@ -10,6 +10,7 @@ import verifyRoutes from "./routes/verify.ts";
 import { pool } from "./db.ts";
 import sessionRoutes from "./routes/sessions.ts";
 import { passkeyAccountRoutes, passkeyLoginRoutes } from "./routes/passkey.ts";
+import badgeRoutes from "./routes/badge.ts";
 
 const app = express();
 
@@ -56,6 +57,9 @@ app.use("/account", requireApiKey, accountRoutes);
 app.use("/account", requireApiKey, sessionRoutes);
 app.use("/account", requireApiKey, passkeyAccountRoutes);
 app.use("/passkey", requireApiKey, passkeyLoginRoutes);
+//   GET  /badge?provider=email&userId=1   读取用户身份徽章（供博客展示）
+//   GET  /badge/batch?keys=email|1,qq|xx  批量读取
+app.use("/badge", requireApiKey, badgeRoutes);
 
 app.use((_req, res) => {
 	res.status(404).json({ ok: false, message: "Not Found" });

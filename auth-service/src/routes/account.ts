@@ -14,6 +14,7 @@ import { env } from "../env.ts";
 import { fail, ok, readJsonBody } from "../middleware.ts";
 import { isValidPassword, isValidUsername, sha256Hex, safeEqualHex } from "../util.ts";
 import { decryptSecret, encryptSecret, generateSecret, otpauthUri, verifyCode } from "../totp.ts";
+import { readBadge } from "../badges.ts";
 
 const router = Router();
 
@@ -283,7 +284,9 @@ router.get("/me", async (req, res) => {
 	try {
 		const user = await findUserById(userId);
 		if (!user) return fail(res, 404, "用户不存在");
-		return ok(res, { user: toPublicUser(user) });
+		// 附带后台授予的身份徽章（邮箱用户固定 provider=email）
+		const badge = readBadge("email", String(user.id));
+		return ok(res, { user: toPublicUser(user), badge });
 	} catch (error) {
 		console.error("[account/me] 读取失败:", error);
 		return fail(res, 500, "服务器错误，请稍后重试");

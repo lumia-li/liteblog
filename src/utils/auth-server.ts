@@ -16,6 +16,7 @@ export type SessionPayload = {
 	expiresAt: number;
 	issuedAt?: number;
 	sessionId?: string;
+	/** 登录方式：email / qq / google / github / microsoft，用于匹配后台授予的身份徽章 */
 	provider?: string;
 };
 

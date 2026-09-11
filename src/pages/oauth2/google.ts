@@ -63,6 +63,7 @@ export const GET: APIRoute = async ({ request }) => {
 				user,
 				accessToken: tokenResult.data.access_token,
 				expiresAt: Date.now() + tokenResult.data.expires_in * 1000,
+				provider: "google",
 			},
 			request,
 		);

@@ -1,6 +1,7 @@
 <script lang="ts">
 import { onMount } from "svelte";
 import { fade } from "svelte/transition";
+import UserBadge from "./UserBadge.svelte";
 
 type User = {
 	id: number;
@@ -11,7 +12,10 @@ type User = {
 	role: "admin" | "user";
 };
 
+type Badge = { preset: string; text: string; tone: string };
+
 let user: User | null = null;
+let badge: Badge = { preset: "", text: "", tone: "" };
 let loading = true;
 let open = false;
 let menuElement: HTMLDivElement | null = null;
@@ -22,12 +26,15 @@ async function fetchUser() {
 		const response = await fetch("/api/auth/me", { cache: "no-store" });
 		if (!response.ok) {
 			user = null;
+			badge = { preset: "", text: "", tone: "" };
 			return;
 		}
 		const data = await response.json();
 		user = data.user as User;
+		badge = (data.badge as Badge) || { preset: "", text: "", tone: "" };
 	} catch {
 		user = null;
+		badge = { preset: "", text: "", tone: "" };
 	} finally {
 		loading = false;
 	}
@@ -113,6 +120,7 @@ onMount(() => {
 				</div>
 			{/if}
 			<span class="user-name">{user.display_name || user.username}</span>
+			<UserBadge tone={badge.tone} text={badge.text} size="md" />
 			<svg class="user-menu-chevron" class:open viewBox="0 0 24 24" aria-hidden="true">
 				<path d="M7 10l5 5 5-5H7z" fill="currentColor" />
 			</svg>
@@ -262,6 +270,8 @@ onMount(() => {
 	overflow hidden
 	text-overflow ellipsis
 	white-space nowrap
+	flex-shrink 1
+	min-width 0
 
 .user-menu-chevron
 	width 16px

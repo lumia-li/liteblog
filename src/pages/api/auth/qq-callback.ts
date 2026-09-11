@@ -83,6 +83,7 @@ export const GET: APIRoute = async ({ request }) => {
 			user,
 			accessToken: tokenResult.accessToken,
 			expiresAt: Date.now() + tokenResult.expiresIn * 1000,
+			provider: "qq",
 		};
 
 		// 重定向到首页，设置会话 cookie，清除 state

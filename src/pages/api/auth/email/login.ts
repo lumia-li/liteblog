@@ -51,6 +51,7 @@ export const POST: APIRoute = async ({ request }) => {
 			user,
 			accessToken: `email-${user.id}`,
 			expiresAt: Date.now() + sessionDays * 24 * 60 * 60 * 1000,
+			provider: "email",
 		}, request);
 
 		await recordLogin(user, "email", {

@@ -225,6 +225,7 @@ const roleText = badge.text || (user?.role === "admin" ? "管理员" : "普通�
 	const profileMaxDuration = 900;
 	const profileDurationPerPx = 1.4;
 	const profileTransitionTimers = new WeakMap<HTMLElement, number>();
+	const profilePanelObservers = new WeakMap<HTMLElement, ResizeObserver>();
 
 	function setupProfileTransitions() {
 		document.querySelectorAll<HTMLElement>(".profile-menu").forEach((menu) => {
@@ -249,7 +250,19 @@ const roleText = badge.text || (user?.role === "admin" ? "管理员" : "普通�
 			// 不要在这里写死 px 高度：字体加载 / 组件 hydration 后内容变高时，
 			// 固定高度会把面板最后一行裁掉（容器 overflow:hidden）。
 			panels.style.height = "auto";
-		});
+
+			// 面板内容高度变化（字体加载、Svelte 组件 hydration、内容异步渲染）时
+			// 同步把容器放回 auto，避免容器比内容矮导致底部被裁。
+			if (!profilePanelObservers.has(panels)) {
+				const observer = new ResizeObserver(() => {
+					// 切换动画进行中不要打断（动画结束后会自行回到 auto）
+					if (panels.dataset.animating === "1") return;
+					if (panels.style.height !== "auto") panels.style.height = "auto";
+				});
+				panels.querySelectorAll<HTMLElement>(".profile-panel").forEach((panel) => observer.observe(panel));
+				profilePanelObservers.set(panels, observer);
+			}
+			});
 	}
 
 	function switchProfilePanel(item: HTMLElement) {
@@ -278,6 +291,8 @@ const roleText = badge.text || (user?.role === "admin" ? "管理员" : "普通�
 		panels.querySelectorAll<HTMLElement>(".profile-panel.is-leaving").forEach((panel) => {
 			panel.classList.remove("is-leaving", "is-forward", "is-backward");
 		});
+		// 动画期间标记，避免 ResizeObserver 在过渡中把高度重置为 auto 打断动画
+		panels.dataset.animating = "1";
 		panels.style.height = `${currentHeight}px`;
 		current.classList.remove("is-active");
 		current.classList.add("is-leaving", `is-${direction}`);
@@ -304,6 +319,7 @@ const roleText = badge.text || (user?.role === "admin" ? "管理员" : "普通�
 		const transitionTimer = window.setTimeout(() => {
 			current.classList.remove("is-leaving", "is-forward", "is-backward");
 			target.classList.remove("is-forward", "is-backward");
+			delete panels.dataset.animating;
 			panels.style.height = "auto";
 		}, duration);
 		profileTransitionTimers.set(panels, transitionTimer);

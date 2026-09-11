@@ -69,7 +69,10 @@
 	function passkeyErrorText(error: unknown): string {
 		const name = (error as { name?: string })?.name ?? "";
 		const raw = error instanceof Error ? error.message : "";
-		if (name === "NotAllowedError") return "已取消操作或验证超时，请重试";
+		if (name === "NotAllowedError") {
+			// 原文会区分「超时」「用户取消」「策略不允许」，排查时很有用
+			return `已取消操作或验证超时，请重试${raw ? `（${raw.slice(0, 120)}）` : ""}`;
+		}
 		if (name === "InvalidStateError") {
 			return "该账号在此设备（或已同步的通行密钥库，如 iCloud / Google / Microsoft 账户）中已有通行密钥，无需重复添加";
 		}

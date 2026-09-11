@@ -692,9 +692,20 @@ async function handlePassword(event: SubmitEvent) {
 	gap 0.5rem
 	flex-wrap wrap
 
+	/* 用 flex-basis 参与换行计算，min-width 归零允许收缩：
+	   否则窄屏下输入框既撑住不缩、又不触发换行，整行溢出被面板 overflow:hidden 裁掉 */
 	& .account-input
-		flex 1
-		min-width 180px
+		flex 1 1 180px
+		min-width 0
+
+	& .account-input-wrap
+		flex 1 1 180px
+		min-width 0
+
+	/* 按钮按内容宽度显示，绝不压缩文字；换行后靠右排列 */
+	& .account-btn
+		flex 0 0 auto
+		margin-left auto
 
 .account-input
 	padding 0.55rem 0.75rem
@@ -731,8 +742,8 @@ async function handlePassword(event: SubmitEvent) {
 	position relative
 	display flex
 	align-items center
-	flex 1
-	min-width 180px
+	flex 1 1 180px
+	min-width 0
 
 	& .account-input
 		width 100%

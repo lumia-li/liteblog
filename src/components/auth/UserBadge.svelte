@@ -71,7 +71,25 @@
 	border-color rgba(220, 38, 38, 0.5)
 	background rgba(220, 38, 38, 0.13)
 
+/* 站点保留身份（liyue / Airliny）：彩虹渐变描边 + 流动光，与个人资料页一致 */
+.ubadge[data-tone="reserved"]
+	color #7c3aed
+	border-color transparent
+	background linear-gradient(var(--capsule-menu-bg, rgba(255,255,255,0.96)), var(--capsule-menu-bg, rgba(255,255,255,0.96))) padding-box, linear-gradient(90deg, #00ff87, #60efff, #0061ff, #ea00ff, #ff1b6b, #00ff87) border-box
+	background-size auto, 200% 100%
+	animation ub-rainbow 4s linear infinite
+	box-shadow 0 0 0 1px rgba(168, 85, 247, 0.18), 0 0 12px rgba(139, 92, 246, 0.3)
+
+@keyframes ub-rainbow
+	0%
+		background-position 0 0, 0% 0%
+	100%
+		background-position 0 0, 200% 0%
+
 /* 暗色主题微调：提高文字亮度保证可读 */
+:global([data-theme="dark"]) .ubadge[data-tone="reserved"]
+	color #c4b5fd
+
 :global([data-theme="dark"]) .ubadge[data-tone="vip"]
 	color #fbbf24
 

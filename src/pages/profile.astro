@@ -63,12 +63,13 @@ const roleText = badge.text || (user?.role === "admin" ? "管理员" : "普通�
 						</button>
 						<div class="profile-name-row">
 							<h1 class="profile-name">{user.display_name || user.username}</h1>
-							{badge.text ? (
-								<span class="profile-role" data-tone={badge.tone}>{badge.text}</span>
-							) : ["1", "4"].includes(user.id) ? (
+							{["1", "4"].includes(user.id) ? (
+								// 站点保留账号（liyue / Airliny）：写死身份，后台不可修改
 								<span class="profile-role profile-role-rainbow">
 									{user.id === "1" ? "猫猫管理员" : "璃猫猫"}
 								</span>
+							) : badge.text ? (
+								<span class="profile-role" data-tone={badge.tone}>{badge.text}</span>
 							) : (
 								<span class="profile-role">{user.role === "admin" ? "管理员" : "普通用户"}</span>
 							)}

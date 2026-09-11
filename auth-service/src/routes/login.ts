@@ -11,7 +11,7 @@ import { decryptSecret, verifyCode } from "../totp.ts";
 const router = Router();
 
 type Body = { email?: unknown; password?: unknown; totpCode?: unknown };
-type AttemptRow = RowDataPacket & { fail_count: number; locked_until: Date | null };
+type AttemptRow = RowDataPacket & { fail_count: number; lock_seconds: number | null };
 
 const MAX_FAILS = 5;
 const LOCK_MINUTES = 15;
@@ -36,14 +36,19 @@ router.post("/login", async (req, res) => {
 	}
 
 	try {
-		// 锁定检查
+		// 锁定检查：剩余秒数交给数据库用 NOW() 计算。
+		// locked_until 是 TIMESTAMP，由 NOW() 写入（数据库本地时区），
+		// 若取回 Node 再比较，mysql2 会按 UTC 解析，导致差一个时区（锁定时间被放大 8 小时）。
 		const [attempts] = await pool.execute<AttemptRow[]>(
-			"SELECT fail_count, locked_until FROM login_attempts WHERE email = ? LIMIT 1",
+			`SELECT fail_count,
+			        IF(locked_until IS NOT NULL AND locked_until > NOW(),
+			           TIMESTAMPDIFF(SECOND, NOW(), locked_until), 0) AS lock_seconds
+			 FROM login_attempts WHERE email = ? LIMIT 1`,
 			[email],
 		);
-		const attempt = attempts[0];
-		if (attempt?.locked_until && new Date(attempt.locked_until).getTime() > Date.now()) {
-			const minutes = Math.ceil((new Date(attempt.locked_until).getTime() - Date.now()) / 60000);
+		const lockSeconds = Number(attempts[0]?.lock_seconds ?? 0);
+		if (lockSeconds > 0) {
+			const minutes = Math.max(1, Math.ceil(lockSeconds / 60));
 			return fail(res, 429, `失败次数过多，账号已锁定，请 ${minutes} 分钟后再试`);
 		}
 

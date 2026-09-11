@@ -69,7 +69,9 @@ router.get("/sessions", async (req, res) => {
 	const userId = text(req.query.userId, 128);
 	if (!userId) return fail(res, 400, "userId 无效");
 	try {
-		await pool.execute("DELETE FROM auth_sessions WHERE expires_at <= NOW()");
+		// 连接池以 timezone:"Z" 写入，issued_at/expires_at 存的是 UTC 墙上时间，
+		// 因此必须与 UTC_TIMESTAMP() 比较（用 NOW() 会差一个时区，约 8 小时）
+		await pool.execute("DELETE FROM auth_sessions WHERE expires_at <= UTC_TIMESTAMP()");
 		const [rows] = await pool.execute(
 			`SELECT session_id AS sessionId, user_id AS userId, provider, ip,
 			 user_agent AS userAgent, issued_at AS issuedAt, expires_at AS expiresAt
@@ -91,7 +93,7 @@ router.get("/sessions/:sessionId/validate", async (req, res) => {
 	if (!userId || !/^[A-Za-z0-9_-]{16,128}$/.test(sessionId)) return fail(res, 400, "会话参数无效");
 	try {
 		const [rows] = await pool.execute(
-			"SELECT session_id FROM auth_sessions WHERE session_id = ? AND user_id = ? AND revoked_at IS NULL AND expires_at > NOW() LIMIT 1",
+			"SELECT session_id FROM auth_sessions WHERE session_id = ? AND user_id = ? AND revoked_at IS NULL AND expires_at > UTC_TIMESTAMP() LIMIT 1",
 			[sessionId, userId],
 		);
 		return ok(res, { active: Array.isArray(rows) && rows.length > 0 });
@@ -108,7 +110,7 @@ router.delete("/sessions/:sessionId", async (req, res) => {
 	if (!userId || !/^[A-Za-z0-9_-]{16,128}$/.test(sessionId)) return fail(res, 400, "会话参数无效");
 	try {
 		await pool.execute(
-			"UPDATE auth_sessions SET revoked_at = COALESCE(revoked_at, NOW()) WHERE session_id = ? AND user_id = ?",
+			"UPDATE auth_sessions SET revoked_at = COALESCE(revoked_at, UTC_TIMESTAMP()) WHERE session_id = ? AND user_id = ?",
 			[sessionId, userId],
 		);
 		return ok(res);
@@ -125,7 +127,7 @@ router.delete("/sessions", async (req, res) => {
 	if (!userId || !/^[A-Za-z0-9_-]{16,128}$/.test(except)) return fail(res, 400, "会话参数无效");
 	try {
 		const [result] = await pool.execute(
-			"UPDATE auth_sessions SET revoked_at = COALESCE(revoked_at, NOW()) WHERE user_id = ? AND session_id <> ? AND revoked_at IS NULL",
+			"UPDATE auth_sessions SET revoked_at = COALESCE(revoked_at, UTC_TIMESTAMP()) WHERE user_id = ? AND session_id <> ? AND revoked_at IS NULL",
 			[userId, except],
 		);
 		return ok(res, { revoked: (result as { affectedRows?: number }).affectedRows ?? 0 });

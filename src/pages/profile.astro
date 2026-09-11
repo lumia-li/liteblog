@@ -1,6 +1,7 @@
 ---
 import MainGridLayout from "@layouts/MainGridLayout.astro";
 import { readSession } from "@utils/auth-server";
+import { callAuthService } from "@utils/auth-service";
 import AccountSettings from "@components/auth/AccountSettings.svelte";
 import SecuritySettings from "@components/auth/SecuritySettings.svelte";
 
@@ -13,6 +14,24 @@ const clientIp = (forwardedFor.split(",")[0] || Astro.request.headers.get("x-rea
 const loginAt = session?.issuedAt ?? Date.now();
 // 邮箱注册账号的 id 是纯数字（MySQL 自增）；OAuth 用户 id 由各 Provider 签发
 const isEmailAccount = Boolean(user && /^\d+$/.test(user.id));
+
+// 实时读取后台（dbviewer）授予的身份组；cookie 里的 role 是登录时快照，仅作兜底
+type IdentityBadge = { preset: string; text: string; tone: string };
+let badge: IdentityBadge = { preset: "", text: "", tone: "" };
+const badgeProvider = session
+	? session.provider || (session.accessToken.startsWith("email-") ? "email" : "")
+	: "";
+if (user && badgeProvider) {
+	try {
+		const data = await callAuthService<{ badge?: IdentityBadge }>("/badge", {
+			query: { provider: badgeProvider, userId: String(user.id) },
+		});
+		if (data.badge && data.badge.tone) badge = data.badge;
+	} catch {
+		/* 读取失败时回退 cookie role，不影响页面渲染 */
+	}
+}
+const roleText = badge.text || (user?.role === "admin" ? "管理员" : "普通用户");
 ---
 
 <MainGridLayout title="个人资料" description="用户个人资料页" showHero={false}>
@@ -44,7 +63,9 @@ const isEmailAccount = Boolean(user && /^\d+$/.test(user.id));
 						</button>
 						<div class="profile-name-row">
 							<h1 class="profile-name">{user.display_name || user.username}</h1>
-							{["1", "4"].includes(user.id) ? (
+							{badge.text ? (
+								<span class="profile-role" data-tone={badge.tone}>{badge.text}</span>
+							) : ["1", "4"].includes(user.id) ? (
 								<span class="profile-role profile-role-rainbow">
 									{user.id === "1" ? "猫猫管理员" : "璃猫猫"}
 								</span>
@@ -510,6 +531,48 @@ const isEmailAccount = Boolean(user && /^\d+$/.test(user.id));
 		user-select: none;
 		white-space: nowrap;
 	}
+
+	/* 后台身份组的皮肤（与导航栏徽章色调一致） */
+	.profile-role[data-tone="admin"] {
+		color: #7c3aed;
+		border-color: rgba(124, 58, 237, 0.5);
+		background: rgba(139, 92, 246, 0.1);
+	}
+
+	.profile-role[data-tone="vip"] {
+		color: #d97706;
+		border-color: rgba(217, 119, 6, 0.55);
+		background: rgba(245, 158, 11, 0.12);
+	}
+
+	.profile-role[data-tone="mod"] {
+		color: #0891b2;
+		border-color: rgba(8, 145, 178, 0.5);
+		background: rgba(8, 145, 178, 0.12);
+	}
+
+	.profile-role[data-tone="friend"] {
+		color: #db2777;
+		border-color: rgba(219, 39, 119, 0.5);
+		background: rgba(219, 39, 119, 0.12);
+	}
+
+	.profile-role[data-tone="test"] {
+		color: #ca8a04;
+		border-color: rgba(202, 138, 4, 0.5);
+		background: rgba(234, 179, 8, 0.14);
+	}
+
+	.profile-role[data-tone="ban"] {
+		color: #dc2626;
+		border-color: rgba(220, 38, 38, 0.5);
+		background: rgba(220, 38, 38, 0.12);
+	}
+
+	:root.dark .profile-role[data-tone="admin"] { color: #a78bfa; }
+	:root.dark .profile-role[data-tone="ban"] { color: #f87171; }
+	:root.dark .profile-role[data-tone="vip"] { color: #fbbf24; }
+	:root.dark .profile-role[data-tone="mod"] { color: #22d3ee; }
 
 	.profile-role-rainbow {
 		position: relative;

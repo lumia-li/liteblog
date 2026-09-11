@@ -195,6 +195,11 @@ let passkeyLoading = false;
 
 async function handlePasskeyLogin() {
 	if (passkeyLoading) return;
+	// WebView 套壳浏览器（Via / 微信 / QQ 等）不提供 WebAuthn API，提前提示
+	if (typeof (window as { PublicKeyCredential?: unknown }).PublicKeyCredential === "undefined" || /; wv\)/.test(navigator.userAgent)) {
+		loginError = "当前浏览器不支持通行密钥，请改用 Chrome、Edge 或 Safari 打开本页";
+		return;
+	}
 	loginError = "";
 	loginSuccess = "";
 	passkeyLoading = true;

@@ -47,6 +47,19 @@
 	let passkeysLoading = true;
 	let passkeyLoading = false;
 	let passkeyMessage = "";
+	/** WebAuthn 是否可用：WebView 套壳浏览器（Via / 微信 / QQ 等）不提供该 API */
+	let passkeySupported = true;
+
+	function detectPasskeySupport(): boolean {
+		if (typeof window === "undefined") return true;
+		// 标准能力检测：WebView 环境下该构造函数不存在
+		if (typeof (window as { PublicKeyCredential?: unknown }).PublicKeyCredential === "undefined") return false;
+		// 部分套壳浏览器提供了构造函数但不可用，再兜一层 UA 判断
+		const ua = navigator.userAgent || "";
+		if (/; wv\)/.test(ua) && !/EdgA?\//.test(ua)) return false;
+		if (/(MicroMessenger|\bQQ\/|Via|UCBrowser|Quark|Baidu)/i.test(ua)) return false;
+		return true;
+	}
 
 	async function loadPasskeys() {
 		if (!isEmailAccount) {
@@ -88,6 +101,10 @@
 
 	async function addPasskey() {
 		if (passkeyLoading) return;
+		if (!passkeySupported) {
+			passkeyMessage = "当前浏览器不支持通行密钥（Via / 微信等套壳浏览器无法使用），请改用 Chrome、Edge 或 Safari 打开本页";
+			return;
+		}
 		passkeyLoading = true;
 		passkeyMessage = "";
 		try {
@@ -339,6 +356,7 @@
 		currentIconKey = deviceIconKey(ua);
 		currentUa = ua;
 		loginTime = formatDate(loginAt);
+		passkeySupported = detectPasskeySupport();
 		// 当前设备可通过高熵 UA 数据区分 Windows 10 / 11（其他设备 UA 无此信息）
 		const uaData = (
 			navigator as Navigator & {
@@ -381,15 +399,24 @@
 				<p>使用设备的指纹、人脸识别或 PIN 安全登录，无需记忆密码。</p>
 			</div>
 			<div class="security-meta">
-				{#if isEmailAccount}
+				{#if !isEmailAccount}
+					<span class="security-status">邮箱账号可用</span>
+				{:else if !passkeySupported}
+					<span class="security-status security-status-warn">当前浏览器不支持</span>
+					<button type="button" class="security-action" on:click={addPasskey}>查看说明</button>
+				{:else}
 					<span class="security-status">{passkeysLoading ? "读取中…" : passkeys.length ? `已设置 ${passkeys.length} 个` : "未设置"}</span>
 					<button type="button" class="security-action" disabled={passkeyLoading} on:click={addPasskey}>
 						{passkeyLoading ? "等待验证…" : "添加"}
 					</button>
-				{:else}
-					<span class="security-status">邮箱账号可用</span>
 				{/if}
 			</div>
+			{#if isEmailAccount && !passkeySupported}
+				<p class="passkey-hint">
+					检测到当前浏览器不支持通行密钥（Via、微信、QQ 等套壳浏览器无法调起系统密码管理器）。请改用
+					<strong>Chrome / Edge / Safari</strong> 打开本页后再添加。
+				</p>
+			{/if}
 			{#if isEmailAccount && passkeys.length}
 				<ul class="passkey-list">
 					{#each passkeys as item (item.id)}
@@ -696,6 +723,20 @@
 	color rgba(17, 17, 17, 0.5)
 	white-space nowrap
 	font-size 0.72rem
+
+.security-status-warn
+	color #d97706
+
+.passkey-hint
+	grid-column 1 / -1
+	margin 0.55rem 0 0
+	padding 0.6rem 0.75rem
+	border 1px dashed rgba(217, 119, 6, 0.45)
+	border-radius 10px
+	background rgba(245, 158, 11, 0.08)
+	font-size 0.75rem
+	line-height 1.6
+	color rgba(17, 17, 17, 0.7)
 
 .passkey-delete
 	padding 0.3rem 0.6rem

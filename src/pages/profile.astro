@@ -242,11 +242,13 @@ const roleText = badge.text || (user?.role === "admin" ? "管理员" : "普通�
 		});
 
 		document.querySelectorAll<HTMLElement>(".profile-panels").forEach((panels) => {
-			const active = panels.querySelector<HTMLElement>(".profile-panel.is-active");
 			panels.querySelectorAll<HTMLElement>(".profile-panel").forEach((panel) => {
 				panel.inert = !panel.classList.contains("is-active");
 			});
-			if (active && !panels.style.height) panels.style.height = `${active.offsetHeight}px`;
+			// 容器高度保持 auto，跟随当前面板自然撑开。
+			// 不要在这里写死 px 高度：字体加载 / 组件 hydration 后内容变高时，
+			// 固定高度会把面板最后一行裁掉（容器 overflow:hidden）。
+			panels.style.height = "auto";
 		});
 	}
 
@@ -261,9 +263,10 @@ const roleText = badge.text || (user?.role === "admin" ? "管理员" : "普通�
 
 		const items = [...menu.querySelectorAll<HTMLElement>(".profile-menu-item")];
 		const direction = items.indexOf(item) >= items.indexOf(current) ? "forward" : "backward";
-		const currentHeight = current.getBoundingClientRect().height;
-		// 面板为 height:auto 的绝对定位，隐藏状态也能测到真实内容高度
-		const targetHeight = target.getBoundingClientRect().height;
+		// 用 offsetHeight 而非 getBoundingClientRect：静止态面板带 transform: scale(0.985)，
+		// getBoundingClientRect 量到的会偏小约 1.5%，导致动画结束后底部被裁。
+		const currentHeight = current.offsetHeight;
+		const targetHeight = target.offsetHeight;
 		// 时长随高度差自适应，保证切换的视觉速度一致
 		const heightDelta = Math.abs(targetHeight - currentHeight);
 		const duration = Math.round(

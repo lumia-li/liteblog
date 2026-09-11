@@ -1,5 +1,6 @@
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { callAuthService, isAuthServiceConfigured } from "./auth-service";
+import { getClientIp } from "./client-ip";
 
 export type OAuthUser = {
 	id: string;
@@ -324,7 +325,7 @@ export async function setSession(
 					sessionId,
 					userId: session.user.id,
 					provider: session.provider || (session.accessToken.startsWith("email-") ? "email" : "oauth"),
-					ip: request?.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || request?.headers.get("x-real-ip") || "",
+					ip: request ? getClientIp(request) : "",
 					userAgent: request?.headers.get("user-agent") || "",
 					issuedAt,
 					expiresAt: session.expiresAt,

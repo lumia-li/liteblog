@@ -8,16 +8,11 @@ import {
 	setSession,
 } from "@utils/auth-server";
 import { recordLogin } from "@utils/login-history";
+import { getClientIp } from "@utils/client-ip";
 
 export const prerender = false;
 
 const STATE_COOKIE_PATH = "/oauth2/microsoft";
-
-function getClientIp(request: Request): string {
-	const forwarded = request.headers.get("x-forwarded-for");
-	if (forwarded) return forwarded.split(",")[0].trim();
-	return request.headers.get("x-real-ip")?.trim() || "";
-}
 
 function redirectResponse(url: string, status = 302): Response {
 	return new Response(null, { status, headers: { Location: url } });

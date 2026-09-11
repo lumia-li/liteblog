@@ -4,21 +4,12 @@
  * 查询失败时返回空字符串，不影响设备列表展示。
  */
 
+import { isPrivateIp } from "./client-ip";
+
 const TTL = 7 * 24 * 60 * 60 * 1000;
 const cache = new Map<string, { value: string; expiresAt: number }>();
 
-/** 内网/环回地址不做属地查询 */
-export function isPrivateIp(ip: string): boolean {
-	if (!ip) return false;
-	if (ip === "::1" || ip.startsWith("fc") || ip.startsWith("fd") || ip.startsWith("fe80")) return true;
-	if (/^127\./.test(ip) || /^10\./.test(ip) || /^192\.168\./.test(ip) || /^169\.254\./.test(ip)) return true;
-	const match = ip.match(/^172\.(\d+)\./);
-	if (match) {
-		const second = Number(match[1]);
-		if (second >= 16 && second <= 31) return true;
-	}
-	return false;
-}
+export { isPrivateIp };
 
 export async function lookupIpLocation(ip: string): Promise<string> {
 	const clean = (ip || "").trim();

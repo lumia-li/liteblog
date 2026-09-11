@@ -2,6 +2,7 @@
 import MainGridLayout from "@layouts/MainGridLayout.astro";
 import { readSession } from "@utils/auth-server";
 import { callAuthService } from "@utils/auth-service";
+import { getClientIp } from "@utils/client-ip";
 import AccountSettings from "@components/auth/AccountSettings.svelte";
 import SecuritySettings from "@components/auth/SecuritySettings.svelte";
 
@@ -9,8 +10,7 @@ export const prerender = false;
 
 const session = await readSession(Astro.request);
 const user = session?.user ?? null;
-const forwardedFor = Astro.request.headers.get("x-forwarded-for") || "";
-const clientIp = (forwardedFor.split(",")[0] || Astro.request.headers.get("x-real-ip") || "").trim() || "未知 IP";
+const clientIp = getClientIp(Astro.request) || "未知 IP";
 const loginAt = session?.issuedAt ?? Date.now();
 // 邮箱注册账号的 id 是纯数字（MySQL 自增）；OAuth 用户 id 由各 Provider 签发
 const isEmailAccount = Boolean(user && /^\d+$/.test(user.id));
@@ -39,6 +39,11 @@ const roleText = badge.text || (user?.role === "admin" ? "管理员" : "普通�
 		{user ? (
 			<>
 				<aside class="profile-aside">
+					<header class="profile-aside-head">
+						<h1 class="profile-aside-title">个人中心</h1>
+						<p class="profile-aside-sub">管理你的账号资料与安全设置</p>
+					</header>
+
 					<div class="profile-summary">
 						<button
 							type="button"
@@ -396,6 +401,29 @@ const roleText = badge.text || (user?.role === "admin" ? "管理员" : "普通�
 		padding: 2.1rem 1.35rem 1.5rem;
 		background: var(--surface-bg, #f4f4f4);
 		border-right: 1px solid var(--surface-border, #dddddd);
+	}
+
+	/* 左上角标题 / 副标题 */
+	.profile-aside-head {
+		display: flex;
+		flex-direction: column;
+		gap: 0.28rem;
+		margin-bottom: -0.85rem;
+	}
+
+	.profile-aside-title {
+		margin: 0;
+		font-size: 1.18rem;
+		font-weight: 800;
+		letter-spacing: -0.01em;
+		color: var(--text-color, #111111);
+	}
+
+	.profile-aside-sub {
+		margin: 0;
+		font-size: 0.82rem;
+		line-height: 1.5;
+		color: color-mix(in oklab, var(--text-color, #111111) 62%, transparent);
 	}
 
 	.profile-summary {
@@ -1249,6 +1277,10 @@ const roleText = badge.text || (user?.role === "admin" ? "管理员" : "普通�
 			border-bottom: 1px solid var(--surface-border, #dddddd);
 			gap: 1.3rem;
 			padding: 1.6rem 1.5rem 1.2rem;
+		}
+
+		.profile-aside-head {
+			margin-bottom: -0.25rem;
 		}
 
 		.profile-summary {

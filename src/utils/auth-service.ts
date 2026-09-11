@@ -61,12 +61,8 @@ export async function callAuthService<T = Record<string, unknown>>(
 	return data as T;
 }
 
-/** 从请求中提取客户端 IP（与 OAuth 回调口径一致） */
-export function getClientIp(request: Request): string {
-	const forwarded = (request.headers.get("x-forwarded-for") || "").trim();
-	if (forwarded) return forwarded.split(",")[0].trim();
-	return (request.headers.get("x-real-ip") || "").trim();
-}
+/** 从请求中提取客户端 IP（与 OAuth 回调口径一致，见 client-ip.ts） */
+export { getClientIp } from "./client-ip";
 
 /** 统一 JSON 响应 helper（对齐现有 API 约定） */
 export function json(status: number, payload: Record<string, unknown>): Response {

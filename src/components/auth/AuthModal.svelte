@@ -222,11 +222,15 @@ async function handlePasskeyLogin() {
 		loginError =
 			name === "NotAllowedError"
 				? "已取消操作或验证超时"
-				: name === "NotSupportedError" || name === "TypeError"
-					? "当前环境不支持通行密钥（需 HTTPS 与现代浏览器）"
-					: error instanceof Error
-						? error.message
-						: "通行密钥登录失败";
+				: name === "InvalidStateError"
+					? "该设备上没有可用于此账号的通行密钥"
+					: name === "SecurityError"
+						? "站点与通行密钥的域名不匹配"
+						: name === "NotSupportedError" || name === "TypeError"
+							? "当前环境不支持通行密钥（需 HTTPS 与现代浏览器）"
+							: error instanceof Error
+								? `${error.message}${name && name !== "Error" ? `（${name}）` : ""}`
+								: "通行密钥登录失败";
 	} finally {
 		passkeyLoading = false;
 	}

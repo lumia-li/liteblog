@@ -1,5 +1,6 @@
 import type { RowDataPacket } from "mysql2";
 import { Router } from "express";
+import type { Request } from "express";
 import {
 	generateAuthenticationOptions,
 	generateRegistrationOptions,
@@ -13,7 +14,7 @@ import type {
 } from "@simplewebauthn/server";
 import { findUserById, findUserByEmail, pool, toPublicUser } from "../db.ts";
 import { env } from "../env.ts";
-import { fail, ok, readJsonBody } from "../middleware.ts";
+import { fail, ok } from "../middleware.ts";
 import { getClientIp } from "../util.ts";
 import { hit } from "../rate-limit.ts";
 
@@ -38,6 +39,23 @@ type ChallengeRow = { challenge: string; userId?: string; expiresAt: number };
 
 const CHALLENGE_TTL = 5 * 60 * 1000;
 const challenges = new Map<string, ChallengeRow>();
+
+/**
+ * WebAuthn 凭据体专用解析：
+ * 手机端（尤其 iOS / Android 系统密码管理器）返回的 attestation 常带证书链，
+ * 体积可达几十 KB，远超 readJsonBody 的 8KB 上限，因此单独放宽到 512KB。
+ */
+const MAX_WEBAUTHN_BODY = 512 * 1024;
+
+function readWebauthnBody<T>(req: Request): T | null {
+	try {
+		const raw = typeof req.body === "string" ? req.body : JSON.stringify(req.body ?? {});
+		if (raw.length > MAX_WEBAUTHN_BODY) return null;
+		return JSON.parse(raw) as T;
+	} catch {
+		return null;
+	}
+}
 
 function saveChallenge(key: string, row: ChallengeRow): void {
 	challenges.set(key, row);
@@ -127,7 +145,7 @@ passkeyAccountRoutes.get("/passkeys", async (req, res) => {
 
 /** POST /account/passkeys/register/options —— 生成注册挑战 */
 passkeyAccountRoutes.post("/passkeys/register/options", async (req, res) => {
-	const body = readJsonBody<{ userId?: unknown }>(req);
+	const body = readWebauthnBody<{ userId?: unknown }>(req);
 	const userId = parseUserId(body?.userId);
 	if (!userId) return fail(res, 400, "缺少用户标识");
 	try {
@@ -163,11 +181,16 @@ passkeyAccountRoutes.post("/passkeys/register/options", async (req, res) => {
 
 /** POST /account/passkeys/register/verify —— 校验注册结果并保存凭据 */
 passkeyAccountRoutes.post("/passkeys/register/verify", async (req, res) => {
-	const body = readJsonBody<{ userId?: unknown; credential?: unknown; deviceLabel?: unknown }>(req);
+	const body = readWebauthnBody<{ userId?: unknown; credential?: unknown; deviceLabel?: unknown }>(req);
 	const userId = parseUserId(body?.userId);
 	if (!userId) return fail(res, 400, "缺少用户标识");
 	const credential = body?.credential as RegistrationResponseJSON | undefined;
 	if (!credential || typeof credential !== "object" || !("response" in credential)) {
+		console.warn(
+			`[passkeys/register/verify] 凭据无效 userId=${userId} type=${typeof body?.credential} keys=${
+				body?.credential && typeof body.credential === "object" ? Object.keys(body.credential).join(",") : "-"
+			}`,
+		);
 		return fail(res, 400, "注册凭据无效");
 	}
 	const deviceLabel = typeof body?.deviceLabel === "string" && body.deviceLabel.trim()
@@ -175,7 +198,10 @@ passkeyAccountRoutes.post("/passkeys/register/verify", async (req, res) => {
 		: "通行密钥";
 	try {
 		const expectedChallenge = takeChallenge(`reg:${userId}`);
-		if (!expectedChallenge) return fail(res, 400, "注册会话已过期，请重新添加");
+		if (!expectedChallenge) {
+			console.warn(`[passkeys/register/verify] 挑战缺失或已过期 userId=${userId}（重复提交 / 超过 ${CHALLENGE_TTL / 60000} 分钟 / 服务重启）`);
+			return fail(res, 400, "注册会话已过期，请重新添加");
+		}
 		const verification = await verifyRegistrationResponse({
 			response: credential,
 			expectedChallenge,
@@ -184,6 +210,10 @@ passkeyAccountRoutes.post("/passkeys/register/verify", async (req, res) => {
 			requireUserVerification: false,
 		});
 		if (!verification.verified || !verification.registrationInfo) {
+			console.warn(
+				`[passkeys/register/verify] 校验未通过 userId=${userId} verified=${verification.verified} ` +
+					`hasInfo=${Boolean(verification.registrationInfo)} origin=${env.passkeyOrigins.join("|")} rpId=${env.rpId}`,
+			);
 			return fail(res, 400, "通行密钥验证失败");
 		}
 		const { credential: newCredential } = verification.registrationInfo;
@@ -199,7 +229,10 @@ passkeyAccountRoutes.post("/passkeys/register/verify", async (req, res) => {
 		);
 		return ok(res, { verified: true });
 	} catch (error) {
-		console.error("[passkeys/register/verify] 验证失败:", error);
+		console.error(
+			`[passkeys/register/verify] 异常 ${(error as { name?: string })?.name ?? "Error"}:`,
+			error instanceof Error ? error.message : error,
+		);
 		return fail(res, 500, "服务器错误，请稍后重试");
 	}
 });
@@ -232,7 +265,7 @@ export const passkeyLoginRoutes = Router();
  * body: { email? } —— 传邮箱则只允许该账号的密钥（非可发现凭据），不传则允许任何已注册密钥。
  */
 passkeyLoginRoutes.post("/login/options", async (req, res) => {
-	const body = readJsonBody<{ email?: unknown }>(req);
+	const body = readWebauthnBody<{ email?: unknown }>(req);
 	const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
 	if (email && !hit(`passkey:${getClientIp(req)}`, 30, 60 * 60 * 1000)) {
 		return fail(res, 429, "尝试次数过多，请一小时后再试");
@@ -273,7 +306,7 @@ passkeyLoginRoutes.post("/login/options", async (req, res) => {
  * body: { credential } —— 校验通过返回用户信息，与 /email/login 响应结构一致。
  */
 passkeyLoginRoutes.post("/login/verify", async (req, res) => {
-	const body = readJsonBody<{ credential?: unknown }>(req);
+	const body = readWebauthnBody<{ credential?: unknown }>(req);
 	const credential = body?.credential as AuthResponseJSON | AuthenticationResponseJSON | undefined;
 	if (!credential || typeof credential !== "object" || !("response" in credential)) {
 		return fail(res, 400, "登录凭据无效");
@@ -309,7 +342,13 @@ passkeyLoginRoutes.post("/login/verify", async (req, res) => {
 			},
 			requireUserVerification: false,
 		});
-		if (!verification.verified) return fail(res, 401, "通行密钥验证失败");
+		if (!verification.verified) {
+			console.warn(
+				`[passkeys/login/verify] 校验未通过 credentialId=${passkey.credential_id.slice(0, 24)}… ` +
+					`origin=${env.passkeyOrigins.join("|")} rpId=${env.rpId}`,
+			);
+			return fail(res, 401, "通行密钥验证失败");
+		}
 
 		const user = await findUserById(passkey.user_id);
 		if (!user || user.status !== "active") return fail(res, 401, "账号不可用");
@@ -325,7 +364,10 @@ passkeyLoginRoutes.post("/login/verify", async (req, res) => {
 			accessTokenMaxAgeDays: env.sessionDays,
 		});
 	} catch (error) {
-		console.error("[passkeys/login/verify] 验证失败:", error);
+		console.error(
+			`[passkeys/login/verify] 异常 ${(error as { name?: string })?.name ?? "Error"}:`,
+			error instanceof Error ? error.message : error,
+		);
 		return fail(res, 500, "服务器错误，请稍后重试");
 	}
 });

@@ -67,12 +67,20 @@
 	}
 
 	function passkeyErrorText(error: unknown): string {
-		const name = (error as { name?: string })?.name;
+		const name = (error as { name?: string })?.name ?? "";
+		const raw = error instanceof Error ? error.message : "";
 		if (name === "NotAllowedError") return "已取消操作或验证超时，请重试";
-		if (name === "InvalidStateError") return "此设备上已存在该账号的通行密钥";
-		if (name === "SecurityError") return "站点与通行密钥的域名不匹配";
-		if (name === "NotSupportedError" || name === "TypeError") return "当前环境不支持通行密钥（需 HTTPS 与现代浏览器）";
-		return error instanceof Error && error.message ? error.message : "操作失败，请重试";
+		if (name === "InvalidStateError") {
+			return "该账号在此设备（或已同步的通行密钥库，如 iCloud / Google / Microsoft 账户）中已有通行密钥，无需重复添加";
+		}
+		if (name === "SecurityError") return "站点与通行密钥的域名不匹配，请确认使用 https://li.liyueovo.top 访问";
+		if (name === "AbortError") return "操作已中断，请重试";
+		if (name === "ConstraintError") return "该设备不支持所需的验证方式（请先在系统中设置指纹 / 面容 / PIN）";
+		if (name === "NotSupportedError") return "当前浏览器不支持通行密钥，请改用系统自带浏览器或升级浏览器";
+		if (name === "TypeError") return "当前环境无法使用通行密钥（需 HTTPS 且在页面内直接触发）";
+		// 未识别的错误：保留原始名称与信息，方便定位
+		const suffix = name && name !== "Error" ? `（${name}）` : "";
+		return `${raw || "添加失败，请重试"}${suffix}`;
 	}
 
 	async function addPasskey() {
@@ -183,6 +191,8 @@
 	async function loadSessions() {
 		sessionsLoading = true;
 		try {
+			// 先用当前请求校正本会话 IP（Cloudflare 代理链路下历史值可能是代理 IP）
+			await fetch("/api/account/sessions", { method: "POST" }).catch(() => {});
 			const response = await fetch("/api/account/sessions");
 			const data = await response.json();
 			if (!response.ok || !data.ok) throw new Error(data.message || "设备读取失败");

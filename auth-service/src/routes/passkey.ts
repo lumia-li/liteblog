@@ -162,6 +162,8 @@ passkeyAccountRoutes.post("/passkeys/register/options", async (req, res) => {
 			userDisplayName: user.display_name || user.username,
 			userID: new TextEncoder().encode(String(user.id)),
 			attestationType: "none",
+			// 手机端系统弹窗/生物识别较慢，给足 2 分钟
+			timeout: 120_000,
 			excludeCredentials: existing.map((row) => ({ id: row.credential_id })),
 			authenticatorSelection: {
 				residentKey: "preferred",
@@ -172,6 +174,10 @@ passkeyAccountRoutes.post("/passkeys/register/options", async (req, res) => {
 			challenge: options.challenge,
 			expiresAt: Date.now() + CHALLENGE_TTL,
 		});
+		console.log(
+			`[passkeys/register/options] userId=${userId} excludeCount=${existing.length} ` +
+				`ua=${String(req.headers["user-agent"] || "").slice(0, 60)}`,
+		);
 		return ok(res, { options });
 	} catch (error) {
 		console.error("[passkeys/register/options] 生成失败:", error);
@@ -196,6 +202,10 @@ passkeyAccountRoutes.post("/passkeys/register/verify", async (req, res) => {
 	const deviceLabel = typeof body?.deviceLabel === "string" && body.deviceLabel.trim()
 		? body.deviceLabel.trim().slice(0, 64)
 		: "通行密钥";
+	console.log(
+		`[passkeys/register/verify] 收到 userId=${userId} credIdLen=${String((credential as { id?: string }).id ?? "").length} ` +
+			`label=${deviceLabel} ua=${String(req.headers["user-agent"] || "").slice(0, 60)}`,
+	);
 	try {
 		const expectedChallenge = takeChallenge(`reg:${userId}`);
 		if (!expectedChallenge) {

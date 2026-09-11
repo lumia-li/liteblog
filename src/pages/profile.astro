@@ -705,22 +705,6 @@ const roleText = badge.text || (user?.role === "admin" ? "管理员" : "普通�
 		pointer-events: none;
 	}
 
-	.profile-menu-indicator::before,
-	.profile-menu-indicator::after {
-		content: "";
-		position: absolute;
-		top: 50%;
-		width: 14px;
-		height: 14px;
-		border-radius: 50%;
-		background: rgba(249, 115, 22, 0.28);
-		filter: blur(5px);
-		transform: translateY(-50%);
-	}
-
-	.profile-menu-indicator::before { left: -5px; }
-	.profile-menu-indicator::after { right: -5px; }
-
 	.profile-menu-item {
 		position: relative;
 		z-index: 1;

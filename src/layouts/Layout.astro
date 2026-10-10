@@ -5,6 +5,7 @@ import "@fontsource/roboto/700.css";
 
 import ConfigCarrier from "@components/ConfigCarrier.astro";
 import Lantern from "@components/widget/Lantern.svelte";
+import Live2DPet from "@components/widget/Live2DPet.astro";
 import RainEffect from "@components/widget/RainEffect.svelte";
 import { getBannerOffset } from "@utils/banner-utils";
 import { profileConfig, siteConfig } from "@/config";
@@ -196,6 +197,8 @@ const customFontHref = url("/fonts/KeinannMaruPOP_CN-EN.ttf");
 		<ConfigCarrier></ConfigCarrier>
 		{!isHubPageType && <Lantern client:only="svelte" />}
 		{!isHubPageType && <RainEffect client:only="svelte" />}
+		<!-- 右下角 Live2D 桌宠挂件：挂在 swup 容器外，切页不会被重建 -->
+		<Live2DPet />
 		<slot />
 
 		<!-- increase the page height during page transition to prevent the scrolling animation from jumping -->

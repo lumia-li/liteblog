@@ -1,0 +1,244 @@
+<div id="live2d-pet">
+  <div id="stage"></div>
+
+  <button id="dock" title="显示/隐藏控制面板">≡</button>
+
+  <aside id="panel" data-collapsed="true" data-open="true">
+    <header id="panel-head" title="按住这里拖动面板 · 双击复位">
+      <span class="grip" aria-hidden="true"></span>
+      <img id="avatar" src="/live2d/model/icon.png" alt="" />
+      <div class="title">
+        <h1>DS鼠控版</h1>
+        <p id="status">正在加载模型…</p>
+      </div>
+      <button id="collapse" title="展开面板">＋</button>
+    </header>
+
+    <nav class="tabs" id="tabs">
+      <button class="tab" data-tab="expr" data-on="true">表情</button>
+      <button class="tab" data-tab="deco">装饰</button>
+      <button class="tab" data-tab="prop">道具</button>
+      <button class="tab" data-tab="motion">动作</button>
+      <button class="tab" data-tab="setting">设置</button>
+    </nav>
+
+    <div class="body">
+      <section class="page" data-page="expr" data-on="true">
+        <div class="statebar" id="state-expr">待机 · 现在：平常脸</div>
+        <div class="chips" id="chips-expr"></div>
+        <p class="hint">
+          点一下 = 开 / 关，<b>可以叠着来</b>；想回到干净的脸就点「平常」。<br />
+          按钮角上的小字是快捷键（<b>挂件模式下键盘快捷键不会触发</b>，只在这里点）。
+        </p>
+      </section>
+
+      <section class="page" data-page="deco">
+        <div class="statebar" id="state-deco">还没戴任何东西</div>
+        <div class="chips" id="chips-deco"></div>
+        <p class="hint">眼镜、贴纸、发型这类装扮，戴上和取下互不影响，可以同时戴好几样。</p>
+      </section>
+
+      <section class="page" data-page="prop">
+        <div class="statebar" id="state-prop">桌上空空的</div>
+        <div class="chips" id="chips-prop"></div>
+        <p class="hint">点一下拿出来，再点一下收回去；道具会跟着头/身体一起动。</p>
+      </section>
+
+      <section class="page" data-page="motion">
+        <div class="statebar" id="state-motion">待机</div>
+        <div class="chips" id="chips-motion"></div>
+        <p class="hint">点一下播放，<b>再点一次停止</b>；带「停在末帧」的动画会保持最后一个姿势。</p>
+      </section>
+
+      <section class="page" data-page="setting">
+        <div class="card" data-open="true" data-key="track">
+          <button type="button" class="card-head">
+            <span class="chev">▾</span>
+            <span class="card-title">跟踪方式</span>
+            <span class="card-sum" id="sum-track">鼠标</span>
+          </button>
+          <div class="card-body">
+            <div class="seg" id="opt-source">
+              <button data-value="mouse" data-on="true">鼠标</button>
+              <button data-value="face">面捕</button>
+              <button data-value="off">关闭</button>
+            </div>
+            <div class="row" id="cam-row" hidden>
+              <span>摄像头</span>
+              <select id="opt-cam"></select>
+              <button type="button" class="mini" id="btn-cam-refresh" title="重新扫描摄像头">⟳</button>
+            </div>
+            <div id="face-box" hidden>
+              <div class="row">
+                <span>头部幅度</span>
+                <input type="range" id="opt-facegain" min="0.4" max="2" step="0.05" value="1" /><b id="v-facegain">1.00</b>
+              </div>
+              <div class="row">
+                <span>平滑</span>
+                <input type="range" id="opt-facesmooth" min="0" max="90" step="1" value="55" /><b id="v-facesmooth">55</b>
+              </div>
+              <div class="row">
+                <span>嘴部灵敏度</span>
+                <input type="range" id="opt-mouthgain" min="0.5" max="3" step="0.05" value="1.2" /><b id="v-mouthgain">1.20</b>
+              </div>
+              <label class="row"><span>眨眼由人脸控制</span><input type="checkbox" id="opt-faceblink" checked /></label>
+              <label class="row"><span>显示预览</span><input type="checkbox" id="opt-showpreview" checked /></label>
+              <div class="row">
+                <span>面捕状态</span>
+                <b id="face-state" class="wide-val">未开启</b>
+              </div>
+              <p class="tip" id="face-tip">点上方「面捕」后浏览器会请求摄像头权限，画面只在本地处理，不会上传。</p>
+            </div>
+
+            <div class="sub">
+              <label class="row"><span>跟随鼠标</span><input type="checkbox" id="opt-mouse" checked /></label>
+              <label class="row"><span>跟踪范围</span><input type="range" id="opt-range" min="0.2" max="2" step="0.05" value="1" /><b id="v-range">1.00</b></label>
+              <label class="row"><span>身体跟随</span><input type="checkbox" id="opt-body" checked /></label>
+              <label class="row"><span>自动眨眼</span><input type="checkbox" id="opt-blink" checked /></label>
+              <label class="row"><span>自动呼吸</span><input type="checkbox" id="opt-breath" checked /></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" data-open="false" data-key="gesture">
+          <button type="button" class="card-head">
+            <span class="chev">▾</span>
+            <span class="card-title">手势触发</span>
+            <span class="card-sum" id="sum-gesture">关闭</span>
+          </button>
+          <div class="card-body">
+            <label class="row"><span>开启手势</span><input type="checkbox" id="opt-gesture" /></label>
+            <div id="gesture-box" hidden>
+              <p class="tip">对着摄像头做手势即可触发，每种手势都能改成任意<b>表情</b>或<b>动作</b>；选「无」= 不触发。</p>
+              <div id="gesture-map"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" data-open="false" data-key="audio">
+          <button type="button" class="card-head">
+            <span class="chev">▾</span>
+            <span class="card-title">麦克风对口型</span>
+            <span class="card-sum" id="sum-audio">关闭</span>
+          </button>
+          <div class="card-body">
+            <label class="row"><span>开启麦克风</span><input type="checkbox" id="opt-mic" /></label>
+            <label class="row"><span>灵敏度</span><input type="range" id="opt-micgain" min="1" max="24" step="0.5" value="9" /><b id="v-micgain">9</b></label>
+            <div class="meter"><i id="mic-meter"></i></div>
+          </div>
+        </div>
+
+        <div class="card" data-open="false" data-key="view">
+          <button type="button" class="card-head">
+            <span class="chev">▾</span>
+            <span class="card-title">显示</span>
+            <span class="card-sum" id="sum-view">缩放 1.00</span>
+          </button>
+          <div class="card-body">
+            <label class="row"><span>角色大小</span><input type="range" id="opt-zoom" min="0.4" max="2.2" step="0.01" value="1" /><b id="v-zoom">1.00</b></label>
+            <label class="row"><span>背景</span>
+              <select id="opt-bg">
+                <option value="transparent" selected>透明</option>
+                <option value="dark">深色</option>
+              </select>
+            </label>
+            <button class="wide ghost" id="btn-reset-view">复位位置与大小</button>
+          </div>
+        </div>
+
+        <div class="card" data-open="false" data-key="params">
+          <button type="button" class="card-head">
+            <span class="chev">▾</span>
+            <span class="card-title">手动参数</span>
+            <span class="card-sum" id="sum-params">未改动</span>
+          </button>
+          <div class="card-body">
+            <p class="tip">鼠标 / 面捕够不到的参数都能自己拖（200+ 个，按模型原本的分组排列）。</p>
+            <button class="wide" id="btn-open-params">打开参数面板</button>
+          </div>
+        </div>
+
+        <div class="card" data-open="false" data-key="misc">
+          <button type="button" class="card-head">
+            <span class="chev">▾</span>
+            <span class="card-title">其它</span>
+            <span class="card-sum" id="sum-misc">记住设置：开</span>
+          </button>
+          <div class="card-body">
+            <label class="row"><span>记住设置</span><input type="checkbox" id="opt-remember" checked /></label>
+            <p class="tip" id="tip-remember">打开后，跟踪方式 / 开关 / 滑块 / 当前表情会记在本机，刷新后照旧。</p>
+            <button class="wide ghost" id="btn-fold">收起面板（只剩标题栏）</button>
+            <button class="wide ghost" id="btn-selftest">运行自检</button>
+            <p class="tip">
+              拖动人物 = 移动位置　滚轮 / 滑块 = 缩放　双击人物 = 复位<br />
+              拖动面板顶部 = 移动面板，面板边缘 / 四角可拖动改大小
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </aside>
+
+  <div id="face-preview-wrap" hidden>
+    <video id="face-preview" playsinline muted></video>
+    <div class="fp-btns">
+      <button id="face-preview-switch" title="切换摄像头">⟳</button>
+      <button id="face-preview-hide" title="隐藏预览">×</button>
+    </div>
+  </div>
+
+  <div id="param-modal" hidden>
+    <div class="pm-box">
+      <header>
+        <h3>手动参数</h3>
+        <input type="search" id="param-search" placeholder="搜索参数…" />
+        <button type="button" class="mini" id="manual-reset">参数归位</button>
+        <button type="button" class="mini" id="param-close" title="关闭（Esc）">×</button>
+      </header>
+      <div class="params" id="manual-params"></div>
+      <div class="pm-tip">
+        拖动 = 改值（会一直保持）　双击某行 = 回到默认值<br />
+        247 个参数都实测有效；少数道具类参数要先显示对应道具才看得见
+      </div>
+    </div>
+  </div>
+
+  <pre id="selftest" hidden></pre>
+</div>
+
+<script is:inline>
+  (function () {
+    if (window.__L2D_PET_LOADED__) return;   // swup 切页时不要重复加载
+    window.__L2D_PET_LOADED__ = true;
+
+    var BASE = '/live2d/';
+    window.L2D_EMBED = { mode: 'widget', base: BASE };   // 让 app.js 走“挂件模式”
+
+    if (!document.querySelector('link[data-l2d-pet]')) {
+      var link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = BASE + 'css/live2d.css';
+      link.setAttribute('data-l2d-pet', '1');
+      document.head.appendChild(link);
+    }
+
+    var files = [
+      'lib/pixi.min.js',
+      'lib/live2dcubismcore.min.js',
+      'lib/pixi-live2d-display.cubism4.min.js',
+      'js/config.js',
+      'js/engine.js',
+      'js/face.js',
+      'js/app.js',
+    ];
+    (function next(i) {
+      if (i >= files.length) return;
+      var s = document.createElement('script');
+      s.src = BASE + files[i];
+      s.async = false;
+      s.onload = function () { next(i + 1); };
+      s.onerror = function () { console.error('[live2d-pet] 资源加载失败: ' + s.src); };
+      document.body.appendChild(s);
+    })(0);
+  })();
+</script>
